@@ -1,0 +1,152 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Painel de manutenção - BE-Desk{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/reservas.css' %}?v=20260814">
+<link rel="stylesheet" href="{% static 'css/admin-form.css' %}?v=20260814">
+<link rel="stylesheet" href="{% static 'css/manutencao.css' %}?v=20260814">
+{% endblock %}
+
+{% block content %}
+<div class="container bd-reservas-page">
+
+  <div class="bd-reservas-hero">
+    <div class="bd-reservas-kicker">
+      <i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i> Operacional
+    </div>
+    <h1>Painel de <span>manutenção</span></h1>
+    <p>Acompanhe os problemas relatados nos espaços e registre o andamento de cada um.</p>
+  </div>
+
+  <div class="bd-reservas-stats">
+    <div class="bd-reservas-stat"><i class="fa-regular fa-folder-open" aria-hidden="true"></i>
+      <span><strong>{{ contagem.abertas }}</strong> abertas</span></div>
+    <div class="bd-reservas-stat"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+      <span><strong>{{ contagem.analise }}</strong> em análise</span></div>
+    <div class="bd-reservas-stat"><i class="fa-solid fa-wrench" aria-hidden="true"></i>
+      <span><strong>{{ contagem.manutencao }}</strong> em manutenção</span></div>
+    <div class="bd-reservas-stat"><i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+      <span><strong>{{ contagem.resolvidas }}</strong> resolvidas</span></div>
+  </div>
+
+  <!-- Filtros -->
+  <form method="get" class="bd-mnt-filtros">
+    <div class="bd-mnt-filtro">
+      <label for="f-status">Status</label>
+      <select name="status" id="f-status">
+        <option value="">Todos</option>
+        <option value="ABERTAS" {% if f_status == 'ABERTAS' %}selected{% endif %}>Só em aberto</option>
+        {% for valor, rotulo in status_choices %}
+        <option value="{{ valor }}" {% if f_status == valor %}selected{% endif %}>{{ rotulo }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="bd-mnt-filtro">
+      <label for="f-prio">Prioridade</label>
+      <select name="prioridade" id="f-prio">
+        <option value="">Todas</option>
+        {% for valor, rotulo in prioridade_choices %}
+        <option value="{{ valor }}" {% if f_prioridade == valor %}selected{% endif %}>{{ rotulo }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="bd-mnt-filtro">
+      <label for="f-sala">Espaço</label>
+      <select name="sala" id="f-sala">
+        <option value="">Todos</option>
+        {% for sala in salas %}
+        <option value="{{ sala.pk }}" {% if f_sala == sala.pk|stringformat:"s" %}selected{% endif %}>{{ sala.nome }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="bd-mnt-filtro is-busca">
+      <label for="f-q">Busca</label>
+      <input type="search" name="q" id="f-q" value="{{ busca }}" placeholder="Descrição, espaço ou solicitante">
+    </div>
+
+    <button type="submit" class="bd-adminform-btn bd-adminform-btn-primary">Filtrar</button>
+    {% if f_status or f_prioridade or f_sala or busca %}
+    <a href="{% url 'painel_manutencao' %}" class="bd-adminform-btn bd-adminform-btn-secondary">Limpar</a>
+    {% endif %}
+  </form>
+
+  {% if solicitacoes %}
+  <div class="bd-reservas-card">
+    <table class="bd-reservas-table">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Espaço</th>
+          <th scope="col">Problema</th>
+          <th scope="col">Solicitante</th>
+          <th scope="col">Prioridade</th>
+          <th scope="col">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in solicitacoes %}
+        <tr class="bd-mnt-linha" onclick="location.href='{% url 'detalhe_manutencao' s.pk %}'">
+          <td>
+            <span class="bd-reservas-th-mobile">Nº</span>
+            <a href="{% url 'detalhe_manutencao' s.pk %}" class="bd-reservas-sala">#{{ s.pk }}</a>
+          </td>
+          <td>
+            <span class="bd-reservas-th-mobile">Espaço</span>
+            <span class="bd-reservas-sala">{{ s.local }}</span>
+          </td>
+          <td>
+            <span class="bd-reservas-th-mobile">Problema</span>
+            <span>
+              {{ s.get_categoria_display }}
+              <span class="bd-reservas-motivo" title="{{ s.descricao }}">{{ s.descricao }}</span>
+            </span>
+          </td>
+          <td>
+            <span class="bd-reservas-th-mobile">Solicitante</span>
+            <span>{{ s.solicitante.get_full_name|default:s.solicitante.username }}</span>
+          </td>
+          <td>
+            <span class="bd-reservas-th-mobile">Prioridade</span>
+            <span class="bd-mnt-prio {{ s.prioridade_cor }}">{{ s.get_prioridade_display }}</span>
+          </td>
+          <td>
+            <span class="bd-reservas-th-mobile">Status</span>
+            <span class="bd-mnt-status {{ s.status_cor }}">{{ s.get_status_display }}</span>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if solicitacoes.has_other_pages %}
+  <nav class="bd-reservas-pagination" aria-label="Paginação">
+    {% if solicitacoes.has_previous %}
+    <a href="?{{ request.GET.urlencode }}&page={{ solicitacoes.previous_page_number }}">
+      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Anterior
+    </a>
+    {% endif %}
+    <span>Página {{ solicitacoes.number }} de {{ solicitacoes.paginator.num_pages }}</span>
+    {% if solicitacoes.has_next %}
+    <a href="?{{ request.GET.urlencode }}&page={{ solicitacoes.next_page_number }}">
+      Próxima <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+    </a>
+    {% endif %}
+  </nav>
+  {% endif %}
+
+  {% else %}
+  <div class="bd-reservas-empty">
+    <i class="fa-solid fa-clipboard-check" aria-hidden="true"></i>
+    <strong>Nenhuma solicitação encontrada</strong>
+    <p>{% if f_status or f_prioridade or f_sala or busca %}Nenhum resultado para os filtros aplicados.{% else %}Ainda não há problemas relatados nos espaços.{% endif %}</p>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

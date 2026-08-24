@@ -12,6 +12,7 @@ urlpatterns = [
     path("", include("core.urls")),
     path("", include("usuarios.urls")),
     path("", include("reservas.urls")),
+    path("", include("manutencao.urls")),
     path("", include("notificacoes.urls")),
     path("", include("relatorios.urls")),
     path("", include("integracao_suap.urls")),

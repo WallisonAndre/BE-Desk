@@ -1,4 +1,5 @@
 from bedesk.models import Agendamento
+from manutencao.models import SolicitacaoManutencao
 from notificacoes.models import Notificacao
 
 
@@ -13,7 +14,12 @@ def notificacoes_pendentes(request):
         ).count()
 
         if request.user.is_staff:
-            total_pendentes = Agendamento.objects.filter(status="PENDENTE").count()
+            total_pendentes = (
+                Agendamento.objects.filter(status="PENDENTE").count()
+                + SolicitacaoManutencao.objects.filter(
+                    status__in=SolicitacaoManutencao.STATUS_ABERTOS
+                ).count()
+            )
 
     return {
         "pendentes_count": total_pendentes,

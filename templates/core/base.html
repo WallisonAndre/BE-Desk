@@ -1360,7 +1360,9 @@
         <a href="{% url 'lista_reserva' %}" class="pill-nav-item">Reservas</a>
         <a href="#" class="pill-nav-item">Benefícios</a>
         <a href="{% url 'blog_index' %}" class="pill-nav-item">Blog</a>
-        <a href="#" class="pill-nav-item">Feedback</a>
+        {% if user.is_authenticated %}
+        <a href="{% url 'minhas_manutencoes' %}" class="pill-nav-item">Manutenção</a>
+        {% endif %}
         {% if user.is_staff %}
         <a href="{% url 'admin_dashboard' %}" class="pill-nav-item">Admin</a>
         <a href="{% url 'listar_pendentes' %}" class="pill-nav-item">Dashboard</a>
@@ -1462,6 +1464,7 @@
         <a href="{% url 'admin_dashboard' %}" class="text-white text-decoration-none fs-5"><i class="fa-solid fa-chart-line me-3 text-secondary"></i>Admin</a>
         <a href="{% url 'listar_pendentes' %}" class="text-white text-decoration-none fs-5"><i class="fa-solid fa-clipboard-list me-3 text-secondary"></i>Dashboard</a>
         <a href="{% url 'aprovacoes' %}" class="text-white text-decoration-none fs-5"><i class="fa-solid fa-list-check me-3 text-secondary"></i>Aprovações</a>
+        <a href="{% url 'painel_manutencao' %}" class="text-white text-decoration-none fs-5"><i class="fa-solid fa-screwdriver-wrench me-3 text-secondary"></i>Painel de manutenção</a>
         {% endif %}
         {% if user.is_authenticated %}
         <hr class="border-secondary my-1">
@@ -1650,6 +1653,9 @@
         RESERVA_APROVADA:   { icon: 'fa-calendar-check', bg: '#16a34a' },
         RESERVA_REJEITADA:  { icon: 'fa-calendar-xmark', bg: '#dc2626' },
         RESERVA_CANCELADA:  { icon: 'fa-calendar-minus', bg: '#f59e0b' },
+        MANUTENCAO_CRIADA:     { icon: 'fa-screwdriver-wrench', bg: '#f97316' },
+        MANUTENCAO_ATUALIZADA: { icon: 'fa-wrench',             bg: '#0ea5e9' },
+        MANUTENCAO_RESOLVIDA:  { icon: 'fa-circle-check',       bg: '#22c55e' },
         LEMBRETE:           { icon: 'fa-clock',          bg: '#0ea5e9' },
         ADMIN_NOVA_SOLICITACAO: { icon: 'fa-user-plus',  bg: '#f59e0b' },
         CONFLITO_HORARIO:   { icon: 'fa-clock-rotate-left', bg: '#dc2626' },

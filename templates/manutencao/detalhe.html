@@ -1,0 +1,112 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Solicitação #{{ solicitacao.pk }} - BE-Desk{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/reservas.css' %}?v=20260814">
+<link rel="stylesheet" href="{% static 'css/admin-form.css' %}?v=20260814">
+<link rel="stylesheet" href="{% static 'css/manutencao.css' %}?v=20260814">
+{% endblock %}
+
+{% block content %}
+<div class="container bd-reservas-page bd-mnt-detalhe">
+
+  <a href="{% if pode_gerenciar %}{% url 'painel_manutencao' %}{% else %}{% url 'minhas_manutencoes' %}{% endif %}"
+     class="bd-adminform-back">
+    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+    {% if pode_gerenciar %}Painel de manutenção{% else %}Minhas solicitações{% endif %}
+  </a>
+
+  <header class="bd-mnt-detalhe-head">
+    <div>
+      <div class="bd-mnt-badges">
+        <span class="bd-mnt-status {{ solicitacao.status_cor }}">{{ solicitacao.get_status_display }}</span>
+        <span class="bd-mnt-prio {{ solicitacao.prioridade_cor }}">{{ solicitacao.get_prioridade_display }}</span>
+        <span class="bd-mnt-cat">{{ solicitacao.get_categoria_display }}</span>
+      </div>
+      <h1>{{ solicitacao.local }}</h1>
+      <p>
+        Solicitação #{{ solicitacao.pk }} &middot;
+        aberta por {{ solicitacao.solicitante.get_full_name|default:solicitacao.solicitante.username }}
+        em {{ solicitacao.criado_em|date:"d/m/Y H:i" }}
+        {% if solicitacao.resolvido_em %} &middot; resolvida em {{ solicitacao.resolvido_em|date:"d/m/Y H:i" }}{% endif %}
+      </p>
+    </div>
+  </header>
+
+  <div class="bd-mnt-detalhe-grid">
+    <div>
+      <!-- Problema -->
+      <section class="bd-mnt-painel">
+        <h2>Problema relatado</h2>
+        <p class="bd-mnt-descricao">{{ solicitacao.descricao|linebreaksbr }}</p>
+
+        {% if solicitacao.imagem %}
+        <a href="{{ solicitacao.imagem.url }}" target="_blank" rel="noopener" class="bd-mnt-foto">
+          <img src="{{ solicitacao.imagem.url }}" alt="Foto do problema em {{ solicitacao.local }}">
+        </a>
+        {% endif %}
+      </section>
+
+      <!-- Histórico -->
+      <section class="bd-mnt-painel">
+        <h2>Histórico</h2>
+        <ol class="bd-mnt-timeline">
+          {% for h in historico %}
+          <li>
+            <span class="bd-mnt-timeline-dot" aria-hidden="true"></span>
+            <div>
+              <strong>
+                {% if h.status_anterior %}
+                  {{ h.get_status_anterior_display }} &rarr; {{ h.get_status_novo_display }}
+                {% else %}
+                  {{ h.get_status_novo_display }}
+                {% endif %}
+              </strong>
+              {% if h.observacao %}<p>{{ h.observacao|linebreaksbr }}</p>{% endif %}
+              <small>
+                {{ h.criado_em|date:"d/m/Y H:i" }}
+                {% if h.autor %} &middot; {{ h.autor.get_full_name|default:h.autor.username }}{% endif %}
+              </small>
+            </div>
+          </li>
+          {% endfor %}
+        </ol>
+      </section>
+    </div>
+
+    <aside>
+      {% if pode_gerenciar %}
+      <section class="bd-mnt-painel">
+        <h2>Atualizar solicitação</h2>
+        <form method="post" action="{% url 'atualizar_manutencao' solicitacao.pk %}" class="bd-mnt-form-status">
+          {% csrf_token %}
+          {% for field in form_status %}
+          <div class="bd-adminform-field">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+          </div>
+          {% endfor %}
+          <button type="submit" class="bd-adminform-btn bd-adminform-btn-primary">
+            <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i> Salvar
+          </button>
+        </form>
+      </section>
+      {% endif %}
+
+      <section class="bd-mnt-painel">
+        <h2>Resumo</h2>
+        <dl class="bd-mnt-resumo">
+          <dt>Espaço</dt><dd>{{ solicitacao.local }}</dd>
+          <dt>Categoria</dt><dd>{{ solicitacao.get_categoria_display }}</dd>
+          <dt>Prioridade</dt><dd>{{ solicitacao.get_prioridade_display }}</dd>
+          <dt>Status</dt><dd>{{ solicitacao.get_status_display }}</dd>
+          <dt>Última atualização</dt><dd>{{ solicitacao.atualizado_em|date:"d/m/Y H:i" }}</dd>
+        </dl>
+      </section>
+    </aside>
+  </div>
+
+</div>
+{% endblock %}

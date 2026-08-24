@@ -1,0 +1,111 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Relatar problema - BE-Desk{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/admin-form.css' %}?v=20260814">
+<link rel="stylesheet" href="{% static 'css/manutencao.css' %}?v=20260814">
+{% endblock %}
+
+{% block content %}
+<section class="bd-adminform-page">
+  <div class="bd-adminform-shell">
+
+    <a href="{% url 'minhas_manutencoes' %}" class="bd-adminform-back">
+      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+      Minhas solicitações
+    </a>
+
+    <header class="bd-adminform-header">
+      <span class="bd-adminform-kicker">Manutenção</span>
+      <h1>Relatar um problema</h1>
+      <p>Descreva o que está errado no espaço. A administração recebe o aviso e acompanha até a solução.</p>
+    </header>
+
+    <form method="post" enctype="multipart/form-data" class="bd-adminform" novalidate>
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+      <div class="bd-adminform-errors" role="alert">
+        <ul>{% for e in form.non_field_errors %}<li>{{ e }}</li>{% endfor %}</ul>
+      </div>
+      {% endif %}
+
+      {% for field in form %}
+      <div class="bd-adminform-field {% if field.errors %}has-error{% endif %}">
+        <label for="{{ field.id_for_label }}">
+          {{ field.label }}{% if field.field.required %}<span class="bd-adminform-required" aria-hidden="true">*</span>{% endif %}
+        </label>
+
+        {% if field.field.widget.input_type == 'file' %}
+          <div class="bd-adminform-dropzone" data-dropzone role="button" tabindex="0"
+               aria-label="Clique ou arraste uma imagem do problema">
+            {{ field }}
+            <i class="fa-solid fa-camera" aria-hidden="true"></i>
+            <div class="bd-adminform-dropzone-text">
+              <strong>Arraste a foto ou clique para selecionar</strong>
+              <small>PNG, JPG ou WebP</small>
+            </div>
+            <div class="bd-adminform-dropzone-preview" data-preview hidden>
+              <img src="" alt="Pré-visualização" data-preview-img>
+              <div class="bd-adminform-dropzone-overlay">
+                <i class="fa-solid fa-pen" aria-hidden="true"></i> Alterar imagem
+              </div>
+            </div>
+          </div>
+        {% else %}
+          {{ field }}
+        {% endif %}
+
+        {% if field.help_text %}<small class="bd-adminform-help">{{ field.help_text }}</small>{% endif %}
+        {% if field.errors %}
+        <div class="bd-adminform-field-error" role="alert">
+          <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i> {{ field.errors.0 }}
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+
+      <div class="bd-adminform-actions">
+        <button type="submit" class="bd-adminform-btn bd-adminform-btn-primary">
+          <i class="fa-solid fa-paper-plane" aria-hidden="true"></i> Enviar solicitação
+        </button>
+        <a href="{% url 'minhas_manutencoes' %}" class="bd-adminform-btn bd-adminform-btn-secondary">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('[data-dropzone]').forEach((zone) => {
+    const input = zone.querySelector('input[type="file"]');
+    const preview = zone.querySelector('[data-preview]');
+    const img = zone.querySelector('[data-preview-img]');
+    if (!input || !preview || !img) return;
+
+    const mostrar = (file) => {
+      if (!file || !file.type.startsWith('image/')) return;
+      const reader = new FileReader();
+      reader.onload = (e) => { img.src = e.target.result; preview.hidden = false; };
+      reader.readAsDataURL(file);
+    };
+
+    input.addEventListener('change', () => { if (input.files.length) mostrar(input.files[0]); });
+    zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('dragover'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+    zone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      zone.classList.remove('dragover');
+      if (e.dataTransfer.files.length) { input.files = e.dataTransfer.files; mostrar(e.dataTransfer.files[0]); }
+    });
+    zone.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); input.click(); }
+    });
+  });
+});
+</script>
+{% endblock %}

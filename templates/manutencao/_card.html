@@ -1,0 +1,23 @@
+{% comment %}Card de solicitação, usado na lista do usuário.{% endcomment %}
+<a class="bd-mnt-card" href="{% url 'detalhe_manutencao' s.pk %}">
+  {% if s.imagem %}
+  <div class="bd-mnt-card-foto">
+    <img src="{{ s.imagem.url }}" alt="Foto do problema em {{ s.local }}" loading="lazy">
+  </div>
+  {% endif %}
+
+  <div class="bd-mnt-card-body">
+    <div class="bd-mnt-card-top">
+      <span class="bd-mnt-status {{ s.status_cor }}">{{ s.get_status_display }}</span>
+      <span class="bd-mnt-prio {{ s.prioridade_cor }}">{{ s.get_prioridade_display }}</span>
+    </div>
+
+    <strong class="bd-mnt-card-local">{{ s.local }}</strong>
+    <span class="bd-mnt-card-cat">{{ s.get_categoria_display }}</span>
+    <p class="bd-mnt-card-desc">{{ s.descricao }}</p>
+
+    <span class="bd-mnt-card-meta">
+      #{{ s.pk }} &middot; aberta há {{ s.criado_em|timesince }}
+    </span>
+  </div>
+</a>

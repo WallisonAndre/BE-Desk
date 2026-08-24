@@ -1,0 +1,70 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Minhas solicitações - BE-Desk{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/reservas.css' %}?v=20260814">
+<link rel="stylesheet" href="{% static 'css/manutencao.css' %}?v=20260814">
+{% endblock %}
+
+{% block content %}
+<div class="container bd-reservas-page">
+
+  <div class="bd-reservas-hero">
+    <div class="bd-reservas-kicker">
+      <i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i> Manutenção
+    </div>
+    <h1>Problemas <span>relatados</span></h1>
+    <p>Acompanhe o andamento dos problemas que você informou nos espaços do Bloco E.</p>
+  </div>
+
+  <div class="bd-reservas-stats">
+    <div class="bd-reservas-stat">
+      <i class="fa-regular fa-clock" aria-hidden="true"></i>
+      <span><strong>{{ total_abertas }}</strong> em andamento</span>
+    </div>
+    <div class="bd-reservas-stat">
+      <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+      <span><strong>{{ total_resolvidas }}</strong> resolvida{{ total_resolvidas|pluralize }}</span>
+    </div>
+  </div>
+
+  <section class="bd-reservas-section">
+    <div class="bd-reservas-section-head">
+      <h2>Em andamento</h2>
+      <a href="{% url 'criar_manutencao' %}" class="bd-reservas-btn bd-mnt-btn-novo">
+        <i class="fa-solid fa-plus" aria-hidden="true"></i> Relatar problema
+      </a>
+    </div>
+
+    {% if abertas %}
+    <div class="bd-mnt-grid">
+      {% for s in abertas %}{% include 'manutencao/_card.html' with s=s %}{% endfor %}
+    </div>
+    {% else %}
+    <div class="bd-reservas-empty">
+      <i class="fa-regular fa-face-smile" aria-hidden="true"></i>
+      <strong>Nenhum problema em aberto</strong>
+      <p>Encontrou algo quebrado ou fora do lugar em um espaço? Avise a administração.</p>
+      <a href="{% url 'criar_manutencao' %}" class="bd-reservas-btn bd-reservas-btn-primary">
+        <i class="fa-solid fa-plus" aria-hidden="true"></i> Relatar problema
+      </a>
+    </div>
+    {% endif %}
+  </section>
+
+  {% if resolvidas %}
+  <section class="bd-reservas-section">
+    <div class="bd-reservas-section-head">
+      <h2>Resolvidas</h2>
+      <span class="bd-reservas-count">{{ total_resolvidas }}</span>
+    </div>
+    <div class="bd-mnt-grid">
+      {% for s in resolvidas %}{% include 'manutencao/_card.html' with s=s %}{% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+</div>
+{% endblock %}

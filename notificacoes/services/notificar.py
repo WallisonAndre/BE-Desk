@@ -64,6 +64,66 @@ def notificar_reserva_cancelada(agendamento):
         )
 
 
+def notificar_manutencao_criada(solicitacao):
+    from django.contrib.auth.models import User
+    autor = solicitacao.solicitante.get_full_name() or solicitacao.solicitante.username
+
+    for admin in User.objects.filter(is_staff=True, is_active=True):
+        criar_notificacao(
+            destinatario=admin,
+            titulo='Nova solicitação de manutenção',
+            mensagem=(
+                f'{autor} relatou um problema de {solicitacao.get_categoria_display().lower()} '
+                f'em "{solicitacao.local}".'
+            ),
+            tipo='MANUTENCAO_CRIADA',
+            link=solicitacao.get_absolute_url(),
+        )
+
+    criar_notificacao(
+        destinatario=solicitacao.solicitante,
+        titulo='Solicitação registrada',
+        mensagem=(
+            f'Sua solicitação de manutenção para "{solicitacao.local}" foi registrada '
+            f'e está aguardando análise.'
+        ),
+        tipo='MANUTENCAO_CRIADA',
+        link=solicitacao.get_absolute_url(),
+    )
+
+
+def notificar_manutencao_atualizada(solicitacao, observacao=''):
+    """Avisa o solicitante de qualquer mudança de status.
+
+    Quando a solicitação é resolvida usa um tipo próprio, para a
+    notificação de conclusão se destacar das demais.
+    """
+    resolvida = solicitacao.status == solicitacao.RESOLVIDA
+
+    if resolvida:
+        titulo = 'Manutenção concluída'
+        mensagem = f'O problema relatado em "{solicitacao.local}" foi resolvido.'
+        tipo = 'MANUTENCAO_RESOLVIDA'
+    else:
+        titulo = 'Solicitação atualizada'
+        mensagem = (
+            f'Sua solicitação para "{solicitacao.local}" agora está com o status '
+            f'"{solicitacao.get_status_display()}".'
+        )
+        tipo = 'MANUTENCAO_ATUALIZADA'
+
+    if observacao:
+        mensagem = f'{mensagem} Observação: {observacao}'
+
+    criar_notificacao(
+        destinatario=solicitacao.solicitante,
+        titulo=titulo,
+        mensagem=mensagem,
+        tipo=tipo,
+        link=solicitacao.get_absolute_url(),
+    )
+
+
 def notificar_lembrete(usuario, agendamento):
     criar_notificacao(
         destinatario=usuario,
