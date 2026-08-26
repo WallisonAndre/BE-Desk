@@ -1,0 +1,78 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Participantes - {{ evento.nome }}{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/reservas.css' %}?v=20260814">
+<link rel="stylesheet" href="{% static 'css/admin-form.css' %}?v=20260814">
+<link rel="stylesheet" href="{% static 'css/eventos.css' %}?v=20260814">
+{% endblock %}
+
+{% block content %}
+<div class="container bd-reservas-page">
+
+  <a href="{% url 'detalhe_evento' evento.pk %}" class="bd-adminform-back">
+    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Voltar ao evento
+  </a>
+
+  <div class="bd-reservas-section-head" style="margin-top:1.5rem">
+    <h2>Participantes de "{{ evento.nome }}"</h2>
+    <span class="bd-reservas-count">
+      {{ evento.total_inscritos }}{% if evento.vagas %} / {{ evento.vagas }}{% endif %}
+    </span>
+  </div>
+
+  {% if inscricoes %}
+  <div class="bd-reservas-card">
+    <table class="bd-reservas-table">
+      <thead>
+        <tr>
+          <th scope="col">Participante</th>
+          <th scope="col">Matrícula</th>
+          <th scope="col">Inscrito em</th>
+          <th scope="col" class="bd-reservas-acao">Ação</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for i in inscricoes %}
+        <tr>
+          <td>
+            <span class="bd-reservas-th-mobile">Participante</span>
+            <span class="bd-reservas-sala">{{ i.usuario.get_full_name|default:i.usuario.username }}</span>
+          </td>
+          <td>
+            <span class="bd-reservas-th-mobile">Matrícula</span>
+            <span>{{ i.usuario.profile.matricula|default:"—" }}</span>
+          </td>
+          <td>
+            <span class="bd-reservas-th-mobile">Inscrito em</span>
+            <span>{{ i.criado_em|date:"d/m/Y H:i" }}</span>
+          </td>
+          <td class="bd-reservas-acao">
+            <span class="bd-reservas-th-mobile">Ação</span>
+            <form method="post" action="{% url 'remover_participante_evento' evento.pk i.pk %}"
+                  data-confirm-title="Remover participante"
+                  data-confirm="Remover {{ i.usuario.get_full_name|default:i.usuario.username }} deste evento?"
+                  data-confirm-ok="Remover">
+              {% csrf_token %}
+              <button type="submit" class="bd-reservas-btn">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i> Remover
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="bd-reservas-empty">
+    <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
+    <strong>Nenhum inscrito ainda</strong>
+    <p>As inscrições aparecem aqui assim que alguém confirmar participação.</p>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

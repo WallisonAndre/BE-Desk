@@ -32,19 +32,35 @@ class AgendarForm(forms.ModelForm):
             )
             return cleaned_data
 
+        # A grade já esconde os horários vencidos, mas a validação precisa
+        # existir aqui também: a URL de agendamento aceita data e hora por
+        # querystring e pode ser montada à mão.
+        if data_inicio and horario:
+            inicio = datetime.datetime.combine(data_inicio.date(), horario)
+            if inicio < datetime.datetime.now():
+                self.add_error(
+                    None,
+                    "Não é possível reservar um horário que já passou. Escolha uma data ou horário futuro.",
+                )
+                return cleaned_data
+
         if sala and data_inicio and horario:
             data_do_agendamento = data_inicio.date()
+            # Só reserva aprovada bloqueia o horário. Pendente não pode
+            # barrar: como a grade passou a exibir apenas as aprovadas, um
+            # horário livre na tela precisa ser de fato solicitável.
+            # Pedidos concorrentes ficam para a administração decidir.
             conflitos = Agendamento.objects.filter(
                 sala=sala,
                 data_inicio__date=data_do_agendamento,
                 horario=horario,
-                status__in=["PENDENTE", "APROVADO"],
+                status="APROVADO",
             )
             if self.instance and self.instance.pk:
                 conflitos = conflitos.exclude(pk=self.instance.pk)
             if conflitos.exists():
                 self.add_error(
                     None,
-                    f"A sala {sala.nome} já tem uma reserva (Pendente ou Aprovada) para as {horario.strftime('%H:%M')} de {data_do_agendamento.strftime('%d/%m/%Y')}.",
+                    f"A sala {sala.nome} já tem uma reserva aprovada para as {horario.strftime('%H:%M')} de {data_do_agendamento.strftime('%d/%m/%Y')}.",
                 )
         return cleaned_data

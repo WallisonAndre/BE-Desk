@@ -40,7 +40,7 @@
     <div class="bd-reservas-section-head">
       <h2 id="bd-reservas-proximas">Próximas reservas</h2>
       {% if reservas_ativas %}
-      <a href="{% url 'agendar_sala' %}" class="bd-reservas-btn">
+      <a href="{% url 'lista_locais' %}" class="bd-reservas-btn">
         <i class="fa-solid fa-plus" aria-hidden="true"></i> Nova reserva
       </a>
       {% endif %}
@@ -109,7 +109,7 @@
       <i class="fa-regular fa-calendar-plus" aria-hidden="true"></i>
       <strong>Nenhuma reserva agendada</strong>
       <p>Você não possui reservas pendentes ou aprovadas para o futuro. Escolha um local e reserve em poucos cliques.</p>
-      <a href="{% url 'agendar_sala' %}" class="bd-reservas-btn bd-reservas-btn-primary">
+      <a href="{% url 'lista_locais' %}" class="bd-reservas-btn bd-reservas-btn-primary">
         <i class="fa-solid fa-plus" aria-hidden="true"></i> Fazer uma reserva
       </a>
     </div>

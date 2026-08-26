@@ -15,7 +15,13 @@ def _json_login_required(view_func):
 
 @login_required
 def notificacoes_lista(request):
-    notificacoes = Notificacao.objects.filter(destinatario=request.user)[:30]
+    notificacoes = list(Notificacao.objects.filter(destinatario=request.user)[:30])
+
+    # Abrir a lista conta como ter visto: zera o contador do sininho.
+    # As não lidas são marcadas só depois de carregadas, para esta
+    # visita ainda exibir o destaque de "nova" antes de sumir.
+    Notificacao.objects.filter(destinatario=request.user, lida=False).update(lida=True)
+
     return render(request, 'notificacoes/lista.html', {
         'notificacoes': notificacoes,
     })

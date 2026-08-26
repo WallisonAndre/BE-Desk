@@ -16,6 +16,12 @@ from reservas.forms import AgendarForm
 
 @login_required
 def agendar_sala(request):
+    # A página deixou de ser um ponto de entrada: quem chega sem escolher
+    # horário na grade vai escolher o local primeiro. O formulário só abre
+    # a partir de um slot (com sala/data/hora na query) ou no POST.
+    if request.method == "GET" and not request.GET.get("sala"):
+        return redirect("lista_locais")
+
     initial_data, context_predefinido = _get_dados_predefinidos(request)
 
     if request.method == "POST":

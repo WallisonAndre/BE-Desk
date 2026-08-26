@@ -1,0 +1,124 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}{{ evento.nome }} - BE-Desk{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/reservas.css' %}?v=20260814">
+<link rel="stylesheet" href="{% static 'css/admin-form.css' %}?v=20260814">
+<link rel="stylesheet" href="{% static 'css/eventos.css' %}?v=20260814">
+{% endblock %}
+
+{% block content %}
+<div class="container bd-reservas-page bd-ev-detalhe">
+
+  <a href="{% url 'lista_eventos' %}" class="bd-adminform-back">
+    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Todos os eventos
+  </a>
+
+  <header class="bd-ev-detalhe-head">
+    <div class="bd-ev-card-top">
+      <span class="bd-ev-cat is-{{ evento.categoria|lower }}">{{ evento.get_categoria_display }}</span>
+      {% if evento.cancelado %}<span class="bd-ev-cancelado">Cancelado</span>
+      {% elif evento.encerrado %}<span class="bd-ev-inativo-tag">Encerrado</span>{% endif %}
+    </div>
+    <h1>{{ evento.nome }}</h1>
+    <p>Responsável: {{ evento.responsavel.get_full_name|default:evento.responsavel.username }}</p>
+  </header>
+
+  <div class="bd-ev-detalhe-grid">
+    <div>
+      <section class="bd-ev-painel">
+        <h2>Sobre o evento</h2>
+        <p class="bd-ev-descricao">{{ evento.descricao|linebreaksbr }}</p>
+      </section>
+
+      {% if pode_gerenciar %}
+      <section class="bd-ev-painel">
+        <h2>Administração</h2>
+        <div class="bd-ev-admin-acoes">
+          <a href="{% url 'editar_evento' evento.pk %}" class="bd-ev-btn">
+            <i class="fa-solid fa-pen" aria-hidden="true"></i> Editar
+          </a>
+          <a href="{% url 'participantes_evento' evento.pk %}" class="bd-ev-btn">
+            <i class="fa-solid fa-users" aria-hidden="true"></i> Participantes ({{ evento.total_inscritos }})
+          </a>
+          {% if not evento.cancelado %}
+          <form method="post" action="{% url 'cancelar_evento' evento.pk %}"
+                data-confirm-title="Cancelar evento"
+                data-confirm="Cancelar &quot;{{ evento.nome }}&quot;? Os horários reservados serão liberados e os {{ evento.total_inscritos }} inscritos serão avisados."
+                data-confirm-ok="Cancelar evento">
+            {% csrf_token %}
+            <button type="submit" class="bd-ev-btn bd-ev-btn-danger">
+              <i class="fa-solid fa-ban" aria-hidden="true"></i> Cancelar evento
+            </button>
+          </form>
+          {% endif %}
+        </div>
+      </section>
+      {% endif %}
+    </div>
+
+    <aside>
+      <section class="bd-ev-painel">
+        <h2>Quando e onde</h2>
+        <dl class="bd-ev-resumo">
+          <dt>Espaço</dt><dd>{{ evento.sala.nome }}</dd>
+          <dt>Início</dt><dd>{{ evento.data_inicio|date:"d/m/Y" }}</dd>
+          <dt>Término</dt><dd>{{ evento.data_fim|date:"d/m/Y" }}</dd>
+          <dt>Horário</dt><dd>{{ evento.horario_inicio|time:"H:i" }} às {{ evento.horario_fim|time:"H:i" }}</dd>
+          <dt>Inscritos</dt>
+          <dd>{{ evento.total_inscritos }}{% if evento.vagas %} de {{ evento.vagas }}{% endif %}</dd>
+        </dl>
+
+        <a href="{% url 'detalhe_sala' evento.sala.nome %}?foco={{ evento.data_inicio|date:'Y-m-d' }}"
+           class="bd-ev-link-grade">
+          <i class="fa-regular fa-calendar" aria-hidden="true"></i> Ver na grade da sala
+        </a>
+      </section>
+
+      <section class="bd-ev-painel">
+        <h2>Inscrição</h2>
+
+        {% if not user.is_authenticated %}
+          <p class="bd-ev-aviso">Entre na sua conta para se inscrever.</p>
+          <a href="{% url 'login' %}" class="bd-ev-btn bd-ev-btn-primary">Entrar</a>
+
+        {% elif minha_inscricao %}
+          <p class="bd-ev-confirmado">
+            <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+            Você está inscrito desde {{ minha_inscricao.criado_em|date:"d/m/Y" }}.
+          </p>
+          {% if not evento.encerrado and not evento.cancelado %}
+          <form method="post" action="{% url 'cancelar_inscricao_evento' evento.pk %}"
+                data-confirm-title="Cancelar inscrição"
+                data-confirm="Cancelar sua inscrição em &quot;{{ evento.nome }}&quot;?"
+                data-confirm-ok="Cancelar inscrição">
+            {% csrf_token %}
+            <button type="submit" class="bd-ev-btn">Cancelar inscrição</button>
+          </form>
+          {% endif %}
+
+        {% elif evento.cancelado %}
+          <p class="bd-ev-aviso">Este evento foi cancelado.</p>
+        {% elif evento.encerrado %}
+          <p class="bd-ev-aviso">Este evento já foi encerrado.</p>
+        {% elif not evento.aberto_para_inscricao %}
+          <p class="bd-ev-aviso">As vagas se esgotaram.</p>
+        {% else %}
+          {% if evento.vagas %}
+          <p class="bd-ev-aviso">{{ evento.vagas_restantes }} vaga{{ evento.vagas_restantes|pluralize }} restante{{ evento.vagas_restantes|pluralize }}.</p>
+          {% endif %}
+          <form method="post" action="{% url 'inscrever_evento' evento.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="bd-ev-btn bd-ev-btn-primary">
+              <i class="fa-solid fa-check" aria-hidden="true"></i> Quero participar
+            </button>
+          </form>
+        {% endif %}
+      </section>
+    </aside>
+  </div>
+
+</div>
+{% endblock %}

@@ -50,9 +50,12 @@ def detalhe_sala(request, nome_sala):
     dias_semana_datas = [start_of_week + timedelta(days=i) for i in range(5)]
 
     sala_obj = get_object_or_404(Sala, nome__iexact=nome_sala)
+    # Só reserva aprovada ocupa a grade. Pendente ainda é um pedido: não
+    # deve bloquear visualmente o horário nem para quem pediu nem para os
+    # demais, já que pode acabar rejeitada.
     agendamentos = Agendamento.objects.filter(
         sala=sala_obj,
-        status__in=["APROVADO", "PENDENTE"],
+        status="APROVADO",
         data_inicio__date__range=[start_of_week, dias_semana_datas[-1]],
     ).select_related("usuario")
 
@@ -89,6 +92,7 @@ def _get_data_foco(data_foco_str):
 
 def _build_tabela_horarios(dias_semana_datas, agendamentos_map):
     tabela_horarios = []
+    agora = datetime.now()
 
     for item in HORARIOS_ESTRUTURA:
         if item["tipo"] != "hora":
@@ -96,6 +100,8 @@ def _build_tabela_horarios(dias_semana_datas, agendamentos_map):
             continue
 
         hora_inicio_str = item["inicio"]
+        hora_inicio = datetime.strptime(hora_inicio_str, "%H:%M").time()
+
         tabela_horarios.append(
             {
                 "tipo": "hora",
@@ -105,6 +111,8 @@ def _build_tabela_horarios(dias_semana_datas, agendamentos_map):
                     {
                         "data": data_do_dia,
                         "agendamento": agendamentos_map.get((hora_inicio_str, dia_num)),
+                        # Horário que já começou não é mais reservável.
+                        "passado": datetime.combine(data_do_dia, hora_inicio) < agora,
                     }
                     for dia_num, data_do_dia in enumerate(dias_semana_datas)
                 ],

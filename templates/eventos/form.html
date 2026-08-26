@@ -1,0 +1,61 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}{{ titulo }} - BE-Desk{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/admin-form.css' %}?v=20260814">
+<link rel="stylesheet" href="{% static 'css/eventos.css' %}?v=20260814">
+{% endblock %}
+
+{% block content %}
+<section class="bd-adminform-page">
+  <div class="bd-adminform-shell">
+
+    <a href="{% if evento %}{% url 'detalhe_evento' evento.pk %}{% else %}{% url 'lista_eventos' %}{% endif %}"
+       class="bd-adminform-back">
+      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+      {% if evento %}Voltar ao evento{% else %}Todos os eventos{% endif %}
+    </a>
+
+    <header class="bd-adminform-header">
+      <span class="bd-adminform-kicker">Eventos</span>
+      <h1>{{ titulo }}</h1>
+      <p>O espaço é reservado automaticamente nos horários do evento, e o evento aparece na grade da sala.</p>
+    </header>
+
+    <form method="post" class="bd-adminform" novalidate>
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+      <div class="bd-adminform-errors" role="alert">
+        <ul>{% for e in form.non_field_errors %}<li>{{ e }}</li>{% endfor %}</ul>
+      </div>
+      {% endif %}
+
+      {% for field in form %}
+      <div class="bd-adminform-field {% if field.errors %}has-error{% endif %}">
+        <label for="{{ field.id_for_label }}">
+          {{ field.label }}{% if field.field.required %}<span class="bd-adminform-required" aria-hidden="true">*</span>{% endif %}
+        </label>
+        {{ field }}
+        {% if field.help_text %}<small class="bd-adminform-help">{{ field.help_text }}</small>{% endif %}
+        {% if field.errors %}
+        <div class="bd-adminform-field-error" role="alert">
+          <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i> {{ field.errors.0 }}
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+
+      <div class="bd-adminform-actions">
+        <button type="submit" class="bd-adminform-btn bd-adminform-btn-primary">
+          <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i> Salvar evento
+        </button>
+        <a href="{% if evento %}{% url 'detalhe_evento' evento.pk %}{% else %}{% url 'lista_eventos' %}{% endif %}"
+           class="bd-adminform-btn bd-adminform-btn-secondary">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

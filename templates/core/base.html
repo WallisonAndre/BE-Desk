@@ -828,16 +828,6 @@
     }
     [data-theme="light"] .schedule-title { color: #1e293b !important; }
     [data-theme="light"] .schedule-author { color: #64748b !important; }
-    [data-theme="light"] .badge-pendente {
-      background: #fffbeb !important;
-      color: #92400e !important;
-      border-color: #fde68a !important;
-    }
-    [data-theme="light"] .badge-aprovado {
-      background: #ecfdf5 !important;
-      color: #065f46 !important;
-      border-color: #a7f3d0 !important;
-    }
     [data-theme="light"] .btn-add-schedule {
       background: #f7fbfd !important;
       border-color: #d6e0e7 !important;
@@ -848,6 +838,10 @@
       border-color: #6ee7b7 !important;
       color: #047857 !important;
       box-shadow: none !important;
+    }
+    [data-theme="light"] .slot-passado {
+      background: #f1f5f9 !important;
+      color: #cbd5e1 !important;
     }
     /* Locais page light */
     [data-theme="light"] body:has(.locais-page),
@@ -1358,7 +1352,7 @@
         <a href="{% url 'inicio' %}" class="pill-nav-item">Inicio</a>
         <a href="{% url 'lista_locais' %}" class="pill-nav-item">Locais</a>
         <a href="{% url 'lista_reserva' %}" class="pill-nav-item">Reservas</a>
-        <a href="#" class="pill-nav-item">Benefícios</a>
+        <a href="{% url 'lista_eventos' %}" class="pill-nav-item">Eventos</a>
         <a href="{% url 'blog_index' %}" class="pill-nav-item">Blog</a>
         {% if user.is_authenticated %}
         <a href="{% url 'minhas_manutencoes' %}" class="pill-nav-item">Manutenção</a>
@@ -1656,6 +1650,9 @@
         MANUTENCAO_CRIADA:     { icon: 'fa-screwdriver-wrench', bg: '#f97316' },
         MANUTENCAO_ATUALIZADA: { icon: 'fa-wrench',             bg: '#0ea5e9' },
         MANUTENCAO_RESOLVIDA:  { icon: 'fa-circle-check',       bg: '#22c55e' },
+        EVENTO_CRIADO:         { icon: 'fa-calendar-day',       bg: '#8b5cf6' },
+        EVENTO_ATUALIZADO:     { icon: 'fa-calendar-day',       bg: '#0ea5e9' },
+        EVENTO_CANCELADO:      { icon: 'fa-calendar-xmark',     bg: '#ef4444' },
         LEMBRETE:           { icon: 'fa-clock',          bg: '#0ea5e9' },
         ADMIN_NOVA_SOLICITACAO: { icon: 'fa-user-plus',  bg: '#f59e0b' },
         CONFLITO_HORARIO:   { icon: 'fa-clock-rotate-left', bg: '#dc2626' },

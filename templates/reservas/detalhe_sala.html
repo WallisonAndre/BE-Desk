@@ -152,6 +152,20 @@
             transition: all 0.2s ease;
             text-decoration: none;
         }
+        /* Horário já iniciado: sem link, sem hover, só o cadeado. */
+        .slot-passado {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            min-height: 60px;
+            width: 100%;
+            border-radius: 0.5rem;
+            background-color: rgba(255, 255, 255, 0.02);
+            color: rgba(255, 255, 255, 0.12);
+            font-size: 0.75rem;
+            cursor: not-allowed;
+        }
         .btn-add-schedule:hover {
             background-color: rgba(181, 232, 83, 0.08);
             color: #b5e853;
@@ -179,28 +193,8 @@
             box-shadow: 0 10px 20px rgba(0,0,0,0.5);
             border-color: rgba(255, 255, 255, 0.2);
         }
-        .schedule-card.status-pendente {
-            border-left: 4px solid #f59e0b;
-        }
         .schedule-card.status-aprovado {
             border-left: 4px solid #b5e853;
-        }
-        .badge-status {
-            font-size: 0.65rem;
-            padding: 0.25em 0.5em;
-            border-radius: 4px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-        .badge-pendente {
-            background: rgba(245, 158, 11, 0.15);
-            color: #fcd34d;
-            border: 1px solid rgba(245, 158, 11, 0.3);
-        }
-        .badge-aprovado {
-            background: rgba(181, 232, 83, 0.15);
-            color: #b5e853;
-            border: 1px solid rgba(181, 232, 83, 0.3);
         }
         .schedule-title {
             font-size: 0.85rem;
@@ -305,21 +299,20 @@
                         {% for celula in linha.celulas %}
                         <td>
                             {% if celula.agendamento %}
-                            <div class="schedule-card {% if celula.agendamento.status == 'PENDENTE' %}status-pendente{% else %}status-aprovado{% endif %}" data-bs-toggle="tooltip" title="Motivo: {{ celula.agendamento.motivo }}">
+                            <div class="schedule-card status-aprovado" data-bs-toggle="tooltip" title="Motivo: {{ celula.agendamento.motivo }}">
                                 <div class="schedule-title">
                                     {{ celula.agendamento.nome }}
                                 </div>
-                                <div class="d-flex justify-content-between align-items-center mt-auto pt-1">
+                                <div class="d-flex align-items-center mt-auto pt-1">
                                     <span class="schedule-author">
                                         {{ celula.agendamento.usuario.first_name|default:celula.agendamento.usuario.username }}
                                     </span>
-                                    {% if celula.agendamento.status == 'PENDENTE' %}
-                                    <span class="badge-status badge-pendente">Pendente</span>
-                                    {% else %}
-                                    <span class="badge-status badge-aprovado">Aprovado</span>
-                                    {% endif %}
                                 </div>
                             </div>
+                            {% elif celula.passado %}
+                            <span class="slot-passado" data-bs-toggle="tooltip" title="Horário já passou">
+                                <i class="fa-solid fa-lock"></i>
+                            </span>
                             {% else %}
                             <a href="{% url 'agendar_sala' %}?hora={{ linha.hora_para_link }}&data={{ celula.data|date:'Y-m-d' }}&sala={{ sala.nome }}" class="btn-add-schedule" data-bs-toggle="tooltip" title="Clique para agendar">
                                 <i class="fa-solid fa-plus"></i>

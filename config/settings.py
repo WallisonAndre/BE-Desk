@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'usuarios',
     'reservas',
     'manutencao',
+    'eventos',
     'notificacoes',
     'relatorios',
     'integracao_suap',

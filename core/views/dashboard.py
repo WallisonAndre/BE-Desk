@@ -1,6 +1,7 @@
 import datetime
 import json
 
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Count
 from django.db.models.functions import ExtractHour, ExtractWeekDay, TruncMonth
@@ -188,6 +189,32 @@ def mudar_status_reserva(request, agendamento_id, novo_status):
         return JsonResponse({"success": False, "erro": "Status inválido"}, status=400)
 
     reserva = get_object_or_404(Agendamento, pk=agendamento_id)
+
+    # Como pendente não bloqueia mais o horário, dois pedidos podem existir
+    # para o mesmo slot. A trava passa para cá: só a primeira aprovação
+    # ocupa a grade, a segunda é barrada.
+    if novo_status == "APROVADO":
+        ocupado = (
+            Agendamento.objects.filter(
+                sala=reserva.sala,
+                data_inicio__date=reserva.data_inicio.date(),
+                horario=reserva.horario,
+                status="APROVADO",
+            )
+            .exclude(pk=reserva.pk)
+            .exists()
+        )
+        if ocupado:
+            aviso = (
+                f'Já existe reserva aprovada para {reserva.sala.nome} '
+                f'às {reserva.horario.strftime("%H:%M")} de '
+                f'{reserva.data_inicio.strftime("%d/%m/%Y")}.'
+            )
+            if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                return JsonResponse({"success": False, "erro": aviso}, status=409)
+            messages.error(request, aviso)
+            return redirect("aprovacoes")
+
     reserva.status = novo_status
     reserva.save()
 
