@@ -1,0 +1,111 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Eventos - BE-Desk{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/reservas.css' %}?v=20260814">
+<link rel="stylesheet" href="{% static 'css/eventos.css' %}?v=20260814">
+{% endblock %}
+
+{% block content %}
+<div class="container bd-reservas-page">
+
+  <div class="bd-reservas-hero">
+    <div class="bd-reservas-kicker">
+      <i class="fa-solid fa-calendar-days" aria-hidden="true"></i> Agenda
+    </div>
+    <h1>Eventos do <span>Bloco E</span></h1>
+    <p>Atividades esportivas, acadêmicas e institucionais abertas à comunidade.</p>
+  </div>
+
+  <form method="get" class="bd-ev-busca" role="search">
+    <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+    <input type="search" name="q" value="{{ busca }}" placeholder="Buscar por nome, descrição ou espaço"
+           aria-label="Buscar eventos">
+    <button type="submit" class="bd-ev-btn bd-ev-btn-primary">Buscar</button>
+    {% if pode_gerenciar %}
+    <a href="{% url 'criar_evento' %}" class="bd-ev-btn bd-ev-btn-primary">
+      <i class="fa-solid fa-plus" aria-hidden="true"></i> Criar evento
+    </a>
+    {% endif %}
+  </form>
+
+  <section class="bd-reservas-section">
+    <div class="bd-reservas-section-head">
+      <h2>Próximos eventos</h2>
+      {% if proximos %}<span class="bd-reservas-count">{{ proximos|length }}</span>{% endif %}
+    </div>
+
+    {% if proximos %}
+    <div class="bd-ev-grid">
+      {% for e in proximos %}
+      <a class="bd-ev-card" href="{% url 'detalhe_evento' e.pk %}">
+        <div class="bd-ev-card-top">
+          <span class="bd-ev-cat is-{{ e.categoria|lower }}">{{ e.get_categoria_display }}</span>
+          {% if e.pk in inscritos_em %}<span class="bd-ev-inscrito">Inscrito</span>{% endif %}
+        </div>
+
+        <strong class="bd-ev-nome">{{ e.nome }}</strong>
+        <p class="bd-ev-desc">{{ e.descricao }}</p>
+
+        <dl class="bd-ev-meta">
+          <div><dt><i class="fa-solid fa-location-dot"></i></dt><dd>{{ e.sala.nome }}</dd></div>
+          <div>
+            <dt><i class="fa-regular fa-calendar"></i></dt>
+            <dd>
+              {% if e.dia_unico %}{{ e.data_inicio|date:"d/m/Y" }}
+              {% else %}{{ e.data_inicio|date:"d/m" }} a {{ e.data_fim|date:"d/m/Y" }}{% endif %}
+            </dd>
+          </div>
+          <div>
+            <dt><i class="fa-regular fa-clock"></i></dt>
+            <dd>{{ e.horario_inicio|time:"H:i" }} às {{ e.horario_fim|time:"H:i" }}</dd>
+          </div>
+          <div>
+            <dt><i class="fa-solid fa-users"></i></dt>
+            <dd>
+              {{ e.inscritos }} inscrito{{ e.inscritos|pluralize }}{% if e.vagas %} de {{ e.vagas }}{% endif %}
+            </dd>
+          </div>
+        </dl>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="bd-reservas-empty">
+      <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+      <strong>Nenhum evento programado</strong>
+      <p>{% if busca %}Nada encontrado para &ldquo;{{ busca }}&rdquo;.{% else %}Assim que houver atividades marcadas, elas aparecem aqui.{% endif %}</p>
+      {% if pode_gerenciar %}
+      <a href="{% url 'criar_evento' %}" class="bd-ev-btn bd-ev-btn-primary">
+        <i class="fa-solid fa-plus" aria-hidden="true"></i> Criar evento
+      </a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </section>
+
+  {% if encerrados %}
+  <section class="bd-reservas-section">
+    <div class="bd-reservas-section-head"><h2>Encerrados e cancelados</h2></div>
+    <div class="bd-ev-grid">
+      {% for e in encerrados %}
+      <a class="bd-ev-card is-inativo" href="{% url 'detalhe_evento' e.pk %}">
+        <div class="bd-ev-card-top">
+          <span class="bd-ev-cat is-{{ e.categoria|lower }}">{{ e.get_categoria_display }}</span>
+          {% if e.cancelado %}<span class="bd-ev-cancelado">Cancelado</span>{% endif %}
+        </div>
+        <strong class="bd-ev-nome">{{ e.nome }}</strong>
+        <dl class="bd-ev-meta">
+          <div><dt><i class="fa-solid fa-location-dot"></i></dt><dd>{{ e.sala.nome }}</dd></div>
+          <div><dt><i class="fa-regular fa-calendar"></i></dt><dd>{{ e.data_inicio|date:"d/m/Y" }}</dd></div>
+        </dl>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+</div>
+{% endblock %}

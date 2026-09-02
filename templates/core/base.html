@@ -1358,7 +1358,7 @@
         <a href="{% url 'inicio' %}" class="pill-nav-item">Inicio</a>
         <a href="{% url 'lista_locais' %}" class="pill-nav-item">Locais</a>
         <a href="{% url 'lista_reserva' %}" class="pill-nav-item">Reservas</a>
-        <a href="#" class="pill-nav-item">Benefícios</a>
+        <a href="{% url 'lista_eventos' %}" class="pill-nav-item">Eventos</a>
         <a href="{% url 'blog_index' %}" class="pill-nav-item">Blog</a>
         <a href="#" class="pill-nav-item">Feedback</a>
         {% if user.is_staff %}
@@ -1650,6 +1650,9 @@
         RESERVA_APROVADA:   { icon: 'fa-calendar-check', bg: '#16a34a' },
         RESERVA_REJEITADA:  { icon: 'fa-calendar-xmark', bg: '#dc2626' },
         RESERVA_CANCELADA:  { icon: 'fa-calendar-minus', bg: '#f59e0b' },
+        EVENTO_CRIADO:      { icon: 'fa-calendar-day',   bg: '#8b5cf6' },
+        EVENTO_ATUALIZADO:  { icon: 'fa-calendar-day',   bg: '#0ea5e9' },
+        EVENTO_CANCELADO:   { icon: 'fa-calendar-xmark', bg: '#ef4444' },
         LEMBRETE:           { icon: 'fa-clock',          bg: '#0ea5e9' },
         ADMIN_NOVA_SOLICITACAO: { icon: 'fa-user-plus',  bg: '#f59e0b' },
         CONFLITO_HORARIO:   { icon: 'fa-clock-rotate-left', bg: '#dc2626' },

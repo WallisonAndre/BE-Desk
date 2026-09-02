@@ -64,6 +64,60 @@ def notificar_reserva_cancelada(agendamento):
         )
 
 
+def _periodo_evento(evento):
+    inicio = evento.data_inicio.strftime('%d/%m/%Y')
+    hora = evento.horario_inicio.strftime('%H:%M')
+    if evento.dia_unico:
+        return f'{inicio} às {hora}'
+    return f'de {inicio} a {evento.data_fim.strftime("%d/%m/%Y")}, às {hora}'
+
+
+def notificar_evento_criado(evento):
+    """Divulga o evento para todo mundo que usa o sistema."""
+    from django.contrib.auth.models import User
+
+    for usuario in User.objects.filter(is_active=True).exclude(pk=evento.responsavel_id):
+        criar_notificacao(
+            destinatario=usuario,
+            titulo=f'Novo evento: {evento.nome}',
+            mensagem=(
+                f'{evento.get_categoria_display()} em "{evento.sala.nome}" '
+                f'{_periodo_evento(evento)}. Inscrições abertas.'
+            ),
+            tipo='EVENTO_CRIADO',
+            link=evento.get_absolute_url(),
+        )
+
+
+def notificar_evento_atualizado(evento):
+    """Avisa apenas os inscritos: mudança só interessa a quem vai."""
+    for inscricao in evento.inscricoes.select_related('usuario'):
+        criar_notificacao(
+            destinatario=inscricao.usuario,
+            titulo=f'Evento atualizado: {evento.nome}',
+            mensagem=(
+                f'Os dados mudaram. Agora é em "{evento.sala.nome}" '
+                f'{_periodo_evento(evento)}.'
+            ),
+            tipo='EVENTO_ATUALIZADO',
+            link=evento.get_absolute_url(),
+        )
+
+
+def notificar_evento_cancelado(evento):
+    for inscricao in evento.inscricoes.select_related('usuario'):
+        criar_notificacao(
+            destinatario=inscricao.usuario,
+            titulo=f'Evento cancelado: {evento.nome}',
+            mensagem=(
+                f'O evento que estava marcado para {_periodo_evento(evento)} '
+                f'em "{evento.sala.nome}" foi cancelado.'
+            ),
+            tipo='EVENTO_CANCELADO',
+            link=evento.get_absolute_url(),
+        )
+
+
 def notificar_lembrete(usuario, agendamento):
     criar_notificacao(
         destinatario=usuario,
