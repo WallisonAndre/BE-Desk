@@ -4,7 +4,7 @@
 {% block title %}{{ evento.nome }} - BE-Desk{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/reservas.css' %}?v=20260814">
+<link rel="stylesheet" href="{% static 'css/reservas.css' %}?v=20260903">
 <link rel="stylesheet" href="{% static 'css/admin-form.css' %}?v=20260814">
 <link rel="stylesheet" href="{% static 'css/eventos.css' %}?v=20260814">
 {% endblock %}
@@ -68,7 +68,7 @@
           <dt>Término</dt><dd>{{ evento.data_fim|date:"d/m/Y" }}</dd>
           <dt>Horário</dt><dd>{{ evento.horario_inicio|time:"H:i" }} às {{ evento.horario_fim|time:"H:i" }}</dd>
           <dt>Inscritos</dt>
-          <dd>{{ evento.total_inscritos }}{% if evento.vagas %} de {{ evento.vagas }}{% endif %}</dd>
+          <dd>{{ evento.total_inscritos }}</dd>
         </dl>
 
         <a href="{% url 'detalhe_sala' evento.sala.nome %}?foco={{ evento.data_inicio|date:'Y-m-d' }}"
@@ -103,12 +103,7 @@
           <p class="bd-ev-aviso">Este evento foi cancelado.</p>
         {% elif evento.encerrado %}
           <p class="bd-ev-aviso">Este evento já foi encerrado.</p>
-        {% elif not evento.aberto_para_inscricao %}
-          <p class="bd-ev-aviso">As vagas se esgotaram.</p>
         {% else %}
-          {% if evento.vagas %}
-          <p class="bd-ev-aviso">{{ evento.vagas_restantes }} vaga{{ evento.vagas_restantes|pluralize }} restante{{ evento.vagas_restantes|pluralize }}.</p>
-          {% endif %}
           <form method="post" action="{% url 'inscrever_evento' evento.pk %}">
             {% csrf_token %}
             <button type="submit" class="bd-ev-btn bd-ev-btn-primary">
