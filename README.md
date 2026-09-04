@@ -212,3 +212,7 @@ As issues são abertas pelos formulários em `.github/ISSUE_TEMPLATE`:
 | Funcionalidade | `enhancement` | funcionalidade ou melhoria percebida pelo usuário |
 | Bug | `bug` | erro ou comportamento inesperado do sistema |
 | Tarefa técnica | `task` | atividade técnica que não é bug nem funcionalidade |
+
+### Quadro de Acompanhamento
+
+O andamento das tarefas fica no Project **[BE-Desk](https://github.com/users/devigMurilo/projects/2)**, onde cada issue é acompanhada pelas colunas `Backlog`, `Sprint Backlog (To do)`, `In Progress`, `In Review` e `Done`.
