@@ -1365,7 +1365,7 @@
         {% if user.is_staff %}
         <a href="{% url 'admin_dashboard' %}" class="pill-nav-item">Admin</a>
         <a href="{% url 'listar_pendentes' %}" class="pill-nav-item">Dashboard</a>
-        <a href="{% url 'aprovacoes' %}" class="pill-nav-item">Aprovações</a>
+        <a href="{% url 'aprovacoes' %}" class="pill-nav-item">Solicitações</a>
         {% endif %}
       </div>
 
@@ -1462,7 +1462,7 @@
         <hr class="border-secondary my-1">
         <a href="{% url 'admin_dashboard' %}" class="text-white text-decoration-none fs-5"><i class="fa-solid fa-chart-line me-3 text-secondary"></i>Admin</a>
         <a href="{% url 'listar_pendentes' %}" class="text-white text-decoration-none fs-5"><i class="fa-solid fa-clipboard-list me-3 text-secondary"></i>Dashboard</a>
-        <a href="{% url 'aprovacoes' %}" class="text-white text-decoration-none fs-5"><i class="fa-solid fa-list-check me-3 text-secondary"></i>Aprovações</a>
+        <a href="{% url 'aprovacoes' %}" class="text-white text-decoration-none fs-5"><i class="fa-solid fa-list-check me-3 text-secondary"></i>Solicitações</a>
         {% endif %}
         {% if user.is_authenticated %}
         <hr class="border-secondary my-1">
