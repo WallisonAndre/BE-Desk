@@ -1,16 +1,17 @@
 {% load static %}
 
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-br" data-theme="light">
 
 <head>
   {% block head %}
   <meta charset="UTF-8">
-  <!-- Anti-flash: aplica o tema ANTES de qualquer render -->
+  <!-- Claro é o padrão, marcado no próprio <html> para valer sem JS e sem flash.
+       Só sai daqui quem escolheu o escuro no botão. -->
   <script>
     (function() {
       var t = localStorage.getItem('bd-theme');
-      if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
+      if (t === 'dark') document.documentElement.removeAttribute('data-theme');
     })();
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
