@@ -6,7 +6,8 @@
 {% block main_container_class %}bd-blog-main flex-grow-1{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/blog.css' %}?v=20260814">
+<link rel="stylesheet" href="{% static 'css/reservas.css' %}?v=20260903">
+<link rel="stylesheet" href="{% static 'css/blog.css' %}?v=20260905">
 <meta name="description" content="Blog do BE-Desk — atualizações, orientações e conteúdos para acompanhar a rotina do Bloco E com mais clareza.">
 {% endblock %}
 
@@ -157,11 +158,9 @@
       {% else %}
       <!-- Empty state: differentiate between search and no posts -->
       {% if q %}
-      <div class="bd-blog-empty">
-        <div class="bd-blog-empty-icon">
-          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-        </div>
-        <h2>Nenhum resultado encontrado</h2>
+      <div class="bd-reservas-empty">
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+        <strong>Nenhum resultado encontrado</strong>
         <p>N&atilde;o encontramos publica&ccedil;&otilde;es para &ldquo;{{ q }}&rdquo;. Tente buscar com outros termos.</p>
         <a href="{% url 'blog_index' %}" class="bd-blog-btn bd-blog-btn-secondary">
           <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
@@ -169,12 +168,10 @@
         </a>
       </div>
       {% else %}
-      <div class="bd-blog-empty">
-        <div class="bd-blog-empty-icon">
-          <i class="fa-solid fa-newspaper" aria-hidden="true"></i>
-        </div>
-        <h2>Nenhuma publica&ccedil;&atilde;o cadastrada</h2>
-        <p>Ajuste a busca ou volte mais tarde para conferir novas atualiza&ccedil;&otilde;es.</p>
+      <div class="bd-reservas-empty">
+        <i class="fa-solid fa-newspaper" aria-hidden="true"></i>
+        <strong>Nenhuma publica&ccedil;&atilde;o cadastrada</strong>
+        <p>Assim que houver novidades publicadas, elas aparecem aqui.</p>
         {% if user.is_staff %}
         <a href="{% url 'blog_admin_create' %}" class="bd-blog-btn bd-blog-btn-primary">
           <i class="fa-solid fa-plus" aria-hidden="true"></i>

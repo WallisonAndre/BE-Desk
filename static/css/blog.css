@@ -259,7 +259,6 @@
 
 .bd-blog-feature,
 .bd-blog-card,
-.bd-blog-empty,
 .bd-blog-article-content,
 .bd-blog-article-cover {
   position: relative;
@@ -273,7 +272,6 @@
 
 .bd-blog-feature::before,
 .bd-blog-card::before,
-.bd-blog-empty::before,
 .bd-blog-article-content::before {
   content: "";
   position: absolute;
@@ -284,7 +282,6 @@
 
 .bd-blog-feature > *,
 .bd-blog-card > *,
-.bd-blog-empty > *,
 .bd-blog-article-content > * {
   position: relative;
   z-index: 1;
@@ -488,33 +485,6 @@
   background: rgba(255, 255, 255, 0.045);
   color: #fff;
   transition: transform 0.22s var(--blog-ease), border-color 0.22s var(--blog-ease), background 0.22s var(--blog-ease);
-}
-
-.bd-blog-empty {
-  display: grid;
-  place-items: center;
-  min-height: 24rem;
-  padding: 2rem;
-  border-radius: 18px;
-  text-align: center;
-}
-
-.bd-blog-empty i {
-  color: var(--blog-lime);
-  font-size: 2rem;
-}
-
-.bd-blog-empty h2 {
-  margin: 0.9rem 0 0.35rem;
-  color: #fff;
-  font-size: 1.55rem;
-}
-
-.bd-blog-empty p {
-  max-width: 460px;
-  margin: 0;
-  color: rgba(226, 234, 242, 0.66);
-  line-height: 1.55;
 }
 
 .bd-blog-article-shell {
@@ -1390,27 +1360,10 @@
   color: #fff;
 }
 
-/* ===================================================================
-   ENHANCED EMPTY STATE
-   =================================================================== */
-
-.bd-blog-empty-icon {
-  width: 4.5rem;
-  height: 4.5rem;
-  display: grid;
-  place-items: center;
-  margin: 0 auto 0.8rem;
-  border-radius: 999px;
-  background: rgba(200, 255, 31, 0.08);
-  border: 1px solid rgba(200, 255, 31, 0.15);
-}
-
-.bd-blog-empty-icon i {
-  font-size: 1.6rem;
-}
-
-.bd-blog-empty .bd-blog-btn {
-  margin-top: 1.2rem;
+/* O estado vazio usa .bd-reservas-empty (reservas/eventos); só o botão
+   é do blog, e ele precisa do respiro que o componente não dá. */
+.bd-reservas-empty .bd-blog-btn {
+  margin-top: 0.5rem;
 }
 
 /* ===================================================================

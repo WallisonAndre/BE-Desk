@@ -6,7 +6,8 @@
 {% block main_container_class %}bd-blog-main flex-grow-1{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/blog.css' %}?v=20260814">
+<link rel="stylesheet" href="{% static 'css/reservas.css' %}?v=20260903">
+<link rel="stylesheet" href="{% static 'css/blog.css' %}?v=20260905">
 {% endblock %}
 
 {% block content %}
@@ -108,11 +109,9 @@
       {% endfor %}
     </div>
     {% else %}
-    <div class="bd-blog-empty">
-      <div class="bd-blog-empty-icon">
-        <i class="fa-solid fa-file-pen" aria-hidden="true"></i>
-      </div>
-      <h2>{{ empty_message|default:'Nenhuma publicação cadastrada' }}</h2>
+    <div class="bd-reservas-empty">
+      <i class="fa-solid fa-file-pen" aria-hidden="true"></i>
+      <strong>{{ empty_message|default:'Nenhuma publicação cadastrada' }}</strong>
       <p>{{ empty_sub_message|default:'Comece criando sua primeira publicação para o blog do Bloco E.' }}</p>
       <a class="bd-blog-btn bd-blog-btn-primary" href="{% url 'blog_admin_create' %}">
         <i class="fa-solid fa-plus" aria-hidden="true"></i>
