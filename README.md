@@ -9,6 +9,12 @@
   Sistema online de reserva de espaços e organização de eventos do Bloco E do IFRN.
 </p>
 
+<p align="center">
+  🌐 <strong>Sistema no ar:</strong> <a href="http://34.57.139.37">http://34.57.139.37</a><br>
+  <sub>Abra com <code>http://</code> na frente. O endereço ainda não tem certificado, e navegadores<br>
+  que tentam HTTPS sozinhos não conseguem conectar.</sub>
+</p>
+
 ---
 
 ## 📖 Sobre o Projeto
