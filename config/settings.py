@@ -8,16 +8,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Load environment variables from .env file
 load_dotenv(BASE_DIR / ".env")
 
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "unsafe-secret-key")
-DEBUG = True
+# SECRET_KEY é o nome que o docker-compose entrega; DJANGO_SECRET_KEY fica
+# aceito para não quebrar quem já tinha o .env antigo.
+SECRET_KEY = os.getenv("SECRET_KEY") or os.getenv("DJANGO_SECRET_KEY", "unsafe-secret-key")
 
 # SECURITY WARNING: don't run with debug turned on in production!
+# O default é True para o desenvolvimento seguir funcionando sem .env;
+# em produção o .env precisa trazer DEBUG=False.
+DEBUG = os.getenv("DEBUG", "True").strip().lower() not in ("false", "0", "no", "off")
 
+# Lista separada por vírgula. "*" continua sendo o default de desenvolvimento.
+ALLOWED_HOSTS = [h.strip() for h in os.getenv("ALLOWED_HOSTS", "*").split(",") if h.strip()]
 
-ALLOWED_HOSTS = ["*"]
-
-
-BASE_URL = "http://localhost:8000"
+BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")
 # SUAP OAuth2 Settings
 SUAP_OAUTH_CLIENT_ID = os.getenv("SUAP_OAUTH_CLIENT_ID", "")
 SUAP_OAUTH_CLIENT_SECRET = os.getenv("SUAP_OAUTH_CLIENT_SECRET", "")
@@ -80,12 +83,24 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if os.getenv("POSTGRES_DB"):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv("POSTGRES_DB"),
+            'USER': os.getenv("POSTGRES_USER", ""),
+            'PASSWORD': os.getenv("POSTGRES_PASSWORD", ""),
+            'HOST': os.getenv("DB_HOST", "db"),
+            'PORT': os.getenv("DB_PORT", "5432"),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation
