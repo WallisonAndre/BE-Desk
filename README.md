@@ -6,23 +6,25 @@
 
 <p align="center">
   <strong>Organização e praticidade ao seu alcance.</strong><br>
-  Sistema online de cadastro, reservas e solicitação de materiais esportivos para o Bloco E do IFRN.
+  Sistema online de reserva de espaços e organização de eventos do Bloco E do IFRN.
 </p>
 
 ---
 
 ## 📖 Sobre o Projeto
 
-O **BE-Desk** nasceu para modernizar e digitalizar o processo de empréstimo e reserva de materiais esportivos e didáticos do Bloco E do IFRN. 
+O **BE-Desk** nasceu para modernizar e digitalizar o uso dos espaços do Bloco E do IFRN — quadra, ginásio e salas —, tanto nas reservas do dia a dia quanto nos eventos abertos à comunidade acadêmica.
 
-Combinamos a necessidade de um controle interno rigoroso com a facilidade de acesso para os alunos e servidores. O sistema substitui os antigos registros manuais por uma plataforma digital intuitiva, ágil e acessível para toda a comunidade acadêmica.
+Combinamos a necessidade de um controle interno rigoroso com a facilidade de acesso para alunos e servidores. O sistema substitui os antigos registros manuais por uma plataforma digital, com login pela conta institucional do SUAP.
 
 ### 🚀 Funcionalidades Principais
-- [x] **Reserva de Materiais:** Solicitação e agendamento de materiais esportivos em tempo real.
-- [x] **Controle de Disponibilidade:** Visualização instantânea dos itens livres ou ocupados.
-- [x] **Cadastro Geral:** Gerenciamento centralizado de usuários, alunos e servidores.
-- [x] **Sistema de Notificações:** Alertas sobre prazos de devolução e status de reservas.
-- [x] **Relatórios Administrativos:** Emissão de dados e estatísticas de uso para a gestão do bloco.
+- [x] **Reserva de Espaços:** Pedido de horário na grade da sala, com aprovação pela administração.
+- [x] **Grade de Horários:** Visualização por sala e por semana, mostrando o que já está ocupado.
+- [x] **Eventos:** Atividades esportivas, acadêmicas e institucionais com inscrição de participantes e limite de vagas. O evento reserva o espaço automaticamente e bloqueia conflitos.
+- [x] **Login Institucional:** Autenticação pelo SUAP, sem senha separada.
+- [x] **Notificações:** Avisos de aprovação, recusa e mudança em reservas e eventos.
+- [x] **Blog:** Publicações e comunicados do bloco.
+- [x] **Painel Administrativo:** Aprovação de pedidos, gestão de salas e permissões.
 
 ---
 
@@ -32,7 +34,7 @@ As principais ferramentas usadas no desenvolvimento do sistema:
 
 - [**Python / Django**](https://www.djangoproject.com/) - Core do sistema, lógica de negócio e painel administrativo.
 - [**HTML5 / CSS3 / JavaScript**](https://developer.mozilla.org/pt-BR/) - Interface responsiva para dispositivos móveis e desktops.
-- [**SQLite**](https://www.sqlite.org/index.html) - Banco de dados (ambiente de desenvolvimento).
+- [**SQLite**](https://www.sqlite.org/index.html) / [**PostgreSQL**](https://www.postgresql.org/) - Banco de dados: SQLite em desenvolvimento, PostgreSQL em produção.
 - [**Docker / Nginx**](https://www.docker.com/) - Containerização e servidor para deploys robustos e seguros.
 
 ---
@@ -48,9 +50,9 @@ As principais ferramentas usadas no desenvolvimento do sistema:
 ### 📦 1. Clone o repositório
 
 ```bash
-git clone (https://github.com/WallisonAndre/BE-Desk.git)>
+git clone https://github.com/WallisonAndre/BE-Desk.git
 cd BE-Desk
-````
+```
 
 ### 🐍 2. Crie um ambiente virtual
 
@@ -74,32 +76,43 @@ source venv/bin/activate
 
 ### 📥 4. Instale as dependências
 
-Caso exista o arquivo `requirements.txt`:
-
 ```bash
 pip install -r requirements.txt
 ```
 
-Ou instale manualmente:
+### ⚙️ 5. Configure as variáveis de ambiente
+
+Copie o arquivo de exemplo e preencha com as credenciais da aplicação OAuth2 do SUAP:
 
 ```bash
-pip install django requests
+cp .env.example .env
 ```
 
-### 🗄️ 5. Configure o banco de dados
+```text
+SUAP_OAUTH_CLIENT_ID=seu_client_id
+SUAP_OAUTH_CLIENT_SECRET=seu_client_secret
+SUAP_OAUTH_REDIRECT_URI=http://localhost:8000/auth/callback/
+SUAP_API_URL=https://suap.ifrn.edu.br
+```
+
+> ⚠️ O `SUAP_OAUTH_REDIRECT_URI` precisa ser **idêntico** ao cadastrado na aplicação no SUAP, incluindo a barra final. Qualquer diferença resulta em `Mismatching redirect URI` na hora de entrar.
+
+O sistema sobe sem o `.env` — apenas o login pelo SUAP fica indisponível.
+
+### 🗄️ 6. Configure o banco de dados
 
 ```bash
 python manage.py makemigrations
 python manage.py migrate
 ```
 
-### ▶️ 6. Inicie o servidor
+### ▶️ 7. Inicie o servidor
 
 ```bash
 python manage.py runserver
 ```
 
-### 🌐 7. Acesse o sistema
+### 🌐 8. Acesse o sistema
 
 Abra o navegador e acesse:
 
