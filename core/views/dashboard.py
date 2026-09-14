@@ -1,6 +1,7 @@
 import datetime
 import json
 
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Count
 from django.db.models.functions import ExtractHour, ExtractWeekDay, TruncMonth
@@ -188,6 +189,33 @@ def mudar_status_reserva(request, agendamento_id, novo_status):
         return JsonResponse({"success": False, "erro": "Status inválido"}, status=400)
 
     reserva = get_object_or_404(Agendamento, pk=agendamento_id)
+
+    # Pedido pendente não impede a criação de um evento, que só considera o
+    # que já está aprovado. Sem esta trava, aprovar o pedido depois deixava
+    # duas ocupações aprovadas no mesmo horário da mesma sala.
+    if novo_status == "APROVADO" and reserva.data_inicio:
+        conflito = (
+            Agendamento.objects.filter(
+                sala=reserva.sala,
+                data_inicio__date=timezone.localtime(reserva.data_inicio).date(),
+                horario=reserva.horario,
+                status="APROVADO",
+            )
+            .exclude(pk=reserva.pk)
+            .first()
+        )
+        if conflito:
+            evento = conflito.eventos.first()
+            ocupante = f'pelo evento "{evento.nome}"' if evento else "por outra reserva aprovada"
+            aviso = (
+                f"Não foi possível aprovar: {reserva.sala.nome} já está ocupada {ocupante} "
+                f"às {reserva.horario:%H:%M} de {timezone.localtime(reserva.data_inicio):%d/%m/%Y}."
+            )
+            if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                return JsonResponse({"success": False, "erro": aviso}, status=409)
+            messages.error(request, aviso)
+            return redirect("aprovacoes")
+
     reserva.status = novo_status
     reserva.save()
 

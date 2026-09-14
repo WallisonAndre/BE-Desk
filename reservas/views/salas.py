@@ -27,6 +27,18 @@ HORARIOS_ESTRUTURA = [
     {"tipo": "hora", "inicio": "17:15", "fim": "18:00"},
 ]
 
+# Horários reserváveis da grade como pares (início, fim), sem os intervalos.
+# Reserva e evento ocupam a grade por essas faixas: uma reserva sempre começa
+# num desses inícios, e um evento ocupa toda faixa em que ele encosta.
+FAIXAS_HORARIO = [
+    (
+        datetime.strptime(item["inicio"], "%H:%M").time(),
+        datetime.strptime(item["fim"], "%H:%M").time(),
+    )
+    for item in HORARIOS_ESTRUTURA
+    if item["tipo"] == "hora"
+]
+
 DIAS_SEMANA_NOMES = [
     "Segunda-feira",
     "Terça-feira",

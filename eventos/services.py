@@ -11,14 +11,7 @@ from datetime import datetime, timedelta
 from django.utils import timezone
 
 from bedesk.models import Agendamento
-from reservas.views.salas import HORARIOS_ESTRUTURA
-
-# Slots fixos da grade (07:00, 07:45, ...), ignorando intervalos.
-SLOTS = [
-    datetime.strptime(item['inicio'], '%H:%M').time()
-    for item in HORARIOS_ESTRUTURA
-    if item['tipo'] == 'hora'
-]
+from reservas.views.salas import FAIXAS_HORARIO
 
 
 def _dias_do_evento(evento):
@@ -29,16 +22,19 @@ def _dias_do_evento(evento):
 
 
 def slots_ocupados(evento):
-    """Pares (data, hora) da grade que o evento cobre.
+    """Pares (data, hora de início) dos horários da grade que o evento toca.
 
-    Um slot entra se o seu início cai dentro da janela do evento — um
-    evento das 14h às 16h ocupa 14:00, 14:50, 15:35 e assim por diante.
+    Um horário entra quando qualquer trecho dele cai dentro da janela do
+    evento. Um evento das 14:00 às 16:00 ocupa 13:45, 14:50 e 15:35: o
+    horário das 13:45 começa antes, mas só termina às 14:30, com o evento já
+    em andamento. Olhar apenas o início deixava esse trecho reservável, e um
+    evento curto entre dois inícios — 14:00 às 14:40 — não ocupava nada.
     """
     pares = []
     for dia in _dias_do_evento(evento):
-        for slot in SLOTS:
-            if evento.horario_inicio <= slot < evento.horario_fim:
-                pares.append((dia, slot))
+        for inicio, fim in FAIXAS_HORARIO:
+            if inicio < evento.horario_fim and fim > evento.horario_inicio:
+                pares.append((dia, inicio))
     return pares
 
 

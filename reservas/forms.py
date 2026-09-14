@@ -3,6 +3,12 @@ import datetime
 from django import forms
 
 from bedesk.models import Agendamento
+from reservas.views.salas import FAIXAS_HORARIO
+
+# A checagem de conflito compara o horário exato. Uma reserva fora destes
+# inícios — 14:10, por exemplo — não colidiria com nada e passaria por cima
+# de outra reserva ou de um evento.
+INICIOS_DA_GRADE = {inicio for inicio, _ in FAIXAS_HORARIO}
 
 
 class AgendarForm(forms.ModelForm):
@@ -30,6 +36,12 @@ class AgendarForm(forms.ModelForm):
                 "horario",
                 f"O horário deve estar entre {horario_abertura.strftime('%H:%M')} e {horario_fechamento.strftime('%H:%M')}.",
             )
+            return cleaned_data
+
+        if horario and horario not in INICIOS_DA_GRADE:
+            # Erro geral, não do campo: quando o horário vem da grade ele é
+            # renderizado oculto, e o erro de um campo oculto não aparece.
+            self.add_error(None, "Escolha um dos horários da grade da sala.")
             return cleaned_data
 
         if sala and data_inicio and horario:
