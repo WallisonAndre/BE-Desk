@@ -297,7 +297,7 @@
   text-align: center;
 }
 
-.bd-reservas-empty i {
+.bd-reservas-empty > i {
   font-size: 1.9rem;
   color: var(--accent);
   opacity: 0.75;
@@ -538,7 +538,7 @@
   color: #ffffff;
 }
 
-[data-theme="light"] .bd-reservas-empty i {
+[data-theme="light"] .bd-reservas-empty > i {
   color: #047857;
 }
 

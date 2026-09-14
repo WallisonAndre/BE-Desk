@@ -15,7 +15,7 @@ class EventoForm(forms.ModelForm):
         model = Evento
         fields = [
             'nome', 'descricao', 'categoria', 'responsavel', 'sala',
-            'data_inicio', 'data_fim', 'horario_inicio', 'horario_fim', 'vagas',
+            'data_inicio', 'data_fim', 'horario_inicio', 'horario_fim',
         ]
         widgets = {
             'descricao': forms.Textarea(attrs={'rows': 4}),

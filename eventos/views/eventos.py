@@ -76,10 +76,8 @@ def inscrever(request, pk):
     if not evento.aberto_para_inscricao:
         if evento.cancelado:
             motivo = 'Este evento foi cancelado.'
-        elif evento.encerrado:
-            motivo = 'Este evento já foi encerrado.'
         else:
-            motivo = 'As vagas para este evento se esgotaram.'
+            motivo = 'Este evento já foi encerrado.'
         messages.error(request, motivo)
         return redirect('detalhe_evento', pk=pk)
 

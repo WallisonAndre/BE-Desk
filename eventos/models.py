@@ -55,12 +55,6 @@ class Evento(models.Model):
     horario_inicio = models.TimeField(verbose_name='Horário de início')
     horario_fim = models.TimeField(verbose_name='Horário de término')
 
-    vagas = models.PositiveIntegerField(
-        null=True,
-        blank=True,
-        help_text='Deixe vazio para inscrições ilimitadas.',
-    )
-
     status = models.CharField(max_length=12, choices=STATUS_CHOICES, default=PROGRAMADO)
 
     # Agendamentos gerados para bloquear a grade. Guardados aqui para o
@@ -115,19 +109,11 @@ class Evento(models.Model):
 
     @property
     def aberto_para_inscricao(self):
-        if self.cancelado or self.encerrado:
-            return False
-        return self.vagas is None or self.total_inscritos < self.vagas
+        return not self.cancelado and not self.encerrado
 
     @property
     def total_inscritos(self):
         return self.inscricoes.count()
-
-    @property
-    def vagas_restantes(self):
-        if self.vagas is None:
-            return None
-        return max(self.vagas - self.total_inscritos, 0)
 
     @property
     def dia_unico(self):
