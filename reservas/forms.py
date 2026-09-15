@@ -34,17 +34,19 @@ class AgendarForm(forms.ModelForm):
 
         if sala and data_inicio and horario:
             data_do_agendamento = data_inicio.date()
+            # Só o que está aprovado ocupa o horário. Vários alunos podem pedir
+            # o mesmo horário; quem aprova é que escolhe um e recusa os outros.
             conflitos = Agendamento.objects.filter(
                 sala=sala,
                 data_inicio__date=data_do_agendamento,
                 horario=horario,
-                status__in=["PENDENTE", "APROVADO"],
+                status="APROVADO",
             )
             if self.instance and self.instance.pk:
                 conflitos = conflitos.exclude(pk=self.instance.pk)
             if conflitos.exists():
                 self.add_error(
                     None,
-                    f"A sala {sala.nome} já tem uma reserva (Pendente ou Aprovada) para as {horario.strftime('%H:%M')} de {data_do_agendamento.strftime('%d/%m/%Y')}.",
+                    f"A sala {sala.nome} já tem uma reserva aprovada para as {horario.strftime('%H:%M')} de {data_do_agendamento.strftime('%d/%m/%Y')}. Escolha outro horário.",
                 )
         return cleaned_data

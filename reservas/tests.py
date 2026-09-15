@@ -55,3 +55,54 @@ class GradeDaSalaTests(TestCase):
         pedido.status = 'APROVADO'
         pedido.save()
         self.assertEqual(self.grade(), [pedido])
+
+
+class PedidoDeReservaTests(TestCase):
+    """Vários alunos podem pedir o mesmo horário; aprovado é que ocupa."""
+
+    def setUp(self):
+        self.aluno = User.objects.create_user('aluno', password='x')
+        self.outro = User.objects.create_user('outro', password='x')
+        self.sala = Sala.objects.create(nome='Quadra')
+        self.dia = date.today() + timedelta(days=1)
+        while self.dia.weekday() >= 5:
+            self.dia += timedelta(days=1)
+
+    def reserva(self, usuario, hora, status):
+        return Agendamento.objects.create(
+            usuario=usuario, sala=self.sala, nome='Treino', motivo='treino', horario=hora,
+            data_inicio=timezone.make_aware(datetime.combine(self.dia, hora)), status=status,
+        )
+
+    def pedir(self, hora):
+        self.client.force_login(self.outro)
+        return self.client.post(reverse('agendar_sala'), {
+            'nome': 'Treino do outro', 'sala': self.sala.pk, 'motivo': 'treino',
+            'horario': hora.strftime('%H:%M'), 'data_inicio': self.dia.isoformat(),
+        })
+
+    def pedidos_do_outro(self):
+        return Agendamento.objects.filter(usuario=self.outro).count()
+
+    def test_horario_livre_aceita_pedido(self):
+        self.pedir(time(7, 0))
+        self.assertEqual(self.pedidos_do_outro(), 1)
+
+    def test_pedido_pendente_de_outra_pessoa_nao_impede(self):
+        self.reserva(self.aluno, time(7, 45), 'PENDENTE')
+        self.pedir(time(7, 45))
+        self.assertEqual(self.pedidos_do_outro(), 1)
+        self.assertEqual(
+            Agendamento.objects.filter(horario=time(7, 45), status='PENDENTE').count(), 2
+        )
+
+    def test_reserva_aprovada_impede_o_pedido(self):
+        self.reserva(self.aluno, time(8, 50), 'APROVADO')
+        resp = self.pedir(time(8, 50))
+        self.assertEqual(self.pedidos_do_outro(), 0)
+        self.assertContains(resp, 'já tem uma reserva aprovada')
+
+    def test_reserva_rejeitada_nao_impede(self):
+        self.reserva(self.aluno, time(9, 35), 'REJEITADO')
+        self.pedir(time(9, 35))
+        self.assertEqual(self.pedidos_do_outro(), 1)
