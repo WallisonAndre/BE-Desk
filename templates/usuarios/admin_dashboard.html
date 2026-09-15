@@ -174,7 +174,8 @@
     {% endif %}
   </section>
 
-  <!-- Permissões -->
+  {% if user.is_superuser %}
+  <!-- Permissões (a view gerenciar_permissoes exige superusuário) -->
   <section class="bd-reservas-section" aria-labelledby="bd-admin-perm">
     <div class="bd-reservas-section-head">
       <h2 id="bd-admin-perm">Gerenciar permissões</h2>
@@ -186,6 +187,7 @@
       </a>
     </div>
   </section>
+  {% endif %}
 
 </div>
 {% endblock %}
