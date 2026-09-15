@@ -62,9 +62,11 @@ def detalhe_sala(request, nome_sala):
     dias_semana_datas = [start_of_week + timedelta(days=i) for i in range(5)]
 
     sala_obj = get_object_or_404(Sala, nome__iexact=nome_sala)
+    # Só o que já foi aprovado ocupa a grade. Pedido pendente ainda pode ser
+    # recusado, e mostrá-lo aqui daria a entender que o horário está tomado.
     agendamentos = Agendamento.objects.filter(
         sala=sala_obj,
-        status__in=["APROVADO", "PENDENTE"],
+        status="APROVADO",
         data_inicio__date__range=[start_of_week, dias_semana_datas[-1]],
     ).select_related("usuario")
 

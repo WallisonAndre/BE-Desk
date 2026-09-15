@@ -12,12 +12,17 @@ INICIOS_DA_GRADE = {inicio for inicio, _ in FAIXAS_HORARIO}
 
 
 def reserva_em_conflito(sala, dia, horario, excluir_pk=None):
-    """Agendamento pendente ou aprovado que já ocupa a sala no dia e horário."""
+    """Reserva aprovada que já ocupa a sala no dia e horário.
+
+    Pedido pendente não ocupa: vários alunos podem pedir o mesmo horário, e
+    quem aprova escolhe um e recusa os outros. A trava contra duas aprovações
+    no mesmo horário fica em core.views.dashboard.mudar_status_reserva.
+    """
     agendamentos = Agendamento.objects.filter(
         sala=sala,
         data_inicio__date=dia,
         horario=horario,
-        status__in=["PENDENTE", "APROVADO"],
+        status="APROVADO",
     )
     if excluir_pk:
         agendamentos = agendamentos.exclude(pk=excluir_pk)
@@ -26,8 +31,8 @@ def reserva_em_conflito(sala, dia, horario, excluir_pk=None):
 
 def mensagem_reserva_em_conflito(sala, dia, horario):
     return (
-        f"A sala {sala.nome} já tem uma reserva (Pendente ou Aprovada) para as "
-        f"{horario.strftime('%H:%M')} de {dia.strftime('%d/%m/%Y')}."
+        f"A sala {sala.nome} já tem uma reserva aprovada para as "
+        f"{horario.strftime('%H:%M')} de {dia.strftime('%d/%m/%Y')}. Escolha outro horário."
     )
 
 

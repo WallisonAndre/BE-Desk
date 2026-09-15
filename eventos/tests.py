@@ -239,6 +239,20 @@ class ChecagemNaGravacaoTests(ConflitosBase):
         self.assertContains(resp, 'já está ocupado')
 
     def test_reserva_e_conferida_de_novo_ao_gravar(self):
+        """Só aprovação ocupa: a reconferência barra quando surge uma aprovada."""
+        original = AgendarForm.is_valid
+
+        def valida_e_outra_requisicao_aprova(form):
+            valido = original(form)
+            self.agendamento('09:35', status='APROVADO', usuario=self.outro_aluno)
+            return valido
+
+        with mock.patch.object(AgendarForm, 'is_valid', valida_e_outra_requisicao_aprova):
+            self.pedir_reserva('09:35')
+        self.assertFalse(Agendamento.objects.filter(usuario=self.aluno).exists())
+
+    def test_pedido_pendente_de_outra_pessoa_nao_impede_a_gravacao(self):
+        """Vários alunos podem pedir o mesmo horário enquanto ninguém aprovou."""
         original = AgendarForm.is_valid
 
         def valida_e_outra_requisicao_pede(form):
@@ -248,7 +262,7 @@ class ChecagemNaGravacaoTests(ConflitosBase):
 
         with mock.patch.object(AgendarForm, 'is_valid', valida_e_outra_requisicao_pede):
             self.pedir_reserva('09:35')
-        self.assertFalse(Agendamento.objects.filter(usuario=self.aluno).exists())
+        self.assertTrue(Agendamento.objects.filter(usuario=self.aluno, status='PENDENTE').exists())
 
     def test_aprovacao_trava_a_sala(self):
         pedido = self.agendamento('09:35', status='PENDENTE')
