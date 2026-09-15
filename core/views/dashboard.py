@@ -1,7 +1,9 @@
 import datetime
 import json
 
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.db import transaction
 from django.db.models import Count
 from django.db.models.functions import ExtractHour, ExtractWeekDay, TruncMonth
 from django.http import JsonResponse
@@ -9,6 +11,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
+from bedesk.concorrencia import travar_sala
 from bedesk.models import Agendamento, Sala
 from notificacoes.services.notificar import (
     notificar_reserva_aprovada,
@@ -181,6 +184,13 @@ def aprovacoes(request):
     })
 
 
+def _recusar_mudanca(request, aviso):
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        return JsonResponse({"success": False, "erro": aviso}, status=409)
+    messages.error(request, aviso)
+    return redirect("aprovacoes")
+
+
 @user_passes_test(is_admin_or_staff)
 @require_POST
 def mudar_status_reserva(request, agendamento_id, novo_status):
@@ -188,8 +198,46 @@ def mudar_status_reserva(request, agendamento_id, novo_status):
         return JsonResponse({"success": False, "erro": "Status inválido"}, status=400)
 
     reserva = get_object_or_404(Agendamento, pk=agendamento_id)
-    reserva.status = novo_status
-    reserva.save()
+
+    # A faixa de um evento só é liberada cancelando o evento. Rejeitá-la ou
+    # mudar o status dela pela URL soltaria o horário com o evento programado.
+    evento = reserva.eventos.first()
+    if evento:
+        return _recusar_mudanca(
+            request,
+            f'Este horário pertence ao evento "{evento.nome}". Para liberá-lo, cancele o evento.',
+        )
+
+    with transaction.atomic():
+        travar_sala(reserva.sala_id)
+        # Pedido pendente não impede a criação de um evento, que só considera
+        # o que já está aprovado. Sem esta trava, aprovar o pedido depois
+        # deixava duas ocupações aprovadas no mesmo horário da mesma sala.
+        if novo_status == "APROVADO" and reserva.data_inicio:
+            conflito = (
+                Agendamento.objects.filter(
+                    sala=reserva.sala,
+                    data_inicio__date=timezone.localtime(reserva.data_inicio).date(),
+                    horario=reserva.horario,
+                    status="APROVADO",
+                )
+                .exclude(pk=reserva.pk)
+                .first()
+            )
+            if conflito:
+                ocupante_evento = conflito.eventos.first()
+                ocupante = (
+                    f'pelo evento "{ocupante_evento.nome}"' if ocupante_evento
+                    else "por outra reserva aprovada"
+                )
+                return _recusar_mudanca(
+                    request,
+                    f"Não foi possível aprovar: {reserva.sala.nome} já está ocupada {ocupante} "
+                    f"às {reserva.horario:%H:%M} de {timezone.localtime(reserva.data_inicio):%d/%m/%Y}.",
+                )
+
+        reserva.status = novo_status
+        reserva.save()
 
     if novo_status == 'APROVADO':
         notificar_reserva_aprovada(reserva)

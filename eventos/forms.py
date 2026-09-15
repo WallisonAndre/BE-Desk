@@ -10,6 +10,13 @@ from eventos.services import buscar_conflitos
 User = get_user_model()
 
 
+def mensagem_de_conflito(sala, conflitos):
+    """Aviso de conflito, usado no formulário e na checagem repetida ao gravar."""
+    detalhes = '; '.join(conflitos[:5])
+    extra = f'; e mais {len(conflitos) - 5}' if len(conflitos) > 5 else ''
+    return f'O espaço {sala.nome} já está ocupado {detalhes}{extra}. Ajuste a data ou o horário.'
+
+
 class EventoForm(forms.ModelForm):
     class Meta:
         model = Evento
@@ -56,7 +63,8 @@ class EventoForm(forms.ModelForm):
                 self.add_error(None, 'Não é possível criar um evento em data ou horário que já passou.')
                 return dados
 
-        # Conflito com reservas aprovadas (inclusive de outros eventos).
+        # Conflito com outros eventos, pela janela real, e com reservas
+        # aprovadas, pelas faixas da grade que o evento vai ocupar.
         if dados.get('sala') and data_inicio and data_fim and hora_inicio and hora_fim:
             provisorio = Evento(
                 sala=dados['sala'],
@@ -67,15 +75,6 @@ class EventoForm(forms.ModelForm):
             )
             conflitos = buscar_conflitos(provisorio, ignorar_evento=self.instance)
             if conflitos:
-                detalhes = ', '.join(
-                    f'{c.data_inicio.strftime("%d/%m")} às {c.horario.strftime("%H:%M")}'
-                    for c in conflitos[:5]
-                )
-                extra = f' e mais {len(conflitos) - 5}' if len(conflitos) > 5 else ''
-                self.add_error(
-                    None,
-                    f'O espaço {dados["sala"].nome} já está ocupado em: {detalhes}{extra}. '
-                    f'Ajuste a data ou o horário.',
-                )
+                self.add_error(None, mensagem_de_conflito(dados['sala'], conflitos))
 
         return dados

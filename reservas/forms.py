@@ -3,6 +3,32 @@ import datetime
 from django import forms
 
 from bedesk.models import Agendamento
+from reservas.views.salas import FAIXAS_HORARIO
+
+# A checagem de conflito compara o horário exato. Uma reserva fora destes
+# inícios — 14:10, por exemplo — não colidiria com nada e passaria por cima
+# de outra reserva ou de um evento.
+INICIOS_DA_GRADE = {inicio for inicio, _ in FAIXAS_HORARIO}
+
+
+def reserva_em_conflito(sala, dia, horario, excluir_pk=None):
+    """Agendamento pendente ou aprovado que já ocupa a sala no dia e horário."""
+    agendamentos = Agendamento.objects.filter(
+        sala=sala,
+        data_inicio__date=dia,
+        horario=horario,
+        status__in=["PENDENTE", "APROVADO"],
+    )
+    if excluir_pk:
+        agendamentos = agendamentos.exclude(pk=excluir_pk)
+    return agendamentos.first()
+
+
+def mensagem_reserva_em_conflito(sala, dia, horario):
+    return (
+        f"A sala {sala.nome} já tem uma reserva (Pendente ou Aprovada) para as "
+        f"{horario.strftime('%H:%M')} de {dia.strftime('%d/%m/%Y')}."
+    )
 
 
 class AgendarForm(forms.ModelForm):
@@ -32,19 +58,14 @@ class AgendarForm(forms.ModelForm):
             )
             return cleaned_data
 
+        if horario and horario not in INICIOS_DA_GRADE:
+            # Erro geral, não do campo: quando o horário vem da grade ele é
+            # renderizado oculto, e o erro de um campo oculto não aparece.
+            self.add_error(None, "Escolha um dos horários da grade da sala.")
+            return cleaned_data
+
         if sala and data_inicio and horario:
-            data_do_agendamento = data_inicio.date()
-            conflitos = Agendamento.objects.filter(
-                sala=sala,
-                data_inicio__date=data_do_agendamento,
-                horario=horario,
-                status__in=["PENDENTE", "APROVADO"],
-            )
-            if self.instance and self.instance.pk:
-                conflitos = conflitos.exclude(pk=self.instance.pk)
-            if conflitos.exists():
-                self.add_error(
-                    None,
-                    f"A sala {sala.nome} já tem uma reserva (Pendente ou Aprovada) para as {horario.strftime('%H:%M')} de {data_do_agendamento.strftime('%d/%m/%Y')}.",
-                )
+            dia = data_inicio.date()
+            if reserva_em_conflito(sala, dia, horario, excluir_pk=self.instance.pk):
+                self.add_error(None, mensagem_reserva_em_conflito(sala, dia, horario))
         return cleaned_data
