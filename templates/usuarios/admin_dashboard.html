@@ -2,700 +2,192 @@
 {% load static %}
 
 {% block title %}Admin - BE-Desk{% endblock %}
-{% block main_container_class %}bd-admin-main flex-grow-1{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/admin-form.css' %}?v=20260814">
-<style>
-  :root {
-    --admin-bg: #070d10;
-    --admin-panel: rgba(13, 22, 27, 0.76);
-    --admin-panel-strong: rgba(17, 27, 34, 0.88);
-    --admin-line: rgba(182, 199, 214, 0.13);
-    --admin-text: #f7f9f3;
-    --admin-muted: #9fb0c2;
-    --admin-lime: #c8ff1f;
-    --admin-lime-soft: #b5e853;
-    --admin-red: #d71920;
-    --admin-ease: cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .bd-admin-main {
-    width: 100%;
-    max-width: none;
-    margin: 0;
-    padding: 0;
-  }
-
-  .bd-admin {
-    position: relative;
-    width: 100vw;
-    min-height: calc(100vh - 96px);
-    margin-top: -5.5rem;
-    margin-left: calc(50% - 50vw);
-    margin-right: calc(50% - 50vw);
-    overflow: hidden;
-    background:
-      radial-gradient(circle at 16% 4%, rgba(200, 255, 31, 0.12), transparent 28rem),
-      radial-gradient(circle at 85% 10%, rgba(75, 125, 145, 0.17), transparent 30rem),
-      radial-gradient(circle at 50% 100%, rgba(16, 33, 39, 0.9), transparent 38rem),
-      var(--admin-bg);
-    color: var(--admin-text);
-  }
-
-  .bd-admin::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    opacity: 0.36;
-    background-image:
-      linear-gradient(rgba(255, 255, 255, 0.024) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.024) 1px, transparent 1px),
-      radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.13) 1px, transparent 0);
-    background-size: 92px 92px, 92px 92px, 3px 3px;
-    mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.78) 52%, transparent 100%);
-  }
-
-  .bd-admin::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background:
-      radial-gradient(circle at 50% 0%, transparent 0, transparent 32rem, rgba(0, 0, 0, 0.2) 58rem),
-      linear-gradient(180deg, transparent 0%, rgba(7, 13, 16, 0.9) 100%);
-  }
-
-  .floating-navbar-wrapper {
-    top: 0.9rem;
-    margin-bottom: 0;
-    padding-inline: 1rem;
-  }
-
-  .custom-pill-navbar {
-    min-height: 3.55rem;
-    max-width: 1320px;
-    padding: 0.38rem 0.58rem 0.38rem 0.9rem;
-    border-color: rgba(210, 225, 235, 0.13);
-    background: linear-gradient(180deg, rgba(20, 25, 32, 0.78), rgba(12, 17, 22, 0.72));
-    box-shadow: 0 18px 70px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.055);
-    backdrop-filter: blur(22px) saturate(155%);
-    -webkit-backdrop-filter: blur(22px) saturate(155%);
-  }
-
-  .bd-admin > * {
-    position: relative;
-    z-index: 1;
-  }
-
-  .bd-admin-shell {
-    width: min(calc(100% - 2rem), 1180px);
-    margin: 0 auto;
-    padding: 8.4rem 0 4.5rem;
-  }
-
-  .bd-admin-hero {
-    display: grid;
-    grid-template-columns: minmax(0, 0.95fr) minmax(320px, 0.65fr);
-    gap: clamp(1.5rem, 4vw, 3.5rem);
-    align-items: end;
-    margin-bottom: 1.15rem;
-  }
-
-  .bd-admin-status {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.55rem;
-    min-height: 2.15rem;
-    padding: 0 0.8rem;
-    margin-bottom: 1.1rem;
-    border: 1px solid rgba(200, 255, 31, 0.18);
-    border-radius: 999px;
-    background: rgba(200, 255, 31, 0.055);
-    color: var(--admin-lime);
-    font-size: 0.78rem;
-    font-weight: 780;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.055);
-  }
-
-  .bd-admin-status::before {
-    content: "";
-    width: 0.46rem;
-    height: 0.46rem;
-    border-radius: 999px;
-    background: var(--admin-lime);
-    box-shadow: 0 0 18px rgba(200, 255, 31, 0.68);
-  }
-
-  .bd-admin-title {
-    max-width: 760px;
-    margin: 0;
-    color: #fff;
-    font-size: clamp(2.75rem, 6vw, 5.1rem);
-    font-weight: 880;
-    line-height: 0.95;
-    letter-spacing: 0;
-  }
-
-  .bd-admin-title span {
-    display: block;
-    color: var(--admin-lime);
-    text-shadow: 0 0 34px rgba(200, 255, 31, 0.14);
-  }
-
-  .bd-admin-copy {
-    max-width: 640px;
-    margin: 1.25rem 0 0;
-    color: rgba(226, 234, 242, 0.76);
-    font-size: 1.05rem;
-    line-height: 1.65;
-  }
-
-  .bd-admin-actions {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    gap: 0.8rem;
-  }
-
-  .bd-admin-btn {
-    position: relative;
-    min-height: 3.1rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.62rem;
-    padding: 0 1.1rem;
-    border-radius: 14px;
-    font-weight: 820;
-    text-decoration: none;
-    overflow: hidden;
-    transition: transform 0.22s var(--admin-ease), border-color 0.22s var(--admin-ease), box-shadow 0.22s var(--admin-ease), background 0.22s var(--admin-ease);
-  }
-
-  .bd-admin-btn-primary {
-    border: 0;
-    background: linear-gradient(135deg, var(--admin-lime), var(--admin-lime-soft) 58%, #dbff63);
-    color: #071006;
-    box-shadow: 0 18px 46px rgba(181, 232, 83, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.48);
-  }
-
-  .bd-admin-btn-primary:hover {
-    color: #071006;
-    transform: translateY(-2px);
-    box-shadow: 0 24px 58px rgba(181, 232, 83, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.52);
-  }
-
-  .bd-admin-btn-secondary {
-    border: 1px solid rgba(210, 225, 235, 0.16);
-    background: rgba(255, 255, 255, 0.045);
-    color: #fff;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-  }
-
-  .bd-admin-btn-secondary:hover {
-    color: #fff;
-    border-color: rgba(200, 255, 31, 0.32);
-    background: rgba(200, 255, 31, 0.07);
-    transform: translateY(-2px);
-  }
-
-  .bd-admin-stats {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.85rem;
-    margin: 1.4rem 0 1rem;
-  }
-
-  .bd-admin-stat,
-  .bd-admin-panel,
-  .bd-admin-access {
-    position: relative;
-    overflow: hidden;
-    border: 1px solid var(--admin-line);
-    border-radius: 18px;
-    background: var(--admin-panel);
-    box-shadow: 0 22px 70px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(20px) saturate(145%);
-    -webkit-backdrop-filter: blur(20px) saturate(145%);
-  }
-
-  .bd-admin-stat::before,
-  .bd-admin-panel::before,
-  .bd-admin-access::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background: radial-gradient(circle at 78% 0%, rgba(200, 255, 31, 0.1), transparent 18rem);
-  }
-
-  .bd-admin-stat {
-    min-height: 8.4rem;
-    padding: 1.05rem;
-  }
-
-  .bd-admin-stat > *,
-  .bd-admin-panel > *,
-  .bd-admin-access > * {
-    position: relative;
-    z-index: 1;
-  }
-
-  .bd-admin-stat span,
-  .bd-admin-panel-kicker,
-  .bd-admin-access span {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-    color: var(--admin-lime);
-    font-size: 0.74rem;
-    font-weight: 820;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  .bd-admin-stat strong {
-    display: block;
-    margin-top: 0.7rem;
-    color: #fff;
-    font-size: 2.35rem;
-    font-weight: 880;
-    line-height: 1;
-  }
-
-  .bd-admin-stat p {
-    margin: 0.55rem 0 0;
-    color: rgba(226, 234, 242, 0.64);
-    font-size: 0.9rem;
-    line-height: 1.45;
-  }
-
-  .bd-admin-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 1rem;
-    margin-top: 1rem;
-  }
-
-  .bd-admin-panel {
-    padding: 1.1rem;
-  }
-
-  .bd-admin-panel-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 1rem;
-    padding-bottom: 0.95rem;
-    border-bottom: 1px solid rgba(210, 225, 235, 0.1);
-  }
-
-  .bd-admin-panel h2 {
-    margin: 0.45rem 0 0;
-    color: #fff;
-    font-size: 1.35rem;
-    font-weight: 820;
-  }
-
-  .bd-admin-icon {
-    width: 2.65rem;
-    height: 2.65rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex: 0 0 auto;
-    border: 1px solid rgba(200, 255, 31, 0.18);
-    border-radius: 14px;
-    background: rgba(200, 255, 31, 0.07);
-    color: var(--admin-lime);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.055);
-  }
-
-  .bd-admin-list {
-    display: grid;
-    gap: 0.62rem;
-    margin: 0;
-    padding: 1rem 0 0;
-    list-style: none;
-  }
-
-  .bd-admin-list li {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    min-height: 3.2rem;
-    padding: 0.72rem 0.78rem;
-    border: 1px solid rgba(210, 225, 235, 0.09);
-    border-radius: 14px;
-    background: rgba(255, 255, 255, 0.04);
-    color: rgba(226, 234, 242, 0.76);
-  }
-
-  .bd-admin-item-main {
-    min-width: 0;
-  }
-
-  .bd-admin-item-main strong {
-    display: block;
-    overflow: hidden;
-    color: #fff;
-    font-size: 0.96rem;
-    font-weight: 760;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .bd-admin-item-main small {
-    display: block;
-    margin-top: 0.18rem;
-    color: rgba(226, 234, 242, 0.55);
-    font-size: 0.78rem;
-  }
-
-  .bd-admin-tag {
-    display: inline-flex;
-    align-items: center;
-    min-height: 1.85rem;
-    padding: 0 0.65rem;
-    flex: 0 0 auto;
-    border: 1px solid rgba(200, 255, 31, 0.15);
-    border-radius: 999px;
-    background: rgba(200, 255, 31, 0.055);
-    color: var(--admin-lime);
-    font-size: 0.76rem;
-    font-weight: 760;
-  }
-
-  .bd-admin-empty {
-    justify-content: flex-start !important;
-    color: rgba(226, 234, 242, 0.58) !important;
-  }
-
-  .bd-admin-panel-footer {
-    display: flex;
-    justify-content: flex-end;
-    padding-top: 1rem;
-  }
-
-  .bd-admin-access {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1.4rem;
-    margin-top: 1rem;
-    padding: 1.2rem;
-  }
-
-  .bd-admin-access h2 {
-    margin: 0.35rem 0 0.3rem;
-    color: #fff;
-    font-size: 1.35rem;
-    font-weight: 820;
-  }
-
-  .bd-admin-access p {
-    max-width: 650px;
-    margin: 0;
-    color: rgba(226, 234, 242, 0.64);
-    line-height: 1.55;
-  }
-
-  [data-theme="light"] .bd-admin {
-    --admin-bg: #eef3f7;
-    --admin-panel: rgba(255, 255, 255, 0.86);
-    --admin-panel-strong: rgba(255, 255, 255, 0.94);
-    --admin-line: rgba(15, 23, 42, 0.1);
-    --admin-text: #102033;
-    --admin-muted: #64748b;
-    --admin-lime: #047857;
-    --admin-lime-soft: #059669;
-    background: #f4f7fa !important;
-    color: #102033 !important;
-  }
-
-  [data-theme="light"] .bd-admin::before {
-    opacity: 0.2;
-    background-image:
-      linear-gradient(rgba(15, 23, 42, 0.035) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(15, 23, 42, 0.035) 1px, transparent 1px),
-      radial-gradient(circle at 1px 1px, rgba(15, 23, 42, 0.13) 1px, transparent 0);
-  }
-
-  [data-theme="light"] .bd-admin::after { background: none !important; }
-
-  [data-theme="light"] .bd-admin .custom-pill-navbar {
-    background: rgba(255, 255, 255, 0.84) !important;
-    border-color: rgba(15, 23, 42, 0.1) !important;
-    box-shadow: 0 18px 42px rgba(15, 23, 42, 0.12) !important;
-  }
-
-  [data-theme="light"] .bd-admin-stat,
-  [data-theme="light"] .bd-admin-panel,
-  [data-theme="light"] .bd-admin-access {
-    background: rgba(255, 255, 255, 0.88) !important;
-    border-color: rgba(15, 23, 42, 0.1) !important;
-    box-shadow: 0 18px 42px rgba(15, 23, 42, 0.09) !important;
-  }
-
-  [data-theme="light"] .bd-admin-stat::before,
-  [data-theme="light"] .bd-admin-panel::before,
-  [data-theme="light"] .bd-admin-access::before {
-    background: radial-gradient(circle at 78% 0%, rgba(4, 120, 87, 0.08), transparent 18rem) !important;
-  }
-
-  [data-theme="light"] .bd-admin-status,
-  [data-theme="light"] .bd-admin-tag,
-  [data-theme="light"] .bd-admin-icon {
-    background: rgba(4, 120, 87, 0.08) !important;
-    border-color: rgba(4, 120, 87, 0.2) !important;
-    color: #047857 !important;
-  }
-
-  [data-theme="light"] .bd-admin-status::before {
-    background: #047857 !important;
-    box-shadow: 0 0 14px rgba(4, 120, 87, 0.38) !important;
-  }
-
-  [data-theme="light"] .bd-admin-title,
-  [data-theme="light"] .bd-admin-stat strong,
-  [data-theme="light"] .bd-admin-panel h2,
-  [data-theme="light"] .bd-admin-access h2,
-  [data-theme="light"] .bd-admin-item-main strong {
-    color: #102033 !important;
-  }
-
-  [data-theme="light"] .bd-admin-title span,
-  [data-theme="light"] .bd-admin-stat span,
-  [data-theme="light"] .bd-admin-panel-kicker,
-  [data-theme="light"] .bd-admin-access span {
-    color: #047857 !important;
-    text-shadow: none !important;
-  }
-
-  [data-theme="light"] .bd-admin-copy,
-  [data-theme="light"] .bd-admin-stat p,
-  [data-theme="light"] .bd-admin-access p,
-  [data-theme="light"] .bd-admin-list li,
-  [data-theme="light"] .bd-admin-empty {
-    color: #64748b !important;
-  }
-
-  [data-theme="light"] .bd-admin-item-main small {
-    color: #718198 !important;
-  }
-
-  [data-theme="light"] .bd-admin-panel-header {
-    border-bottom-color: rgba(15, 23, 42, 0.1) !important;
-  }
-
-  [data-theme="light"] .bd-admin-list li {
-    background: rgba(248, 251, 253, 0.82) !important;
-    border-color: rgba(15, 23, 42, 0.08) !important;
-  }
-
-  [data-theme="light"] .bd-admin-btn-secondary {
-    background: rgba(255, 255, 255, 0.72) !important;
-    border-color: rgba(15, 23, 42, 0.12) !important;
-    color: #334155 !important;
-  }
-
-  [data-theme="light"] .bd-admin-btn-secondary:hover {
-    background: rgba(4, 120, 87, 0.08) !important;
-    border-color: rgba(4, 120, 87, 0.24) !important;
-    color: #047857 !important;
-  }
-
-  [data-theme="light"] .bd-admin-btn-primary {
-    background: #047857 !important;
-    color: #ffffff !important;
-    box-shadow: 0 14px 28px rgba(4, 120, 87, 0.2) !important;
-  }
-
-  [data-theme="light"] .bd-admin-btn-primary:hover {
-    background: #065f46 !important;
-    color: #ffffff !important;
-  }
-
-  @media (max-width: 992px) {
-    .bd-admin-shell {
-      padding-top: 7.8rem;
-    }
-
-    .bd-admin-hero,
-    .bd-admin-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .bd-admin-actions {
-      justify-content: flex-start;
-    }
-  }
-
-  @media (max-width: 720px) {
-    .bd-admin-stats {
-      grid-template-columns: 1fr;
-    }
-
-    .bd-admin-access {
-      align-items: flex-start;
-      flex-direction: column;
-    }
-
-    .bd-admin-list li {
-      align-items: flex-start;
-      flex-direction: column;
-    }
-  }
-
-  @media (max-width: 576px) {
-    .bd-admin-shell {
-      width: min(calc(100% - 1rem), 1180px);
-      padding-top: 7rem;
-    }
-
-    .bd-admin-title {
-      font-size: 2.55rem;
-    }
-
-    .bd-admin-btn {
-      width: 100%;
-    }
-  }
-</style>
+<link rel="stylesheet" href="{% static 'css/reservas.css' %}?v=20260903">
+<link rel="stylesheet" href="{% static 'css/eventos.css' %}?v=20260814">
 {% endblock %}
 
 {% block content %}
-<section class="bd-admin profile-page" aria-labelledby="bd-admin-title">
-  <div class="profile-banner"></div>
-  <div class="bd-admin-shell">
-    <div class="admin-hero">
-      <div class="hero-left">
-        <div class="hero-kicker">Painel administrativo online</div>
-        <h1 class="hero-title">Controle do BE-Desk, <span style="color:var(--bd-accent); display:block">em um lugar.</span></h1>
-        <p class="hero-sub">Gerencie salas e permissões com a mesma experiência visual da página inicial.</p>
-      </div>
-      <div class="hero-actions">
-        <a class="btn btn-primary" href="{% url 'criar_sala' %}">Criar sala</a>
-        <a class="btn btn-ghost" href="{% url 'blog_admin' %}">Gerenciar Blog</a>
-        <a class="btn btn-ghost" href="{% url 'blog_admin_create' %}">Criar Postagem</a>
-      </div>
+<div class="container bd-reservas-page">
+
+  <!-- Hero -->
+  <div class="bd-reservas-hero">
+    <div class="bd-reservas-kicker">
+      <i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i> Administração
     </div>
-    
-    <div class="stat-cards">
-      <div class="stat-card">
-        <div class="label">SALAS</div>
-        <div class="value">{{ salas|length }}</div>
-        <div class="desc">Ambientes cadastrados para solicitações e consulta de disponibilidade.</div>
-      </div>
-      <div class="stat-card">
-        <div class="label">ACESSO</div>
-        <div class="value">Staff</div>
-        <div class="desc">Permissões administrativas protegidas para usuários autorizados.</div>
-      </div>
-    </div>
-
-    <div class="bd-admin-grid">
-      <section class="bd-admin-panel card-surface" aria-labelledby="bd-admin-salas-title">
-        <div class="bd-admin-panel-header">
-          <div>
-            <span class="bd-admin-panel-kicker">Ambientes</span>
-            <h2 id="bd-admin-salas-title">Salas cadastradas</h2>
-          </div>
-          <div class="bd-admin-icon" aria-hidden="true">
-            <i class="fa-solid fa-door-open"></i>
-          </div>
-        </div>
-
-        <ul class="bd-admin-list">
-          {% for s in salas %}
-            <li>
-              <div class="bd-admin-item-main">
-                <strong>{{ s.nome }}</strong>
-                <small>{{ s.capacidade }} pessoa{{ s.capacidade|pluralize }} &middot; {{ s.total_reservas }} reserva{{ s.total_reservas|pluralize }}</small>
-              </div>
-              <div class="bd-admin-item-actions">
-                <span class="bd-admin-tag">{{ s.capacidade }} pessoas</span>
-                <a class="bd-admin-icon-btn" href="{% url 'editar_sala' s.pk %}"
-                   title="Editar {{ s.nome }}" aria-label="Editar {{ s.nome }}">
-                  <i class="fa-solid fa-pen" aria-hidden="true"></i>
-                </a>
-                <a class="bd-admin-icon-btn is-danger" href="{% url 'excluir_sala' s.pk %}"
-                   title="Excluir {{ s.nome }}" aria-label="Excluir {{ s.nome }}">
-                  <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
-                </a>
-              </div>
-            </li>
-          {% empty %}
-            <li class="bd-admin-empty">
-              <div class="bd-admin-item-main">
-                <strong>Nenhuma sala cadastrada.</strong>
-                <small>Crie a primeira sala para liberar novas reservas.</small>
-              </div>
-            </li>
-          {% endfor %}
-        </ul>
-
-        <div class="bd-admin-panel-footer">
-          <a class="bd-admin-btn bd-admin-btn-secondary" href="{% url 'criar_sala' %}">
-            <i class="fa-solid fa-plus" aria-hidden="true"></i> Nova sala
-          </a>
-        </div>
-      </section>
-    </div>
-
-    <section class="bd-admin-panel card-surface" aria-labelledby="bd-admin-posts-title" style="margin-top:1rem">
-      <div class="bd-admin-panel-header">
-        <div>
-          <span class="bd-admin-panel-kicker">Blog</span>
-          <h2 id="bd-admin-posts-title">Publicações recentes</h2>
-        </div>
-        <div class="bd-admin-icon" aria-hidden="true">
-          <i class="fa-solid fa-newspaper"></i>
-        </div>
-      </div>
-
-      <ul class="bd-admin-list">
-        {% for p in recent_posts %}
-          <li>
-            <div class="bd-admin-item-main">
-              <strong>{{ p.title }}</strong>
-              <small>{{ p.author.get_full_name|default:p.author.username }} • {{ p.created_at|date:'d/m/Y' }}</small>
-            </div>
-            <div style="display:flex;gap:0.5rem">
-              <a class="bd-admin-btn bd-admin-btn-secondary" href="{% url 'blog_admin_edit' p.pk %}">Editar</a>
-              <a class="bd-admin-btn bd-admin-btn-secondary" href="{% url 'blog_admin_delete' p.pk %}">Excluir</a>
-            </div>
-          </li>
-        {% empty %}
-          <li class="bd-admin-empty">
-            <div class="bd-admin-item-main">
-              <strong>Nenhuma publicação.</strong>
-              <small>Crie a primeira publicação para aparecer no blog.</small>
-            </div>
-          </li>
-        {% endfor %}
-      </ul>
-
-      <div class="bd-admin-panel-footer">
-        <a class="bd-admin-btn bd-admin-btn-secondary" href="{% url 'blog_admin' %}">Abrir painel do Blog</a>
-      </div>
-    </section>
-
-    <section class="bd-admin-access" aria-label="Gerenciamento de permissoes">
-      <div>
-        <span>Seguran&ccedil;a</span>
-        <h2>Gerenciar permiss&otilde;es</h2>
-        <p>Atualize o acesso de administradores e superusu&aacute;rios para manter o painel restrito a pessoas autorizadas.</p>
-      </div>
-      <a class="bd-admin-btn bd-admin-btn-primary" href="{% url 'gerenciar_permissoes' %}">
-        Abrir permiss&otilde;es <i class="fa-solid fa-user-shield" aria-hidden="true"></i>
+    <h1>Controle do BE-Desk, <span>em um lugar.</span></h1>
+    <p>Gerencie as salas, as publicações do blog e as permissões de acesso.</p>
+    <div class="bd-ev-admin-acoes justify-content-center mt-4">
+      <a href="{% url 'criar_sala' %}" class="bd-ev-btn bd-ev-btn-primary">
+        <i class="fa-solid fa-plus" aria-hidden="true"></i> Criar sala
       </a>
-    </section>
+      <a href="{% url 'blog_admin' %}" class="bd-ev-btn">
+        <i class="fa-regular fa-newspaper" aria-hidden="true"></i> Gerenciar Blog
+      </a>
+      <a href="{% url 'blog_admin_create' %}" class="bd-ev-btn">
+        <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i> Criar Postagem
+      </a>
+    </div>
   </div>
-</section>
+
+  <!-- Resumo -->
+  <div class="bd-reservas-stats">
+    <div class="bd-reservas-stat">
+      <i class="fa-solid fa-door-open" aria-hidden="true"></i>
+      <span><strong>{{ salas|length }}</strong> sala{{ salas|length|pluralize }} cadastrada{{ salas|length|pluralize }}</span>
+    </div>
+    <div class="bd-reservas-stat">
+      <i class="fa-regular fa-newspaper" aria-hidden="true"></i>
+      <span><strong>{{ recent_posts|length }}</strong> publica{{ recent_posts|length|pluralize:"ção,ções" }} recente{{ recent_posts|length|pluralize }}</span>
+    </div>
+  </div>
+
+  <!-- Salas -->
+  <section class="bd-reservas-section" aria-labelledby="bd-admin-salas">
+    <div class="bd-reservas-section-head">
+      <h2 id="bd-admin-salas">Salas cadastradas</h2>
+      {% if salas %}
+      <div class="bd-ev-admin-acoes">
+        <span class="bd-reservas-count">{{ salas|length }} sala{{ salas|length|pluralize }}</span>
+        <a href="{% url 'criar_sala' %}" class="bd-ev-btn">
+          <i class="fa-solid fa-plus" aria-hidden="true"></i> Nova sala
+        </a>
+      </div>
+      {% endif %}
+    </div>
+
+    {% if salas %}
+    <div class="bd-reservas-card">
+      <table class="bd-reservas-table">
+        <thead>
+          <tr>
+            <th scope="col">Sala</th>
+            <th scope="col">Capacidade</th>
+            <th scope="col">Reservas</th>
+            <th scope="col" class="bd-reservas-acao">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in salas %}
+          <tr>
+            <td>
+              <span class="bd-reservas-th-mobile">Sala</span>
+              <span class="bd-reservas-sala">{{ s.nome }}</span>
+            </td>
+            <td>
+              <span class="bd-reservas-th-mobile">Capacidade</span>
+              <span>{{ s.capacidade }} pessoa{{ s.capacidade|pluralize }}</span>
+            </td>
+            <td>
+              <span class="bd-reservas-th-mobile">Reservas</span>
+              <span>{{ s.total_reservas }} reserva{{ s.total_reservas|pluralize }}</span>
+            </td>
+            <td class="bd-reservas-acao">
+              <span class="bd-reservas-th-mobile">Ações</span>
+              <span class="bd-aprov-actions">
+                <a href="{% url 'editar_sala' s.pk %}" class="bd-ev-btn" aria-label="Editar {{ s.nome }}">
+                  <i class="fa-solid fa-pen" aria-hidden="true"></i> Editar
+                </a>
+                <a href="{% url 'excluir_sala' s.pk %}" class="bd-ev-btn bd-ev-btn-danger" aria-label="Excluir {{ s.nome }}">
+                  <i class="fa-solid fa-trash-can" aria-hidden="true"></i> Excluir
+                </a>
+              </span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="bd-reservas-empty">
+      <i class="fa-solid fa-door-open" aria-hidden="true"></i>
+      <strong>Nenhuma sala cadastrada</strong>
+      <p>Crie a primeira sala para liberar novas reservas.</p>
+      <a href="{% url 'criar_sala' %}" class="bd-ev-btn bd-ev-btn-primary">
+        <i class="fa-solid fa-plus" aria-hidden="true"></i> Nova sala
+      </a>
+    </div>
+    {% endif %}
+  </section>
+
+  <!-- Publicações -->
+  <section class="bd-reservas-section" aria-labelledby="bd-admin-posts">
+    <div class="bd-reservas-section-head">
+      <h2 id="bd-admin-posts">Publicações recentes</h2>
+      <a href="{% url 'blog_admin' %}" class="bd-ev-btn">
+        <i class="fa-regular fa-newspaper" aria-hidden="true"></i> Abrir painel do Blog
+      </a>
+    </div>
+
+    {% if recent_posts %}
+    <div class="bd-reservas-card">
+      <table class="bd-reservas-table">
+        <thead>
+          <tr>
+            <th scope="col">Título</th>
+            <th scope="col">Autor</th>
+            <th scope="col">Data</th>
+            <th scope="col" class="bd-reservas-acao">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in recent_posts %}
+          <tr>
+            <td>
+              <span class="bd-reservas-th-mobile">Título</span>
+              <span class="bd-reservas-sala">{{ p.title }}</span>
+            </td>
+            <td>
+              <span class="bd-reservas-th-mobile">Autor</span>
+              <span>{{ p.author.get_full_name|default:p.author.username }}</span>
+            </td>
+            <td>
+              <span class="bd-reservas-th-mobile">Data</span>
+              <span>{{ p.created_at|date:'d/m/Y' }}</span>
+            </td>
+            <td class="bd-reservas-acao">
+              <span class="bd-reservas-th-mobile">Ações</span>
+              <span class="bd-aprov-actions">
+                <a href="{% url 'blog_admin_edit' p.pk %}" class="bd-ev-btn">
+                  <i class="fa-solid fa-pen" aria-hidden="true"></i> Editar
+                </a>
+                <a href="{% url 'blog_admin_delete' p.pk %}" class="bd-ev-btn bd-ev-btn-danger">
+                  <i class="fa-solid fa-trash-can" aria-hidden="true"></i> Excluir
+                </a>
+              </span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="bd-reservas-empty">
+      <i class="fa-regular fa-newspaper" aria-hidden="true"></i>
+      <strong>Nenhuma publicação</strong>
+      <p>Crie a primeira publicação para aparecer no blog.</p>
+      <a href="{% url 'blog_admin_create' %}" class="bd-ev-btn bd-ev-btn-primary">
+        <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i> Criar Postagem
+      </a>
+    </div>
+    {% endif %}
+  </section>
+
+  {% if user.is_superuser %}
+  <!-- Permissões (a view gerenciar_permissoes exige superusuário) -->
+  <section class="bd-reservas-section" aria-labelledby="bd-admin-perm">
+    <div class="bd-reservas-section-head">
+      <h2 id="bd-admin-perm">Gerenciar permissões</h2>
+    </div>
+    <div class="bd-ev-painel">
+      <p class="bd-ev-aviso">Defina quem é professor, aluno bolsista ou aluno. Apenas professores podem alterar papéis.</p>
+      <a href="{% url 'gerenciar_permissoes' %}" class="bd-ev-btn bd-ev-btn-primary">
+        <i class="fa-solid fa-user-shield" aria-hidden="true"></i> Abrir permissões
+      </a>
+    </div>
+  </section>
+  {% endif %}
+
+</div>
 {% endblock %}
