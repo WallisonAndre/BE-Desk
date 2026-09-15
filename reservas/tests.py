@@ -2,6 +2,7 @@
 from datetime import date, datetime, time, timedelta
 
 from django.contrib.auth import get_user_model
+from django.contrib.messages import get_messages
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -106,3 +107,75 @@ class PedidoDeReservaTests(TestCase):
         self.reserva(self.aluno, time(9, 35), 'REJEITADO')
         self.pedir(time(9, 35))
         self.assertEqual(self.pedidos_do_outro(), 1)
+
+
+class AprovacaoDeVariosPedidosTests(TestCase):
+    """Vários pedidos no mesmo horário, mas só uma aprovação."""
+
+    def setUp(self):
+        self.admin = User.objects.create_user('admin', password='x', is_staff=True)
+        self.aluno = User.objects.create_user('aluno', password='x')
+        self.outro = User.objects.create_user('outro', password='x')
+        self.sala = Sala.objects.create(nome='Quadra')
+        self.hora = time(7, 45)
+        self.dia = date.today() + timedelta(days=1)
+        while self.dia.weekday() >= 5:
+            self.dia += timedelta(days=1)
+
+    def pedido(self, usuario):
+        return Agendamento.objects.create(
+            usuario=usuario, sala=self.sala, nome=f'Treino de {usuario.username}',
+            motivo='treino', horario=self.hora,
+            data_inicio=timezone.make_aware(datetime.combine(self.dia, self.hora)),
+            status='PENDENTE',
+        )
+
+    def aprovar(self, agendamento):
+        self.client.force_login(self.admin)
+        return self.client.post(reverse('aprovar_reserva', args=[agendamento.pk]))
+
+    def aprovadas(self):
+        return Agendamento.objects.filter(
+            sala=self.sala, data_inicio__date=self.dia, horario=self.hora, status='APROVADO'
+        ).count()
+
+    def test_aprovar_o_segundo_pedido_do_mesmo_horario_e_barrado(self):
+        primeiro, segundo = self.pedido(self.aluno), self.pedido(self.outro)
+
+        self.aprovar(primeiro)
+        primeiro.refresh_from_db()
+        self.assertEqual(primeiro.status, 'APROVADO')
+
+        resp = self.aprovar(segundo)
+        segundo.refresh_from_db()
+        self.assertEqual(segundo.status, 'PENDENTE')
+        self.assertEqual(self.aprovadas(), 1)
+        self.assertIn(
+            'já está ocupada',
+            ' '.join(str(m) for m in get_messages(resp.wsgi_request)),
+        )
+
+    def test_recusar_o_segundo_libera_o_horario_para_ele_depois(self):
+        primeiro, segundo = self.pedido(self.aluno), self.pedido(self.outro)
+        self.aprovar(primeiro)
+
+        self.client.force_login(self.admin)
+        self.client.post(reverse('rejeitar_reserva', args=[primeiro.pk]))
+
+        self.aprovar(segundo)
+        segundo.refresh_from_db()
+        self.assertEqual(segundo.status, 'APROVADO')
+        self.assertEqual(self.aprovadas(), 1)
+
+    def test_aprovacao_por_ajax_do_segundo_devolve_409(self):
+        primeiro, segundo = self.pedido(self.aluno), self.pedido(self.outro)
+        self.aprovar(primeiro)
+
+        self.client.force_login(self.admin)
+        resp = self.client.post(
+            reverse('aprovar_reserva', args=[segundo.pk]),
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+        )
+        self.assertEqual(resp.status_code, 409)
+        self.assertFalse(resp.json()['success'])
+        self.assertEqual(self.aprovadas(), 1)

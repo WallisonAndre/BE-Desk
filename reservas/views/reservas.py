@@ -3,15 +3,17 @@ from datetime import date, datetime
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
+from bedesk.concorrencia import travar_sala
 from bedesk.models import Agendamento, Sala
 from notificacoes.services.notificar import (
     notificar_reserva_criada,
     notificar_reserva_cancelada,
 )
-from reservas.forms import AgendarForm
+from reservas.forms import AgendarForm, mensagem_reserva_em_conflito, reserva_em_conflito
 
 
 @login_required
@@ -29,9 +31,27 @@ def agendar_sala(request):
                 )
             nova_reserva.usuario = request.user
             nova_reserva.status = "PENDENTE"
-            nova_reserva.save()
-            notificar_reserva_criada(nova_reserva)
-            return redirect("reserva_sucesso")
+            # O formulário conferiu o horário, mas outra requisição pode ter
+            # pedido o mesmo horário desde então: confere de novo com a sala travada.
+            ocupado = None
+            with transaction.atomic():
+                travar_sala(nova_reserva.sala_id)
+                if nova_reserva.data_inicio and nova_reserva.horario:
+                    ocupado = reserva_em_conflito(
+                        nova_reserva.sala, nova_reserva.data_inicio.date(), nova_reserva.horario
+                    )
+                if not ocupado:
+                    nova_reserva.save()
+            if ocupado:
+                form.add_error(
+                    None,
+                    mensagem_reserva_em_conflito(
+                        nova_reserva.sala, nova_reserva.data_inicio.date(), nova_reserva.horario
+                    ),
+                )
+            else:
+                notificar_reserva_criada(nova_reserva)
+                return redirect("reserva_sucesso")
     else:
         form = AgendarForm(initial=initial_data)
 
@@ -43,15 +63,17 @@ def agendar_sala(request):
 def lista_reservas(request):
     today = date.today()
 
-    reservas_ativas = Agendamento.objects.filter(
-        usuario=request.user,
+    # As faixas geradas por um evento ficam no nome do responsável, mas não
+    # são reservas dele: só saem cancelando o evento.
+    minhas = Agendamento.objects.filter(usuario=request.user, eventos__isnull=True)
+
+    reservas_ativas = minhas.filter(
         data_inicio__date__gte=today,
         status__in=["APROVADO", "PENDENTE"],
     ).order_by("data_inicio", "horario")
 
     reservas_historico = (
-        Agendamento.objects.filter(usuario=request.user)
-        .exclude(pk__in=reservas_ativas.values_list("pk", flat=True))
+        minhas.exclude(pk__in=reservas_ativas.values_list("pk", flat=True))
         .order_by("-data_inicio", "horario")
     )
 
@@ -71,6 +93,14 @@ def lista_reservas(request):
 @require_POST
 def cancelar_reserva_usuario(request, agendamento_id):
     reserva = get_object_or_404(Agendamento, pk=agendamento_id, usuario=request.user)
+
+    evento = reserva.eventos.first()
+    if evento:
+        messages.warning(
+            request,
+            f'Este horário faz parte do evento "{evento.nome}" e só é liberado cancelando o evento.',
+        )
+        return redirect("lista_reserva")
 
     if reserva.status in ["PENDENTE", "APROVADO"]:
         reserva.status = "REJEITADO"

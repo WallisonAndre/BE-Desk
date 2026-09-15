@@ -2,14 +2,15 @@ from datetime import date
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
-from eventos.forms import EventoForm
+from bedesk.concorrencia import travar_sala
+from eventos.forms import EventoForm, mensagem_de_conflito
 from eventos.models import Evento, InscricaoEvento
-from eventos.services import liberar_espaco, reservar_espaco
+from eventos.services import buscar_conflitos, liberar_espaco, reservar_espaco
 from notificacoes.services.notificar import (
     notificar_evento_atualizado,
     notificar_evento_cancelado,
@@ -113,11 +114,20 @@ def criar_evento(request):
         if form.is_valid():
             evento = form.save(commit=False)
             evento.criado_por = request.user
-            evento.save()
-            reservar_espaco(evento)
-            notificar_evento_criado(evento)
-            messages.success(request, f'Evento "{evento.nome}" criado e espaço reservado.')
-            return redirect('detalhe_evento', pk=evento.pk)
+            # O formulário já conferiu conflitos, mas outra requisição pode ter
+            # ocupado a sala desde então: confere de novo com a sala travada.
+            with transaction.atomic():
+                travar_sala(evento.sala_id)
+                conflitos = buscar_conflitos(evento)
+                if not conflitos:
+                    evento.save()
+                    reservar_espaco(evento)
+            if conflitos:
+                form.add_error(None, mensagem_de_conflito(evento.sala, conflitos))
+            else:
+                notificar_evento_criado(evento)
+                messages.success(request, f'Evento "{evento.nome}" criado e espaço reservado.')
+                return redirect('detalhe_evento', pk=evento.pk)
     else:
         form = EventoForm(initial={'responsavel': request.user})
 
@@ -132,12 +142,19 @@ def editar_evento(request, pk):
     if request.method == 'POST':
         form = EventoForm(request.POST, instance=evento)
         if form.is_valid():
-            evento = form.save()
-            # Horário ou sala podem ter mudado: refaz a ocupação da grade.
-            reservar_espaco(evento)
-            notificar_evento_atualizado(evento)
-            messages.success(request, 'Evento atualizado.')
-            return redirect('detalhe_evento', pk=evento.pk)
+            with transaction.atomic():
+                travar_sala(form.instance.sala_id)
+                conflitos = buscar_conflitos(form.instance, ignorar_evento=form.instance)
+                if not conflitos:
+                    evento = form.save()
+                    # Horário ou sala podem ter mudado: refaz a ocupação da grade.
+                    reservar_espaco(evento)
+            if conflitos:
+                form.add_error(None, mensagem_de_conflito(form.instance.sala, conflitos))
+            else:
+                notificar_evento_atualizado(evento)
+                messages.success(request, 'Evento atualizado.')
+                return redirect('detalhe_evento', pk=evento.pk)
     else:
         form = EventoForm(instance=evento)
 
