@@ -291,3 +291,70 @@ class HorarioFixoNaGradeTests(TestCase):
             reverse('detalhe_sala', args=[outra.nome]), {'foco': self.segunda.isoformat()}
         )
         self.assertEqual(self.celulas_fixas(resp), [])
+
+
+class HorarioFixoBloqueiaTests(TestCase):
+    """O horário fixo é respeitado no pedido, na aprovação e no evento."""
+
+    def setUp(self):
+        self.admin = User.objects.create_user('admin', password='x', is_staff=True)
+        self.aluno = User.objects.create_user('aluno', password='x')
+        self.sala = Sala.objects.create(nome='Ginásio')
+        hoje = date.today()
+        self.segunda = hoje - timedelta(days=hoje.weekday()) + timedelta(days=7)
+        self.fixo = HorarioFixo.objects.create(
+            sala=self.sala, dia_semana=HorarioFixo.SEGUNDA, horario_inicio=time(7, 0),
+            horario_fim=time(8, 30), descricao='Treino de futsal',
+        )
+
+    def pedir(self, hora, dia=None):
+        self.client.force_login(self.aluno)
+        return self.client.post(reverse('agendar_sala'), {
+            'nome': 'Treino', 'sala': self.sala.pk, 'motivo': 'treino',
+            'horario': hora.strftime('%H:%M'), 'data_inicio': (dia or self.segunda).isoformat(),
+        })
+
+    def test_pedido_em_horario_fixo_e_recusado(self):
+        resp = self.pedir(time(7, 0))
+        self.assertFalse(Agendamento.objects.exists())
+        self.assertContains(resp, 'tem horário fixo')
+        self.assertContains(resp, 'Treino de futsal')
+
+    def test_pedido_na_faixa_de_borda_tambem_e_recusado(self):
+        self.pedir(time(7, 45))
+        self.assertFalse(Agendamento.objects.exists())
+
+    def test_pedido_em_outro_dia_da_semana_e_aceito(self):
+        self.pedir(time(7, 0), dia=self.segunda + timedelta(days=1))
+        self.assertEqual(Agendamento.objects.count(), 1)
+
+    def test_pedido_fora_da_janela_e_aceito(self):
+        self.pedir(time(8, 50))
+        self.assertEqual(Agendamento.objects.count(), 1)
+
+    def test_aprovacao_de_pedido_anterior_ao_horario_fixo_e_barrada(self):
+        pedido = Agendamento.objects.create(
+            usuario=self.aluno, sala=self.sala, nome='Treino antigo', motivo='treino',
+            horario=time(7, 0),
+            data_inicio=timezone.make_aware(datetime.combine(self.segunda, time(7, 0))),
+            status='PENDENTE',
+        )
+        self.client.force_login(self.admin)
+        resp = self.client.post(reverse('aprovar_reserva', args=[pedido.pk]))
+        pedido.refresh_from_db()
+        self.assertEqual(pedido.status, 'PENDENTE')
+        self.assertIn(
+            'horário fixo', ' '.join(str(m) for m in get_messages(resp.wsgi_request))
+        )
+
+    def test_evento_sobre_horario_fixo_e_recusado(self):
+        self.client.force_login(self.admin)
+        resp = self.client.post(reverse('criar_evento'), {
+            'nome': 'Torneio', 'descricao': 'Interclasse', 'categoria': 'ESPORTIVO',
+            'responsavel': self.admin.pk, 'sala': self.sala.pk,
+            'data_inicio': self.segunda.isoformat(), 'data_fim': self.segunda.isoformat(),
+            'horario_inicio': '08:00', 'horario_fim': '09:00',
+        })
+        from eventos.models import Evento
+        self.assertEqual(Evento.objects.count(), 0)
+        self.assertContains(resp, 'horário fixo')

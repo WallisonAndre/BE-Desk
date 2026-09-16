@@ -13,6 +13,7 @@ from django.views.decorators.http import require_POST
 
 from bedesk.concorrencia import travar_sala
 from bedesk.models import Agendamento, Sala
+from reservas.views.salas import horario_fixo_em
 from notificacoes.services.notificar import (
     notificar_reserva_aprovada,
     notificar_reserva_rejeitada,
@@ -210,6 +211,19 @@ def mudar_status_reserva(request, agendamento_id, novo_status):
 
     with transaction.atomic():
         travar_sala(reserva.sala_id)
+        # O horário fixo pode ter sido cadastrado depois do pedido: aprovar
+        # agora colocaria uma reserva por cima de um treino recorrente.
+        if novo_status == "APROVADO" and reserva.data_inicio:
+            fixo = horario_fixo_em(
+                reserva.sala, timezone.localtime(reserva.data_inicio).date(), reserva.horario
+            )
+            if fixo:
+                return _recusar_mudanca(
+                    request,
+                    f"Não foi possível aprovar: {reserva.sala.nome} tem horário fixo às "
+                    f"{reserva.horario:%H:%M} toda {fixo.get_dia_semana_display().lower()} "
+                    f"({fixo.descricao}).",
+                )
         # Pedido pendente não impede a criação de um evento, que só considera
         # o que já está aprovado. Sem esta trava, aprovar o pedido depois
         # deixava duas ocupações aprovadas no mesmo horário da mesma sala.

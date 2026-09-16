@@ -13,7 +13,13 @@ from notificacoes.services.notificar import (
     notificar_reserva_criada,
     notificar_reserva_cancelada,
 )
-from reservas.forms import AgendarForm, mensagem_reserva_em_conflito, reserva_em_conflito
+from reservas.forms import (
+    AgendarForm,
+    mensagem_horario_fixo,
+    mensagem_reserva_em_conflito,
+    reserva_em_conflito,
+)
+from reservas.views.salas import horario_fixo_em
 
 
 @login_required
@@ -33,16 +39,23 @@ def agendar_sala(request):
             nova_reserva.status = "PENDENTE"
             # O formulário conferiu o horário, mas outra requisição pode ter
             # pedido o mesmo horário desde então: confere de novo com a sala travada.
-            ocupado = None
+            ocupado = fixo = None
             with transaction.atomic():
                 travar_sala(nova_reserva.sala_id)
                 if nova_reserva.data_inicio and nova_reserva.horario:
-                    ocupado = reserva_em_conflito(
-                        nova_reserva.sala, nova_reserva.data_inicio.date(), nova_reserva.horario
-                    )
-                if not ocupado:
+                    dia = nova_reserva.data_inicio.date()
+                    fixo = horario_fixo_em(nova_reserva.sala, dia, nova_reserva.horario)
+                    if not fixo:
+                        ocupado = reserva_em_conflito(
+                            nova_reserva.sala, dia, nova_reserva.horario
+                        )
+                if not fixo and not ocupado:
                     nova_reserva.save()
-            if ocupado:
+            if fixo:
+                form.add_error(
+                    None, mensagem_horario_fixo(nova_reserva.sala, fixo, nova_reserva.horario)
+                )
+            elif ocupado:
                 form.add_error(
                     None,
                     mensagem_reserva_em_conflito(

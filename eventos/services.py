@@ -17,7 +17,7 @@ from django.utils import timezone
 
 from bedesk.models import Agendamento
 from eventos.models import Evento
-from reservas.views.salas import FAIXAS_HORARIO
+from reservas.views.salas import FAIXAS_HORARIO, horarios_fixos_sobrepostos
 
 
 def _dias_do_evento(evento):
@@ -91,6 +91,16 @@ def buscar_conflitos(evento, ignorar_evento=None):
     conflitos = [
         f'pelo evento "{outro.nome}" ({_periodo(outro)})'
         for outro in eventos_sobrepostos(evento, ignorar_evento)
+    ]
+    conflitos += [
+        f'pelo horário fixo "{fixo.descricao}" '
+        f'(toda {fixo.get_dia_semana_display().lower()}, {fixo.periodo})'
+        for fixo in horarios_fixos_sobrepostos(
+            evento.sala,
+            list(_dias_do_evento(evento)),
+            evento.horario_inicio,
+            evento.horario_fim,
+        )
     ]
     conflitos += [
         f'pela reserva "{reserva.nome}" em {timezone.localtime(reserva.data_inicio):%d/%m} '

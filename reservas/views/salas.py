@@ -117,6 +117,34 @@ def faixas_do_horario_fixo(horario_fixo):
     ]
 
 
+def horario_fixo_em(sala, dia, horario):
+    """Horário fixo que ocupa a sala naquele dia, na faixa que começa em `horario`."""
+    faixa = next(((inicio, fim) for inicio, fim in FAIXAS_HORARIO if inicio == horario), None)
+    if faixa is None:
+        return None
+    inicio, fim = faixa
+    return HorarioFixo.objects.filter(
+        sala=sala,
+        dia_semana=dia.weekday(),
+        horario_inicio__lt=fim,
+        horario_fim__gt=inicio,
+    ).first()
+
+
+def horarios_fixos_sobrepostos(sala, dias, horario_inicio, horario_fim):
+    """Horários fixos da sala que colidem com a janela, nos dias informados."""
+    if not dias:
+        return []
+    return list(
+        HorarioFixo.objects.filter(
+            sala=sala,
+            dia_semana__in={dia.weekday() for dia in dias},
+            horario_inicio__lt=horario_fim,
+            horario_fim__gt=horario_inicio,
+        )
+    )
+
+
 def mapa_de_horarios_fixos(sala):
     """Ocupação recorrente da sala, indexada por (hora, dia da semana).
 
