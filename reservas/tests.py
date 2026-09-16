@@ -227,3 +227,67 @@ class HorarioFixoModeloTests(TestCase):
         self.criar(time(7, 0), time(8, 30))
         self.criar(time(7, 0), time(8, 30), dia=2)
         self.assertEqual(HorarioFixo.objects.count(), 2)
+
+
+class HorarioFixoNaGradeTests(TestCase):
+    def setUp(self):
+        self.usuario = User.objects.create_user('aluno', password='x')
+        self.sala = Sala.objects.create(nome='Ginásio')
+        # Segunda-feira da próxima semana, para a grade sempre encontrá-la.
+        hoje = date.today()
+        self.segunda = hoje - timedelta(days=hoje.weekday()) + timedelta(days=7)
+        self.fixo = HorarioFixo.objects.create(
+            sala=self.sala, dia_semana=HorarioFixo.SEGUNDA, horario_inicio=time(7, 0),
+            horario_fim=time(8, 30), descricao='Treino de futsal',
+        )
+
+    def grade(self):
+        self.client.force_login(self.usuario)
+        resp = self.client.get(
+            reverse('detalhe_sala', args=[self.sala.nome]), {'foco': self.segunda.isoformat()}
+        )
+        self.assertEqual(resp.status_code, 200)
+        return resp
+
+    def celulas_fixas(self, resp):
+        return [
+            (linha['hora_para_link'], indice)
+            for linha in resp.context['tabela_horarios'] if linha['tipo'] == 'hora'
+            for indice, celula in enumerate(linha['celulas']) if celula['horario_fixo']
+        ]
+
+    def test_ocupa_todas_as_faixas_da_janela_na_segunda(self):
+        self.assertEqual(self.celulas_fixas(self.grade()), [('07:00', 0), ('07:45', 0)])
+
+    def test_aparece_identificado_e_sem_botao_de_reservar(self):
+        html = self.grade().content.decode()
+        self.assertIn('Treino de futsal', html)
+        self.assertIn('badge-fixo', html)
+        self.assertIn('Horário fixo', html)
+
+    def test_se_repete_na_semana_seguinte_sem_recadastrar(self):
+        self.client.force_login(self.usuario)
+        proxima = self.segunda + timedelta(days=7)
+        resp = self.client.get(
+            reverse('detalhe_sala', args=[self.sala.nome]), {'foco': proxima.isoformat()}
+        )
+        self.assertEqual(self.celulas_fixas(resp), [('07:00', 0), ('07:45', 0)])
+
+    def test_remover_libera_a_grade(self):
+        self.fixo.delete()
+        self.assertEqual(self.celulas_fixas(self.grade()), [])
+
+    def test_editar_move_a_ocupacao(self):
+        self.fixo.dia_semana = 2
+        self.fixo.horario_inicio = time(13, 0)
+        self.fixo.horario_fim = time(13, 45)
+        self.fixo.save()
+        self.assertEqual(self.celulas_fixas(self.grade()), [('13:00', 2)])
+
+    def test_nao_aparece_em_outra_sala(self):
+        outra = Sala.objects.create(nome='Quadra Coberta')
+        self.client.force_login(self.usuario)
+        resp = self.client.get(
+            reverse('detalhe_sala', args=[outra.nome]), {'foco': self.segunda.isoformat()}
+        )
+        self.assertEqual(self.celulas_fixas(resp), [])

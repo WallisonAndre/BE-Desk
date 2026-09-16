@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render
 
 from bedesk.models import Agendamento, Sala
+from reservas.models import HorarioFixo
 
 
 HORARIOS_ESTRUTURA = [
@@ -76,7 +77,9 @@ def detalhe_sala(request, nome_sala):
     }
 
     context = {
-        "tabela_horarios": _build_tabela_horarios(dias_semana_datas, agendamentos_map),
+        "tabela_horarios": _build_tabela_horarios(
+            dias_semana_datas, agendamentos_map, mapa_de_horarios_fixos(sala_obj)
+        ),
         "dias_semana_nomes": DIAS_SEMANA_NOMES,
         "sala": sala_obj,
         "faixa_datas_semana": {
@@ -101,7 +104,33 @@ def _get_data_foco(data_foco_str):
         return date.today()
 
 
-def _build_tabela_horarios(dias_semana_datas, agendamentos_map):
+def faixas_do_horario_fixo(horario_fixo):
+    """Horários da grade que a janela do horário fixo toca.
+
+    Mesma regra dos eventos: entra o horário cujo trecho se sobrepõe à janela,
+    mesmo que ela comece no meio dele.
+    """
+    return [
+        inicio
+        for inicio, fim in FAIXAS_HORARIO
+        if inicio < horario_fixo.horario_fim and fim > horario_fixo.horario_inicio
+    ]
+
+
+def mapa_de_horarios_fixos(sala):
+    """Ocupação recorrente da sala, indexada por (hora, dia da semana).
+
+    O horário fixo não gera agendamento: a ocupação é montada na hora de
+    desenhar a grade, e vale para qualquer semana.
+    """
+    mapa = {}
+    for horario_fixo in HorarioFixo.objects.filter(sala=sala):
+        for inicio in faixas_do_horario_fixo(horario_fixo):
+            mapa[(inicio.strftime("%H:%M"), horario_fixo.dia_semana)] = horario_fixo
+    return mapa
+
+
+def _build_tabela_horarios(dias_semana_datas, agendamentos_map, horarios_fixos_map):
     tabela_horarios = []
 
     for item in HORARIOS_ESTRUTURA:
@@ -119,6 +148,7 @@ def _build_tabela_horarios(dias_semana_datas, agendamentos_map):
                     {
                         "data": data_do_dia,
                         "agendamento": agendamentos_map.get((hora_inicio_str, dia_num)),
+                        "horario_fixo": horarios_fixos_map.get((hora_inicio_str, dia_num)),
                     }
                     for dia_num, data_do_dia in enumerate(dias_semana_datas)
                 ],
