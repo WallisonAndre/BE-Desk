@@ -8,6 +8,9 @@ from django.urls import reverse
 from django.utils import timezone
 
 from bedesk.models import Agendamento, Sala
+from django.core.exceptions import ValidationError
+
+from reservas.models import HorarioFixo
 
 User = get_user_model()
 
@@ -179,3 +182,48 @@ class AprovacaoDeVariosPedidosTests(TestCase):
         self.assertEqual(resp.status_code, 409)
         self.assertFalse(resp.json()['success'])
         self.assertEqual(self.aprovadas(), 1)
+
+
+class HorarioFixoModeloTests(TestCase):
+    def setUp(self):
+        self.sala = Sala.objects.create(nome='Ginásio')
+
+    def criar(self, inicio, fim, dia=HorarioFixo.SEGUNDA, descricao='Treino de futsal'):
+        horario = HorarioFixo(
+            sala=self.sala, dia_semana=dia, horario_inicio=inicio, horario_fim=fim,
+            descricao=descricao,
+        )
+        horario.full_clean()
+        horario.save()
+        return horario
+
+    def test_aceita_horario_dentro_da_grade(self):
+        horario = self.criar(time(7, 0), time(8, 30))
+        self.assertEqual(horario.periodo, '07:00 às 08:30')
+        self.assertEqual(str(horario), 'Treino de futsal — Ginásio, Segunda-feira')
+
+    def test_recusa_termino_antes_do_inicio(self):
+        with self.assertRaises(ValidationError) as erro:
+            self.criar(time(10, 0), time(9, 0))
+        self.assertIn('horario_fim', erro.exception.message_dict)
+
+    def test_recusa_horario_fora_da_grade(self):
+        with self.assertRaises(ValidationError) as erro:
+            self.criar(time(19, 0), time(21, 0))
+        self.assertIn('dentro da grade', str(erro.exception))
+
+    def test_recusa_dia_de_fim_de_semana(self):
+        with self.assertRaises(ValidationError) as erro:
+            self.criar(time(8, 0), time(9, 0), dia=5)
+        self.assertIn('dia_semana', erro.exception.message_dict)
+
+    def test_nao_repete_mesma_sala_dia_e_inicio(self):
+        self.criar(time(7, 0), time(8, 30))
+        with self.assertRaises(ValidationError) as erro:
+            self.criar(time(7, 0), time(9, 35), descricao='Outro treino')
+        self.assertIn('já existe', str(erro.exception).lower())
+
+    def test_mesma_sala_e_horario_em_outro_dia_e_permitido(self):
+        self.criar(time(7, 0), time(8, 30))
+        self.criar(time(7, 0), time(8, 30), dia=2)
+        self.assertEqual(HorarioFixo.objects.count(), 2)
