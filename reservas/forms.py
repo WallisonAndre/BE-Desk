@@ -2,7 +2,8 @@ import datetime
 
 from django import forms
 
-from bedesk.models import Agendamento
+from bedesk.models import Agendamento, Sala
+from reservas.models import HorarioFixo
 from reservas.views.salas import FAIXAS_HORARIO, horario_fixo_em
 
 # A checagem de conflito compara o horário exato. Uma reserva fora destes
@@ -86,3 +87,22 @@ class AgendarForm(forms.ModelForm):
             if reserva_em_conflito(sala, dia, horario, excluir_pk=self.instance.pk):
                 self.add_error(None, mensagem_reserva_em_conflito(sala, dia, horario))
         return cleaned_data
+
+
+class HorarioFixoForm(forms.ModelForm):
+    class Meta:
+        model = HorarioFixo
+        fields = ["sala", "dia_semana", "horario_inicio", "horario_fim", "descricao"]
+        widgets = {
+            "horario_inicio": forms.TimeInput(attrs={"type": "time"}, format="%H:%M"),
+            "horario_fim": forms.TimeInput(attrs={"type": "time"}, format="%H:%M"),
+            "descricao": forms.TextInput(
+                attrs={"placeholder": "Ex.: Treino de futsal da equipe do campus"}
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["sala"].queryset = Sala.objects.order_by("nome")
+        for campo in ("horario_inicio", "horario_fim"):
+            self.fields[campo].input_formats = ["%H:%M", "%H:%M:%S"]

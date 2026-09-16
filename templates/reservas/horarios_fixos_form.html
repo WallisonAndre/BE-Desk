@@ -1,0 +1,62 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}{{ titulo }} - BE-Desk{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/admin-form.css' %}?v=20260814">
+{% endblock %}
+
+{% block content %}
+<section class="bd-adminform-page">
+  <div class="bd-adminform-shell">
+
+    <a href="{% url 'lista_horarios_fixos' %}" class="bd-adminform-back">
+      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+      Horários fixos
+    </a>
+
+    <header class="bd-adminform-header">
+      <span class="bd-adminform-kicker">Uso recorrente</span>
+      <h1>{{ titulo }}</h1>
+      <p>O horário vale toda semana, sem precisar recadastrar, e fica indisponível para reserva.</p>
+    </header>
+
+    <form method="post" class="bd-adminform" novalidate>
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+      <div class="bd-adminform-errors" role="alert">
+        {% for error in form.non_field_errors %}
+        <div><i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i> {{ error }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      {% for field in form %}
+      <div class="bd-adminform-field {% if field.errors %}has-error{% endif %}">
+        <label for="{{ field.id_for_label }}">
+          {{ field.label }}{% if field.field.required %}<span class="bd-adminform-required" aria-hidden="true">*</span>{% endif %}
+        </label>
+        {{ field }}
+        {% if field.help_text %}<small class="bd-adminform-help">{{ field.help_text }}</small>{% endif %}
+        {% if field.errors %}
+        <div class="bd-adminform-field-error" role="alert">
+          <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i> {{ field.errors.0 }}
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+
+      <div class="bd-adminform-actions">
+        <button type="submit" class="bd-adminform-btn bd-adminform-btn-primary">
+          <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i> Salvar horário fixo
+        </button>
+        <a href="{% url 'lista_horarios_fixos' %}" class="bd-adminform-btn bd-adminform-btn-secondary">Cancelar</a>
+      </div>
+    </form>
+
+  </div>
+</section>
+{% endblock %}

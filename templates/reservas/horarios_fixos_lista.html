@@ -1,0 +1,109 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Horários fixos - BE-Desk{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/reservas.css' %}?v=20260903">
+<link rel="stylesheet" href="{% static 'css/eventos.css' %}?v=20260814">
+<link rel="stylesheet" href="{% static 'css/admin-form.css' %}?v=20260814">
+{% endblock %}
+
+{% block content %}
+<div class="container bd-reservas-page">
+
+  <a href="{% url 'admin_dashboard' %}" class="bd-adminform-back">
+    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+    Painel administrativo
+  </a>
+
+  <div class="bd-reservas-hero">
+    <div class="bd-reservas-kicker">
+      <i class="fa-solid fa-repeat" aria-hidden="true"></i> Uso recorrente
+    </div>
+    <h1>Horários <span>fixos</span></h1>
+    <p>Treinos e atividades que ocupam o mesmo espaço toda semana, sem passar por pedido de reserva.</p>
+  </div>
+
+  <section class="bd-reservas-section" aria-labelledby="bd-fixos-titulo">
+    <div class="bd-reservas-section-head">
+      <h2 id="bd-fixos-titulo">Cadastrados</h2>
+      <div class="bd-ev-admin-acoes">
+        {% if horarios %}
+        <span class="bd-reservas-count">{{ horarios|length }} horário{{ horarios|length|pluralize }}</span>
+        {% endif %}
+        <a href="{% url 'criar_horario_fixo' %}" class="bd-ev-btn bd-ev-btn-primary">
+          <i class="fa-solid fa-plus" aria-hidden="true"></i> Novo horário fixo
+        </a>
+      </div>
+    </div>
+
+    {% if horarios %}
+    <div class="bd-reservas-card">
+      <table class="bd-reservas-table">
+        <thead>
+          <tr>
+            <th scope="col">Espaço</th>
+            <th scope="col">Dia</th>
+            <th scope="col">Horário</th>
+            <th scope="col">O que ocupa</th>
+            <th scope="col" class="bd-reservas-acao">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for h in horarios %}
+          <tr>
+            <td>
+              <span class="bd-reservas-th-mobile">Espaço</span>
+              <span class="bd-reservas-sala">{{ h.sala.nome }}</span>
+            </td>
+            <td>
+              <span class="bd-reservas-th-mobile">Dia</span>
+              <span>Toda {{ h.get_dia_semana_display|lower }}</span>
+            </td>
+            <td>
+              <span class="bd-reservas-th-mobile">Horário</span>
+              <span>{{ h.periodo }}</span>
+            </td>
+            <td>
+              <span class="bd-reservas-th-mobile">O que ocupa</span>
+              <span>{{ h.descricao }}</span>
+            </td>
+            <td class="bd-reservas-acao">
+              <span class="bd-reservas-th-mobile">Ações</span>
+              <span class="bd-aprov-actions">
+                <a href="{% url 'editar_horario_fixo' h.pk %}" class="bd-ev-btn"
+                   aria-label="Editar {{ h.descricao }}">
+                  <i class="fa-solid fa-pen" aria-hidden="true"></i> Editar
+                </a>
+                <form method="post" action="{% url 'remover_horario_fixo' h.pk %}"
+                      data-confirm-title="Remover horário fixo"
+                      data-confirm="Remover &quot;{{ h.descricao }}&quot; de {{ h.sala.nome }}, toda {{ h.get_dia_semana_display|lower }} das {{ h.periodo }}? O horário volta a ficar livre na grade."
+                      data-confirm-ok="Remover">
+                  {% csrf_token %}
+                  <button type="submit" class="bd-ev-btn bd-ev-btn-danger"
+                          aria-label="Remover {{ h.descricao }}">
+                    <i class="fa-solid fa-trash-can" aria-hidden="true"></i> Remover
+                  </button>
+                </form>
+              </span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="bd-reservas-empty">
+      <i class="fa-solid fa-repeat" aria-hidden="true"></i>
+      <strong>Nenhum horário fixo cadastrado</strong>
+      <p>Cadastre os treinos e atividades que ocupam um espaço toda semana.</p>
+      <a href="{% url 'criar_horario_fixo' %}" class="bd-ev-btn bd-ev-btn-primary">
+        <i class="fa-solid fa-plus" aria-hidden="true"></i> Novo horário fixo
+      </a>
+    </div>
+    {% endif %}
+  </section>
+
+</div>
+{% endblock %}

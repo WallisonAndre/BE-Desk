@@ -358,3 +358,112 @@ class HorarioFixoBloqueiaTests(TestCase):
         from eventos.models import Evento
         self.assertEqual(Evento.objects.count(), 0)
         self.assertContains(resp, 'horário fixo')
+
+
+class PainelDeHorariosFixosTests(TestCase):
+    """Cadastrar, editar e remover pelo painel, com aviso de choque."""
+
+    def setUp(self):
+        self.admin = User.objects.create_user('admin', password='x', is_staff=True)
+        self.aluno = User.objects.create_user('aluno', password='x')
+        self.sala = Sala.objects.create(nome='Ginásio')
+        hoje = date.today()
+        self.segunda = hoje - timedelta(days=hoje.weekday()) + timedelta(days=7)
+
+    def dados(self, **extra):
+        dados = {
+            'sala': self.sala.pk, 'dia_semana': HorarioFixo.SEGUNDA,
+            'horario_inicio': '07:00', 'horario_fim': '08:30',
+            'descricao': 'Treino de futsal',
+        }
+        dados.update(extra)
+        return dados
+
+    def avisos(self, resp):
+        return ' '.join(str(m) for m in get_messages(resp.wsgi_request))
+
+    def test_aluno_nao_acessa_o_cadastro(self):
+        self.client.force_login(self.aluno)
+        self.assertIn(self.client.get(reverse('lista_horarios_fixos')).status_code, (302, 403))
+
+    def test_admin_cadastra_informando_espaco_dia_horario_e_descricao(self):
+        self.client.force_login(self.admin)
+        self.client.post(reverse('criar_horario_fixo'), self.dados())
+        fixo = HorarioFixo.objects.get()
+        self.assertEqual(
+            (fixo.sala, fixo.dia_semana, fixo.periodo, fixo.descricao, fixo.criado_por),
+            (self.sala, HorarioFixo.SEGUNDA, '07:00 às 08:30', 'Treino de futsal', self.admin),
+        )
+
+    def test_cadastro_fora_da_grade_e_recusado_com_explicacao(self):
+        self.client.force_login(self.admin)
+        resp = self.client.post(
+            reverse('criar_horario_fixo'), self.dados(horario_inicio='19:00', horario_fim='21:00')
+        )
+        self.assertEqual(HorarioFixo.objects.count(), 0)
+        self.assertContains(resp, 'dentro da grade')
+
+    def test_avisa_quando_ja_ha_reserva_aprovada_no_horario(self):
+        Agendamento.objects.create(
+            usuario=self.aluno, sala=self.sala, nome='Treino marcado', motivo='treino',
+            horario=time(7, 0),
+            data_inicio=timezone.make_aware(datetime.combine(self.segunda, time(7, 0))),
+            status='APROVADO',
+        )
+        self.client.force_login(self.admin)
+        resp = self.client.post(reverse('criar_horario_fixo'), self.dados())
+        self.assertEqual(HorarioFixo.objects.count(), 1)
+        aviso = self.avisos(resp)
+        self.assertIn('reserva(s) aprovada(s)', aviso)
+        self.assertIn(f'{self.segunda:%d/%m}', aviso)
+
+    def test_avisa_quando_ja_ha_evento_no_horario(self):
+        from eventos.models import Evento
+        Evento.objects.create(
+            nome='Torneio', descricao='x', categoria='ESPORTIVO', responsavel=self.admin,
+            sala=self.sala, data_inicio=self.segunda, data_fim=self.segunda,
+            horario_inicio=time(8, 0), horario_fim=time(9, 0),
+        )
+        self.client.force_login(self.admin)
+        resp = self.client.post(reverse('criar_horario_fixo'), self.dados())
+        self.assertIn('Torneio', self.avisos(resp))
+
+    def test_sem_choque_nao_avisa(self):
+        self.client.force_login(self.admin)
+        resp = self.client.post(reverse('criar_horario_fixo'), self.dados())
+        self.assertNotIn('já havia', self.avisos(resp))
+
+    def test_admin_edita(self):
+        self.client.force_login(self.admin)
+        self.client.post(reverse('criar_horario_fixo'), self.dados())
+        fixo = HorarioFixo.objects.get()
+        self.client.post(
+            reverse('editar_horario_fixo', args=[fixo.pk]),
+            self.dados(dia_semana=2, descricao='Treino de vôlei'),
+        )
+        fixo.refresh_from_db()
+        self.assertEqual((fixo.dia_semana, fixo.descricao), (2, 'Treino de vôlei'))
+
+    def test_admin_remove_e_horario_volta_a_ficar_livre(self):
+        self.client.force_login(self.admin)
+        self.client.post(reverse('criar_horario_fixo'), self.dados())
+        fixo = HorarioFixo.objects.get()
+        resp = self.client.post(reverse('remover_horario_fixo', args=[fixo.pk]))
+        self.assertEqual(HorarioFixo.objects.count(), 0)
+        self.assertIn('voltou a ficar livre', self.avisos(resp))
+
+        # e o pedido naquele horário volta a ser aceito
+        self.client.force_login(self.aluno)
+        self.client.post(reverse('agendar_sala'), {
+            'nome': 'Treino', 'sala': self.sala.pk, 'motivo': 'treino',
+            'horario': '07:00', 'data_inicio': self.segunda.isoformat(),
+        })
+        self.assertEqual(Agendamento.objects.count(), 1)
+
+    def test_lista_mostra_os_cadastrados(self):
+        self.client.force_login(self.admin)
+        self.client.post(reverse('criar_horario_fixo'), self.dados())
+        html = self.client.get(reverse('lista_horarios_fixos')).content.decode()
+        self.assertIn('Treino de futsal', html)
+        self.assertIn('Toda segunda-feira', html)
+        self.assertIn('07:00 às 08:30', html)

@@ -7,6 +7,12 @@ from reservas.views.ajax import (
     lista_agendamentos,
     tela_ajax,
 )
+from reservas.views.horarios_fixos import (
+    criar_horario_fixo,
+    editar_horario_fixo,
+    lista_horarios_fixos,
+    remover_horario_fixo,
+)
 from reservas.views.reservas import agendar_sala, cancelar_reserva_usuario, lista_reservas
 from reservas.views.salas import detalhe_sala, lista_locais
 
@@ -20,6 +26,10 @@ urlpatterns = [
     path("sala/<str:nome_sala>/", detalhe_sala, name="detalhe_sala"),
     path("agendar/", agendar_sala, name="agendar_sala"),
     path("reservas/", lista_reservas, name="lista_reserva"),
+    path("horarios-fixos/", lista_horarios_fixos, name="lista_horarios_fixos"),
+    path("horarios-fixos/novo/", criar_horario_fixo, name="criar_horario_fixo"),
+    path("horarios-fixos/<int:pk>/editar/", editar_horario_fixo, name="editar_horario_fixo"),
+    path("horarios-fixos/<int:pk>/remover/", remover_horario_fixo, name="remover_horario_fixo"),
     path(
         "reservas/cancelar/<int:agendamento_id>/",
         cancelar_reserva_usuario,
