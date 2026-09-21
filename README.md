@@ -39,6 +39,18 @@ As principais ferramentas usadas no desenvolvimento do sistema:
 
 ---
 
+## 👥 Equipe
+
+| Integrante | Papel | GitHub |
+| --- | --- | --- |
+| Elison | Product Owner | [@ellisonpanda](https://github.com/ellisonpanda) |
+| Wallison André | Scrum Master | [@WallisonAndre](https://github.com/WallisonAndre) |
+| Igor Murilo | Desenvolvimento | [@devigMurilo](https://github.com/devigMurilo) |
+
+Turma de Informática para Internet — 4V, disciplina de Projeto e Desenvolvimento de Sistemas para Internet.
+
+---
+
 <h2 align="center">🚀 Como Executar o Projeto</h2>
 
 <p align="center">
@@ -172,13 +184,12 @@ eventos/services.py      ocupa e libera a grade de horários do evento
 
 ## 🌿 Branches e Fluxo de Trabalho
 
-O repositório usa uma branch de integração entre o trabalho do dia a dia e a versão estável:
+O trabalho do dia a dia acontece em uma branch por tarefa, e tudo chega à `main` por Pull Request:
 
 | Branch | Papel |
 | --- | --- |
-| `main` | Versão estável. Só recebe código que já passou pela `development`. |
-| `development` | Integração do time. É a base de toda tarefa nova. |
-| `feat/…` `fix/…` `chore/…` | Uma branch por tarefa, criada a partir da `development`. |
+| `main` | Versão estável e base de toda tarefa nova. |
+| `feat/…` `fix/…` `chore/…` | Uma branch por tarefa, criada a partir da `main`. |
 
 ### Prefixos
 
@@ -193,12 +204,12 @@ O mesmo vocabulário vale para o nome da branch e para a mensagem do commit:
 ### Ciclo de uma tarefa
 
 ```bash
-# 1. parta da development atualizada
-git checkout development
+# 1. parta da main atualizada
+git switch main
 git pull
 
 # 2. crie a branch da tarefa
-git checkout -b feat/nome-da-tarefa
+git switch -c feat/nome-da-tarefa
 
 # 3. faça os commits
 git commit -m "feat: descreve o que passou a existir"
@@ -206,11 +217,11 @@ git commit -m "feat: descreve o que passou a existir"
 # 4. publique a branch
 git push -u origin feat/nome-da-tarefa
 
-# 5. abra o Pull Request apontando para a development
-gh pr create --base development
+# 5. abra o Pull Request
+gh pr create --repo WallisonAndre/BE-Desk --base main
 ```
 
-> ⚠️ A branch padrão do repositório ainda é a `main`. Enquanto for assim, o `--base development` é obrigatório — sem ele o Pull Request nasce apontando para a `main`.
+> ⚠️ O `--repo` é obrigatório: como este repositório é um fork, sem ele o Pull Request nasce apontando para o repositório de origem.
 
 ### Commits
 
@@ -225,6 +236,15 @@ As issues são abertas pelos formulários em `.github/ISSUE_TEMPLATE`:
 | Funcionalidade | `enhancement` | funcionalidade ou melhoria percebida pelo usuário |
 | Bug | `bug` | erro ou comportamento inesperado do sistema |
 | Tarefa técnica | `task` | atividade técnica que não é bug nem funcionalidade |
+
+### Definição de Pronto
+
+Um item só é considerado pronto quando cumpre todos estes pontos:
+
+- [x] código na `main` por Pull Request, revisado por outro integrante;
+- [x] suíte de testes passando (`python manage.py test`) e funcionalidade conferida manualmente na tela;
+- [x] todos os critérios de aceitação da issue marcados;
+- [x] issue fechada e cartão movido para `Done` no quadro.
 
 ### Quadro de Acompanhamento
 
