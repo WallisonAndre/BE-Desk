@@ -51,6 +51,26 @@ def notificar_reserva_rejeitada(agendamento):
     )
 
 
+def notificar_reserva_recusada_por_concorrencia(agendamento, aprovada):
+    """Avisa quem perdeu a disputa pelo horário.
+
+    "Reserva rejeitada" sozinho não explica nada: o pedido não tinha problema,
+    outro foi escolhido para o mesmo horário.
+    """
+    criar_notificacao(
+        destinatario=agendamento.usuario,
+        titulo='Horário concedido a outro pedido',
+        mensagem=(
+            f'Sua solicitação para {agendamento.sala.nome} às '
+            f'{agendamento.horario.strftime("%H:%M")} de '
+            f'{agendamento.data_inicio.strftime("%d/%m/%Y")} não foi aprovada: '
+            f'o horário foi concedido a outra solicitação. Escolha outro horário na grade.'
+        ),
+        tipo='RESERVA_REJEITADA',
+        link='/reservas/',
+    )
+
+
 def notificar_reserva_cancelada(agendamento):
     from django.contrib.auth.models import User
     admins = User.objects.filter(is_staff=True, is_active=True)
