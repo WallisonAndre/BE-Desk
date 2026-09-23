@@ -8,6 +8,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from bedesk.models import Agendamento, Sala
+from notificacoes.models import Notificacao
 from django.core.exceptions import ValidationError
 
 from reservas.models import HorarioFixo
@@ -147,11 +148,15 @@ class AprovacaoDeVariosPedidosTests(TestCase):
 
         self.aprovar(primeiro)
         primeiro.refresh_from_db()
+        segundo.refresh_from_db()
         self.assertEqual(primeiro.status, 'APROVADO')
+        # aprovar o primeiro já recusa o concorrente (issue #22)
+        self.assertEqual(segundo.status, 'REJEITADO')
 
+        # e insistir nele continua barrado: o horário está ocupado
         resp = self.aprovar(segundo)
         segundo.refresh_from_db()
-        self.assertEqual(segundo.status, 'PENDENTE')
+        self.assertEqual(segundo.status, 'REJEITADO')
         self.assertEqual(self.aprovadas(), 1)
         self.assertIn(
             'já está ocupada',
@@ -467,3 +472,121 @@ class PainelDeHorariosFixosTests(TestCase):
         self.assertIn('Treino de futsal', html)
         self.assertIn('Toda segunda-feira', html)
         self.assertIn('07:00 às 08:30', html)
+
+
+class RecusaAutomaticaDeConcorrentesTests(TestCase):
+    """Aprovar um pedido decide a disputa pelo horário (issue #22)."""
+
+    def setUp(self):
+        self.admin = User.objects.create_user('admin', password='x', is_staff=True)
+        self.aluno = User.objects.create_user('aluno', password='x')
+        self.outro = User.objects.create_user('outro', password='x')
+        self.terceiro = User.objects.create_user('terceiro', password='x')
+        self.sala = Sala.objects.create(nome='Quadra')
+        self.outra_sala = Sala.objects.create(nome='Auditório')
+        self.hora = time(7, 45)
+        hoje = date.today()
+        self.dia = hoje + timedelta(days=1)
+        while self.dia.weekday() >= 5:
+            self.dia += timedelta(days=1)
+
+    def pedido(self, usuario, hora=None, dia=None, sala=None):
+        h = hora or self.hora
+        return Agendamento.objects.create(
+            usuario=usuario, sala=sala or self.sala, nome=f'Treino de {usuario.username}',
+            motivo='treino', horario=h,
+            data_inicio=timezone.make_aware(datetime.combine(dia or self.dia, h)),
+            status='PENDENTE',
+        )
+
+    def aprovar(self, agendamento, ajax=False):
+        self.client.force_login(self.admin)
+        extra = {'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'} if ajax else {}
+        return self.client.post(reverse('aprovar_reserva', args=[agendamento.pk]), **extra)
+
+    def test_aprovar_recusa_os_concorrentes_do_mesmo_horario(self):
+        escolhido = self.pedido(self.aluno)
+        perdedor = self.pedido(self.outro)
+        outro_perdedor = self.pedido(self.terceiro)
+
+        self.aprovar(escolhido)
+
+        escolhido.refresh_from_db(); perdedor.refresh_from_db(); outro_perdedor.refresh_from_db()
+        self.assertEqual(escolhido.status, 'APROVADO')
+        self.assertEqual(perdedor.status, 'REJEITADO')
+        self.assertEqual(outro_perdedor.status, 'REJEITADO')
+
+    def test_quem_perdeu_recebe_notificacao_explicando(self):
+        escolhido = self.pedido(self.aluno)
+        self.pedido(self.outro)
+
+        self.aprovar(escolhido)
+
+        notificacao = Notificacao.objects.get(destinatario=self.outro)
+        self.assertEqual(notificacao.titulo, 'Horário concedido a outro pedido')
+        self.assertIn('concedido a outra solicitação', notificacao.mensagem)
+        self.assertIn('Quadra', notificacao.mensagem)
+
+    def test_pedidos_de_outro_horario_data_ou_sala_nao_sao_afetados(self):
+        escolhido = self.pedido(self.aluno)
+        outro_horario = self.pedido(self.outro, hora=time(8, 50))
+        outro_dia = self.pedido(self.outro, dia=self.dia + timedelta(days=1))
+        outra_sala = self.pedido(self.outro, sala=self.outra_sala)
+
+        self.aprovar(escolhido)
+
+        for pedido in (outro_horario, outro_dia, outra_sala):
+            pedido.refresh_from_db()
+            self.assertEqual(pedido.status, 'PENDENTE')
+
+    def test_recusados_somem_da_fila_de_solicitacoes(self):
+        escolhido = self.pedido(self.aluno)
+        perdedor = self.pedido(self.outro)
+
+        self.aprovar(escolhido)
+
+        self.client.force_login(self.admin)
+        html = self.client.get(reverse('aprovacoes')).content.decode()
+        self.assertNotIn(perdedor.nome, html)
+
+    def test_rejeitar_a_aprovada_depois_nao_reativa_os_recusados(self):
+        escolhido = self.pedido(self.aluno)
+        perdedor = self.pedido(self.outro)
+        self.aprovar(escolhido)
+
+        self.client.force_login(self.admin)
+        self.client.post(reverse('rejeitar_reserva', args=[escolhido.pk]))
+
+        perdedor.refresh_from_db()
+        self.assertEqual(perdedor.status, 'REJEITADO')
+        # e o horário volta a aceitar pedido novo
+        self.client.force_login(self.terceiro)
+        self.client.post(reverse('agendar_sala'), {
+            'nome': 'Treino novo', 'sala': self.sala.pk, 'motivo': 'treino',
+            'horario': self.hora.strftime('%H:%M'), 'data_inicio': self.dia.isoformat(),
+        })
+        self.assertTrue(Agendamento.objects.filter(usuario=self.terceiro, status='PENDENTE').exists())
+
+    def test_rejeitar_um_pedido_nao_mexe_nos_outros(self):
+        alvo = self.pedido(self.aluno)
+        outro = self.pedido(self.outro)
+
+        self.client.force_login(self.admin)
+        self.client.post(reverse('rejeitar_reserva', args=[alvo.pk]))
+
+        outro.refresh_from_db()
+        self.assertEqual(outro.status, 'PENDENTE')
+
+    def test_resposta_ajax_informa_quantos_foram_recusados(self):
+        escolhido = self.pedido(self.aluno)
+        self.pedido(self.outro)
+        self.pedido(self.terceiro)
+
+        resp = self.aprovar(escolhido, ajax=True)
+
+        self.assertEqual(resp.json()['recusados_automaticamente'], 2)
+
+    def test_aprovacao_sem_concorrentes_nao_recusa_nada(self):
+        escolhido = self.pedido(self.aluno)
+        self.aprovar(escolhido)
+        self.assertEqual(Agendamento.objects.filter(status='REJEITADO').count(), 0)

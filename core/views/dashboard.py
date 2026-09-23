@@ -16,6 +16,7 @@ from bedesk.models import Agendamento, Sala
 from reservas.views.salas import horario_fixo_em
 from notificacoes.services.notificar import (
     notificar_reserva_aprovada,
+    notificar_reserva_recusada_por_concorrencia,
     notificar_reserva_rejeitada,
 )
 from usuarios.permissions import is_admin_or_staff
@@ -253,8 +254,37 @@ def mudar_status_reserva(request, agendamento_id, novo_status):
         reserva.status = novo_status
         reserva.save()
 
+        # Vários alunos podem pedir o mesmo horário, e aprovar um decide a
+        # disputa. Sem isto, os concorrentes ficavam pendentes para sempre,
+        # com um botão "Aprovar" que sempre falha, e quem pediu nunca sabia.
+        concorrentes = []
+        if novo_status == "APROVADO" and reserva.data_inicio:
+            concorrentes = list(
+                Agendamento.objects.filter(
+                    sala=reserva.sala,
+                    data_inicio__date=timezone.localtime(reserva.data_inicio).date(),
+                    horario=reserva.horario,
+                    status="PENDENTE",
+                )
+                .exclude(pk=reserva.pk)
+                .select_related("usuario", "sala")
+            )
+            if concorrentes:
+                Agendamento.objects.filter(pk__in=[c.pk for c in concorrentes]).update(
+                    status="REJEITADO"
+                )
+
     if novo_status == 'APROVADO':
         notificar_reserva_aprovada(reserva)
+        for concorrente in concorrentes:
+            concorrente.status = "REJEITADO"
+            notificar_reserva_recusada_por_concorrencia(concorrente, reserva)
+        if concorrentes:
+            messages.info(
+                request,
+                f"{len(concorrentes)} solicitação(ões) para o mesmo horário "
+                "foram recusadas automaticamente, e quem pediu foi avisado.",
+            )
     elif novo_status == 'REJEITADO':
         notificar_reserva_rejeitada(reserva)
 
@@ -264,6 +294,7 @@ def mudar_status_reserva(request, agendamento_id, novo_status):
                 "success": True,
                 "id": reserva.id,
                 "novo_status": reserva.status,
+                "recusados_automaticamente": len(concorrentes) if novo_status == "APROVADO" else 0,
                 "usuario": reserva.usuario.username,
             }
         )
