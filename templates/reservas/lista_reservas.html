@@ -134,6 +134,7 @@
             <th scope="col">Início</th>
             <th scope="col">Título</th>
             <th scope="col">Status</th>
+            <th scope="col" class="bd-reservas-acao">Avaliação</th>
           </tr>
         </thead>
         <tbody>
@@ -163,6 +164,18 @@
                 <span class="bd-reservas-badge is-concluida">Concluída</span>
               {% else %}
                 <span class="bd-reservas-badge is-rejeitado">Cancelada</span>
+              {% endif %}
+            </td>
+            <td class="bd-reservas-acao">
+              <span class="bd-reservas-th-mobile">Avaliação</span>
+              {% if reserva.id in ids_avaliaveis %}
+                <a href="{% url 'avaliar_reserva' reserva.id %}" class="bd-reservas-btn bd-reservas-btn-primary">
+                  <i class="fa-solid fa-star" aria-hidden="true"></i> Avaliar
+                </a>
+              {% elif reserva.id in ids_avaliadas %}
+                <span class="bd-reservas-badge is-concluida">Avaliada</span>
+              {% else %}
+                <span class="bd-reservas-relativo">—</span>
               {% endif %}
             </td>
           </tr>

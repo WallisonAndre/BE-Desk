@@ -1,0 +1,25 @@
+{% comment %}
+Notas como estrelas. Os rádios saem do 5 para o 1 e o CSS inverte a linha:
+assim "input:checked ~ label" alcança as estrelas menores, que aparecem à
+esquerda. Sem JavaScript.
+{% endcomment %}
+<fieldset class="bd-aval-criterio {% if campo.errors %}has-error{% endif %}">
+  <legend>{{ campo.label }}</legend>
+  <div class="bd-aval-estrelas">
+    {% for valor, rotulo in campo.field.choices|slice:"::-1" %}
+    {% if valor %}
+    <input type="radio" name="{{ campo.name }}" id="{{ campo.auto_id }}_{{ valor }}" value="{{ valor }}"
+           {% if campo.value|stringformat:"s" == valor|stringformat:"s" %}checked{% endif %}>
+    <label for="{{ campo.auto_id }}_{{ valor }}" title="{{ rotulo }}">
+      <i class="fa-solid fa-star" aria-hidden="true"></i>
+      <span class="bd-aval-sr">{{ rotulo }}</span>
+    </label>
+    {% endif %}
+    {% endfor %}
+  </div>
+  {% if campo.errors %}
+  <div class="bd-aval-erro" role="alert">
+    <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i> {{ campo.errors.0 }}
+  </div>
+  {% endif %}
+</fieldset>

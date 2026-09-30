@@ -90,6 +90,24 @@
       </div>
       <span class="bd-dash-kpi-label">Horário de pico</span>
     </div>
+
+    <a class="bd-dash-kpi" href="{% url 'indicadores_avaliacoes' %}">
+      <div class="bd-dash-kpi-top">
+        <span class="bd-dash-kpi-value">{% if kpi_media_avaliacoes %}{{ kpi_media_avaliacoes|floatformat:1 }}{% else %}—{% endif %}</span>
+        <span class="bd-dash-kpi-icon is-amber"><i class="fa-solid fa-star" aria-hidden="true"></i></span>
+      </div>
+      <span class="bd-dash-kpi-label">Nota média dos espaços</span>
+      <span class="bd-dash-kpi-hint">{{ kpi_total_avaliacoes }} avaliação{{ kpi_total_avaliacoes|pluralize:"ões" }}</span>
+    </a>
+
+    <a class="bd-dash-kpi" href="{% url 'indicadores_avaliacoes' %}">
+      <div class="bd-dash-kpi-top">
+        <span class="bd-dash-kpi-value is-text">{{ kpi_espaco_pior }}</span>
+        <span class="bd-dash-kpi-icon is-amber"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></span>
+      </div>
+      <span class="bd-dash-kpi-label">Pior avaliado</span>
+      <span class="bd-dash-kpi-hint">onde olhar primeiro</span>
+    </a>
   </div>
 
   {% if tem_dados %}
@@ -121,6 +139,14 @@
       <p class="bd-dash-card-hint">Faixa de funcionamento, 07h às 18h.</p>
       <div class="bd-dash-chart"><canvas id="chartHoras"></canvas></div>
     </div>
+
+    {% if tem_avaliacoes %}
+    <div class="bd-dash-card is-wide">
+      <h2><i class="fa-solid fa-star" aria-hidden="true"></i> Avaliação dos espaços</h2>
+      <p class="bd-dash-card-hint">Nota média de 1 a 5, da melhor para a pior. Não depende do filtro de período.</p>
+      <div class="bd-dash-chart"><canvas id="chartAvaliacoes"></canvas></div>
+    </div>
+    {% endif %}
   </div>
   {% else %}
   <div class="bd-dash-empty">
@@ -264,6 +290,26 @@
     },
     options: { ...base, scales: eixos },
   });
+
+  {% if tem_avaliacoes %}
+  // Barra — nota média dos espaços. A escala vai até 5 porque é uma nota,
+  // não uma contagem: deixar o eixo automático faria 4,8 parecer o teto.
+  new Chart(document.getElementById('chartAvaliacoes'), {
+    type: 'bar',
+    data: {
+      labels: {{ aval_labels|safe }},
+      datasets: [{ label: ' Nota média', data: {{ aval_data|safe }}, backgroundColor: cor.ambar, borderRadius: 6, maxBarThickness: 38 }],
+    },
+    options: {
+      ...base,
+      indexAxis: 'y',
+      scales: {
+        x: { beginAtZero: true, max: 5, ticks: { stepSize: 1 }, grid: { color: cor.grade, drawBorder: false } },
+        y: { grid: { display: false, drawBorder: false } },
+      },
+    },
+  });
+  {% endif %}
 })();
 </script>
 {% endif %}

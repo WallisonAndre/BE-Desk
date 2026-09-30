@@ -1,0 +1,72 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Avaliar {{ reserva.sala.nome }} - BE-Desk{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/admin-form.css' %}?v=20260814">
+<link rel="stylesheet" href="{% static 'css/avaliacoes.css' %}?v=20260930">
+{% endblock %}
+
+{% block content %}
+<section class="bd-adminform-page">
+  <div class="bd-adminform-shell">
+
+    <a href="{% url 'minhas_avaliacoes' %}" class="bd-adminform-back">
+      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+      Minhas avaliações
+    </a>
+
+    <header class="bd-adminform-header">
+      <span class="bd-adminform-kicker">Avaliação do espaço</span>
+      <h1>{{ reserva.sala.nome }}</h1>
+      <p>
+        Uso de {{ reserva.data_inicio|date:"d/m/Y" }} às {{ reserva.horario|time:"H:i" }}
+        {% if reserva.nome %}— {{ reserva.nome }}{% endif %}.
+        Sua nota ajuda a administração a saber o que precisa de manutenção.
+      </p>
+    </header>
+
+    <form method="post" class="bd-adminform bd-aval-form" novalidate>
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+      <div class="bd-adminform-errors" role="alert">
+        {% for error in form.non_field_errors %}
+        <div><i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i> {{ error }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="bd-aval-geral">
+        {% include 'avaliacoes/_estrelas.html' with campo=form.nota %}
+      </div>
+
+      <div class="bd-aval-grade">
+        {% for campo in form.campos_criterio %}
+          {% include 'avaliacoes/_estrelas.html' with campo=campo %}
+        {% endfor %}
+      </div>
+
+      <div class="bd-adminform-field {% if form.comentario.errors %}has-error{% endif %}">
+        <label for="{{ form.comentario.id_for_label }}">{{ form.comentario.label }}</label>
+        {{ form.comentario }}
+        <small class="bd-adminform-help">{{ form.comentario.help_text }}</small>
+        {% if form.comentario.errors %}
+        <div class="bd-adminform-field-error" role="alert">
+          <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i> {{ form.comentario.errors.0 }}
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="bd-adminform-actions">
+        <button type="submit" class="bd-adminform-btn bd-adminform-btn-primary">
+          <i class="fa-solid fa-star" aria-hidden="true"></i> Enviar avaliação
+        </button>
+        <a href="{% url 'minhas_avaliacoes' %}" class="bd-adminform-btn bd-adminform-btn-secondary">Cancelar</a>
+      </div>
+    </form>
+
+  </div>
+</section>
+{% endblock %}

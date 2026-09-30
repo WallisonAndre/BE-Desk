@@ -1,0 +1,170 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Indicadores de Avaliação - BE-Desk{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/reservas.css' %}?v=20260903">
+<link rel="stylesheet" href="{% static 'css/avaliacoes.css' %}?v=20260930">
+{% endblock %}
+
+{% block content %}
+<div class="container bd-reservas-page reservas-page">
+
+  <div class="bd-reservas-hero">
+    <div class="bd-reservas-kicker">
+      <i class="fa-solid fa-chart-simple" aria-hidden="true"></i> Indicadores
+    </div>
+    <h1>Como os espaços estão <span>avaliados</span></h1>
+    <p>Média de cada espaço, os melhores e os piores, e o que os usuários escreveram depois de usar.</p>
+  </div>
+
+  <div class="bd-reservas-stats">
+    <div class="bd-reservas-stat">
+      <i class="fa-solid fa-star" aria-hidden="true"></i>
+      <span><strong>{% if kpi_media %}{{ kpi_media|floatformat:1 }}{% else %}—{% endif %}</strong> média geral</span>
+    </div>
+    <div class="bd-reservas-stat">
+      <i class="fa-regular fa-comment" aria-hidden="true"></i>
+      <span><strong>{{ kpi_total }}</strong> avaliação{{ kpi_total|pluralize:"ões" }}</span>
+    </div>
+    <div class="bd-reservas-stat">
+      <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
+      <span><strong>{{ kpi_espacos_avaliados }}</strong> espaço{{ kpi_espacos_avaliados|pluralize }} avaliado{{ kpi_espacos_avaliados|pluralize }}</span>
+    </div>
+  </div>
+
+  {% if melhor %}
+  <div class="bd-aval-destaques">
+    <div class="bd-aval-destaque is-melhor">
+      <span class="bd-reservas-kicker"><i class="fa-solid fa-arrow-trend-up" aria-hidden="true"></i> Melhor avaliado</span>
+      <strong>{{ melhor.reserva__sala__nome }}</strong>
+      <span>{{ melhor.media|floatformat:1 }} de 5 · {{ melhor.total }} avaliação{{ melhor.total|pluralize:"ões" }}</span>
+    </div>
+    {% if pior %}
+    <div class="bd-aval-destaque is-pior">
+      <span class="bd-reservas-kicker"><i class="fa-solid fa-arrow-trend-down" aria-hidden="true"></i> Pior avaliado</span>
+      <strong>{{ pior.reserva__sala__nome }}</strong>
+      <span>{{ pior.media|floatformat:1 }} de 5 · {{ pior.total }} avaliação{{ pior.total|pluralize:"ões" }}</span>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <!-- Média por espaço -->
+  <section class="bd-reservas-section" aria-labelledby="bd-aval-medias">
+    <div class="bd-reservas-section-head">
+      <h2 id="bd-aval-medias">Média por espaço</h2>
+    </div>
+
+    {% if medias %}
+    <div class="bd-reservas-card">
+      <table class="bd-reservas-table">
+        <thead>
+          <tr>
+            <th scope="col">Espaço</th>
+            <th scope="col">Nota geral</th>
+            <th scope="col">Limpeza</th>
+            <th scope="col">Estrutura</th>
+            <th scope="col">Organização</th>
+            <th scope="col">Conservação</th>
+            <th scope="col">Avaliações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for linha in medias %}
+          <tr>
+            <td>
+              <span class="bd-reservas-th-mobile">Espaço</span>
+              <span class="bd-reservas-sala">{{ linha.reserva__sala__nome }}</span>
+            </td>
+            <td>
+              <span class="bd-reservas-th-mobile">Nota geral</span>
+              <strong class="bd-aval-media">{{ linha.media|floatformat:1 }}</strong>
+            </td>
+            <td><span class="bd-reservas-th-mobile">Limpeza</span>{{ linha.media_limpeza|floatformat:1 }}</td>
+            <td><span class="bd-reservas-th-mobile">Estrutura</span>{{ linha.media_estrutura|floatformat:1 }}</td>
+            <td><span class="bd-reservas-th-mobile">Organização</span>{{ linha.media_organizacao|floatformat:1 }}</td>
+            <td><span class="bd-reservas-th-mobile">Conservação</span>{{ linha.media_conservacao|floatformat:1 }}</td>
+            <td><span class="bd-reservas-th-mobile">Avaliações</span>{{ linha.total }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="bd-reservas-empty">
+      <i class="fa-regular fa-star" aria-hidden="true"></i>
+      <strong>Nenhum espaço avaliado ainda</strong>
+      <p>As médias aparecem assim que os usuários avaliarem os espaços que usaram.</p>
+    </div>
+    {% endif %}
+  </section>
+
+  <!-- Comentários -->
+  <section class="bd-reservas-section" aria-labelledby="bd-aval-comentarios">
+    <div class="bd-reservas-section-head">
+      <h2 id="bd-aval-comentarios">Comentários dos usuários</h2>
+      <form method="get" class="bd-aval-filtro">
+        <label for="filtro-sala" class="bd-aval-sr">Filtrar por espaço</label>
+        <select name="sala" id="filtro-sala">
+          <option value="">Todos os espaços</option>
+          {% for sala in salas %}
+          <option value="{{ sala.id }}" {% if sala.id|stringformat:"s" == sala_escolhida %}selected{% endif %}>{{ sala.nome }}</option>
+          {% endfor %}
+        </select>
+        <button type="submit" class="bd-reservas-btn">
+          <i class="fa-solid fa-filter" aria-hidden="true"></i> Filtrar
+        </button>
+      </form>
+    </div>
+
+    {% if comentarios %}
+    <div class="bd-aval-lista">
+      {% for avaliacao in comentarios %}
+      <article class="bd-aval-item">
+        <header>
+          <span class="bd-reservas-sala">{{ avaliacao.sala.nome }}</span>
+          <span class="bd-aval-nota" aria-label="Nota {{ avaliacao.nota }} de 5">
+            {% for posicao, cheia in avaliacao.estrelas %}
+            <i class="fa-solid fa-star {% if not cheia %}is-vazia{% endif %}" aria-hidden="true"></i>
+            {% endfor %}
+          </span>
+        </header>
+        <p class="bd-reservas-relativo">
+          {{ avaliacao.usuario.get_full_name|default:avaliacao.usuario.username }}
+          · uso de {{ avaliacao.reserva.data_inicio|date:"d/m/Y" }}
+          · avaliada em {{ avaliacao.criada_em|date:"d/m/Y" }}
+        </p>
+        <blockquote class="bd-aval-comentario">{{ avaliacao.comentario }}</blockquote>
+      </article>
+      {% endfor %}
+    </div>
+
+    {% if comentarios.has_other_pages %}
+    <nav class="bd-reservas-pagination" aria-label="Paginação dos comentários">
+      {% if comentarios.has_previous %}
+      <a href="?sala={{ sala_escolhida }}&page={{ comentarios.previous_page_number }}">
+        <i class="fa-solid fa-chevron-left" aria-hidden="true"></i> Anterior
+      </a>
+      {% endif %}
+      <span>Página {{ comentarios.number }} de {{ comentarios.paginator.num_pages }}</span>
+      {% if comentarios.has_next %}
+      <a href="?sala={{ sala_escolhida }}&page={{ comentarios.next_page_number }}">
+        Próxima <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+      </a>
+      {% endif %}
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <div class="bd-reservas-empty">
+      <i class="fa-regular fa-comment" aria-hidden="true"></i>
+      <strong>Nenhum comentário</strong>
+      <p>O comentário é opcional: só aparece aqui quando alguém escreve junto com a nota.</p>
+    </div>
+    {% endif %}
+  </section>
+
+</div>
+{% endblock %}

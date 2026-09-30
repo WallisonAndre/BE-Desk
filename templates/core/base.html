@@ -1414,10 +1414,12 @@
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
             <li><a class="dropdown-item" href="{% url 'user_profile' %}"><i class="fa-solid fa-id-badge me-2"></i> Meu
                 Perfil</a></li>
+            <li><a class="dropdown-item" href="{% url 'minhas_avaliacoes' %}"><i class="fa-solid fa-star me-2"></i> Minhas Avaliações</a></li>
             {% if user.is_staff %}
             <li><a class="dropdown-item" href="{% url 'admin_dashboard' %}"><i class="fa-solid fa-chart-line me-2"></i> Admin Dashboard</a></li>
             <li><a class="dropdown-item" href="{% url 'criar_sala' %}"><i class="fa-solid fa-door-open me-2"></i> Criar Sala</a></li>
             <li><a class="dropdown-item" href="{% url 'gerenciar_permissoes' %}"><i class="fa-solid fa-user-shield me-2"></i> Permissões</a></li>
+            <li><a class="dropdown-item" href="{% url 'indicadores_avaliacoes' %}"><i class="fa-solid fa-star-half-stroke me-2"></i> Indicadores de Avaliação</a></li>
             <li>
               <hr class="dropdown-divider" style="border-color: rgba(255,255,255,0.08);">
             </li>
@@ -1456,11 +1458,15 @@
         <a href="#" class="text-white text-decoration-none fs-5"><i class="fa-solid fa-gift me-3 text-secondary"></i>Benefícios</a>
         <a href="{% url 'blog_index' %}" class="text-white text-decoration-none fs-5"><i class="fa-solid fa-newspaper me-3 text-secondary"></i>Blog</a>
         <a href="#" class="text-white text-decoration-none fs-5"><i class="fa-solid fa-comment-dots me-3 text-secondary"></i>Feedback</a>
+        {% if user.is_authenticated %}
+        <a href="{% url 'minhas_avaliacoes' %}" class="text-white text-decoration-none fs-5"><i class="fa-solid fa-star me-3 text-secondary"></i>Minhas Avaliações</a>
+        {% endif %}
         {% if user.is_staff %}
         <hr class="border-secondary my-1">
         <a href="{% url 'admin_dashboard' %}" class="text-white text-decoration-none fs-5"><i class="fa-solid fa-chart-line me-3 text-secondary"></i>Admin</a>
         <a href="{% url 'listar_pendentes' %}" class="text-white text-decoration-none fs-5"><i class="fa-solid fa-clipboard-list me-3 text-secondary"></i>Dashboard</a>
         <a href="{% url 'aprovacoes' %}" class="text-white text-decoration-none fs-5"><i class="fa-solid fa-list-check me-3 text-secondary"></i>Solicitações</a>
+        <a href="{% url 'indicadores_avaliacoes' %}" class="text-white text-decoration-none fs-5"><i class="fa-solid fa-star-half-stroke me-3 text-secondary"></i>Indicadores</a>
         {% endif %}
         {% if user.is_authenticated %}
         <hr class="border-secondary my-1">

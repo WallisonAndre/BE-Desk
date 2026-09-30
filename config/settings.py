@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'core',
     'usuarios',
     'reservas',
+    'avaliacoes',
     'eventos',
     'notificacoes',
     'relatorios',
