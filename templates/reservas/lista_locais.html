@@ -269,6 +269,17 @@
         font-size: 0.85em;
     }
 
+    /* Nota do espaço. A cor do número vem do tema — cor fixa aqui ficava
+       clara demais no modo claro e caía abaixo do contraste mínimo. */
+    .local-meta-nota strong {
+        color: var(--text-primary, #f3f4f6);
+        font-weight: 800;
+    }
+
+    .local-meta-nota.tem-nota i {
+        color: #fbbf24;
+    }
+
     /* CTA button */
     .local-card-btn {
         display: flex;
@@ -413,6 +424,16 @@
                         <span class="local-meta-item">
                             <i class="fa-solid fa-calendar-week"></i>
                             Seg – Sex
+                        </span>
+                        <span class="local-meta-item local-meta-nota {% if local.media_avaliacao %}tem-nota{% endif %}"
+                              title="Nota média dada por quem já usou o espaço">
+                            <i class="fa-solid fa-star"></i>
+                            {% if local.media_avaliacao %}
+                            <strong>{{ local.media_avaliacao|floatformat:1 }}</strong>
+                            ({{ local.total_avaliacoes }})
+                            {% else %}
+                            sem avaliações
+                            {% endif %}
                         </span>
                     </div>
 
