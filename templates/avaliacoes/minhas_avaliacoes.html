@@ -1,0 +1,144 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Minhas Avaliações - BE-Desk{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/reservas.css' %}?v=20260903">
+<link rel="stylesheet" href="{% static 'css/avaliacoes.css' %}?v=20260930">
+{% endblock %}
+
+{% block content %}
+<div class="container bd-reservas-page reservas-page">
+
+  <div class="bd-reservas-hero">
+    <div class="bd-reservas-kicker">
+      <i class="fa-solid fa-star" aria-hidden="true"></i> Minhas avaliações
+    </div>
+    <h1>Avalie os espaços que <span>você usou</span></h1>
+    <p>Depois que o horário passa, a reserva entra aqui para receber sua nota. O que você escreve chega à administração do Bloco E.</p>
+  </div>
+
+  <div class="bd-reservas-stats">
+    <div class="bd-reservas-stat">
+      <i class="fa-solid fa-star" aria-hidden="true"></i>
+      <span><strong>{{ kpi_total }}</strong> avaliada{{ kpi_total|pluralize }}</span>
+    </div>
+    <div class="bd-reservas-stat">
+      <i class="fa-regular fa-clock" aria-hidden="true"></i>
+      <span><strong>{{ kpi_pendentes }}</strong> esperando sua nota</span>
+    </div>
+    <div class="bd-reservas-stat">
+      <i class="fa-solid fa-chart-simple" aria-hidden="true"></i>
+      <span><strong>{% if kpi_media %}{{ kpi_media|floatformat:1 }}{% else %}—{% endif %}</strong> sua nota média</span>
+    </div>
+  </div>
+
+  <!-- Esperando avaliação -->
+  <section class="bd-reservas-section" aria-labelledby="bd-aval-pendentes">
+    <div class="bd-reservas-section-head">
+      <h2 id="bd-aval-pendentes">Esperando sua avaliação</h2>
+      {% if pendentes %}
+      <span class="bd-reservas-count">{{ kpi_pendentes }} uso{{ kpi_pendentes|pluralize }}</span>
+      {% endif %}
+    </div>
+
+    {% if pendentes %}
+    <div class="bd-reservas-card">
+      <table class="bd-reservas-table">
+        <thead>
+          <tr>
+            <th scope="col">Local</th>
+            <th scope="col">Uso</th>
+            <th scope="col">Título</th>
+            <th scope="col" class="bd-reservas-acao">Ação</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for reserva in pendentes %}
+          <tr>
+            <td>
+              <span class="bd-reservas-th-mobile">Local</span>
+              <span class="bd-reservas-sala">{{ reserva.sala.nome }}</span>
+            </td>
+            <td>
+              <span class="bd-reservas-th-mobile">Uso</span>
+              <span>
+                <span class="bd-reservas-data">{{ reserva.data_inicio|date:"d/m/Y" }} às {{ reserva.horario|time:"H:i" }}</span>
+                <span class="bd-reservas-relativo">há {{ reserva.data_inicio|timesince }}</span>
+              </span>
+            </td>
+            <td>
+              <span class="bd-reservas-th-mobile">Título</span>
+              <span>{{ reserva.nome }}</span>
+            </td>
+            <td class="bd-reservas-acao">
+              <span class="bd-reservas-th-mobile">Ação</span>
+              <a href="{% url 'avaliar_reserva' reserva.id %}" class="bd-reservas-btn bd-reservas-btn-primary">
+                <i class="fa-solid fa-star" aria-hidden="true"></i> Avaliar
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="bd-reservas-empty">
+      <i class="fa-regular fa-circle-check" aria-hidden="true"></i>
+      <strong>Nada esperando avaliação</strong>
+      <p>Quando você usar um espaço reservado, ele aparece aqui para receber sua nota.</p>
+      <a href="{% url 'lista_locais' %}" class="bd-reservas-btn bd-reservas-btn-primary">
+        <i class="fa-solid fa-plus" aria-hidden="true"></i> Fazer uma reserva
+      </a>
+    </div>
+    {% endif %}
+  </section>
+
+  <!-- Avaliações feitas -->
+  <section class="bd-reservas-section" aria-labelledby="bd-aval-feitas">
+    <div class="bd-reservas-section-head">
+      <h2 id="bd-aval-feitas">Avaliações que você fez</h2>
+      {% if kpi_total %}
+      <span class="bd-reservas-count">{{ kpi_total }} registro{{ kpi_total|pluralize }}</span>
+      {% endif %}
+    </div>
+
+    {% if avaliacoes %}
+    <div class="bd-aval-lista">
+      {% for avaliacao in avaliacoes %}
+      <article class="bd-aval-item">
+        <header>
+          <span class="bd-reservas-sala">{{ avaliacao.sala.nome }}</span>
+          <span class="bd-aval-nota" aria-label="Nota {{ avaliacao.nota }} de 5">
+            {% for posicao, cheia in avaliacao.estrelas %}
+            <i class="fa-solid fa-star {% if not cheia %}is-vazia{% endif %}" aria-hidden="true"></i>
+            {% endfor %}
+          </span>
+        </header>
+        <p class="bd-reservas-relativo">
+          Uso de {{ avaliacao.reserva.data_inicio|date:"d/m/Y" }} às {{ avaliacao.reserva.horario|time:"H:i" }}
+          · avaliada em {{ avaliacao.criada_em|date:"d/m/Y" }}
+        </p>
+        <ul class="bd-aval-criterios">
+          {% for rotulo, valor in avaliacao.notas_por_criterio %}
+          <li><span>{{ rotulo }}</span><strong>{{ valor }}/5</strong></li>
+          {% endfor %}
+        </ul>
+        {% if avaliacao.comentario %}
+        <blockquote class="bd-aval-comentario">{{ avaliacao.comentario }}</blockquote>
+        {% endif %}
+      </article>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="bd-reservas-empty">
+      <i class="fa-regular fa-star" aria-hidden="true"></i>
+      <strong>Você ainda não avaliou nenhum espaço</strong>
+      <p>As avaliações que você enviar ficam guardadas aqui.</p>
+    </div>
+    {% endif %}
+  </section>
+
+</div>
+{% endblock %}

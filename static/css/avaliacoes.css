@@ -1,0 +1,242 @@
+/* ===================================================================
+   BE-DESK — AVALIAÇÃO DOS ESPAÇOS
+   Reaproveita as variáveis do tema e as classes de Minhas Reservas;
+   aqui ficam só as estrelas e os blocos próprios da avaliação.
+   Escuro é o padrão; [data-theme="light"] ajusta o que precisa.
+   =================================================================== */
+
+/* ── Texto só para leitor de tela ── */
+.bd-aval-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Estrelas do formulário ──
+   Os rádios vêm do 5 para o 1 e a linha é invertida: assim
+   "input:checked ~ label" alcança as notas menores, à esquerda. */
+.bd-aval-criterio {
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+.bd-aval-criterio legend {
+  padding: 0;
+  margin-bottom: 0.4rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.bd-aval-estrelas {
+  display: inline-flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  gap: 0.25rem;
+}
+
+.bd-aval-estrelas input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.bd-aval-estrelas label {
+  cursor: pointer;
+  padding: 0.15rem;
+  margin: 0;
+  color: var(--border-card);
+  font-size: 1.5rem;
+  line-height: 1;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.bd-aval-estrelas input:checked ~ label,
+.bd-aval-estrelas label:hover,
+.bd-aval-estrelas label:hover ~ label {
+  color: var(--warning);
+}
+
+.bd-aval-estrelas label:hover {
+  transform: scale(1.1);
+}
+
+/* Foco pelo teclado: o rádio é invisível, então o anel vai no rótulo. */
+.bd-aval-estrelas input:focus-visible + label {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.bd-aval-criterio.has-error legend {
+  color: var(--danger, #e5534b);
+}
+
+.bd-aval-erro {
+  margin-top: 0.3rem;
+  color: var(--danger, #e5534b);
+  font-size: 0.82rem;
+}
+
+/* ── Formulário ── */
+.bd-aval-geral {
+  padding: 1.1rem 1.2rem;
+  margin-bottom: 1.2rem;
+  border: 1px solid var(--accent-border);
+  border-radius: 14px;
+  background: var(--accent-glow);
+}
+
+.bd-aval-geral .bd-aval-estrelas label {
+  font-size: 2rem;
+}
+
+.bd-aval-grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem 1.5rem;
+  padding: 1.1rem 1.2rem;
+  margin-bottom: 1.2rem;
+  border: 1px solid var(--border-card);
+  border-radius: 14px;
+  background: var(--bg-card);
+}
+
+/* ── Lista de avaliações ── */
+.bd-aval-lista {
+  display: grid;
+  gap: 1rem;
+}
+
+.bd-aval-item {
+  padding: 1.1rem 1.2rem;
+  border: 1px solid var(--border-card);
+  border-radius: 14px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow-card);
+}
+
+.bd-aval-item header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.3rem;
+}
+
+.bd-aval-nota {
+  color: var(--warning);
+  font-size: 0.95rem;
+  letter-spacing: 0.1em;
+}
+
+.bd-aval-nota .is-vazia {
+  color: var(--border-card);
+}
+
+.bd-aval-criterios {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.4rem;
+  padding: 0;
+  margin: 0.8rem 0 0;
+  list-style: none;
+}
+
+.bd-aval-criterios li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.bd-aval-criterios strong {
+  color: var(--text-primary);
+}
+
+.bd-aval-comentario {
+  padding: 0.7rem 0.9rem;
+  margin: 0.9rem 0 0;
+  border-left: 3px solid var(--accent-border);
+  border-radius: 0 10px 10px 0;
+  background: var(--bg-card-hover);
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  font-style: italic;
+}
+
+/* ── Destaques e filtro (indicadores) ── */
+.bd-aval-destaques {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.bd-aval-destaque {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1.1rem 1.2rem;
+  border: 1px solid var(--border-card);
+  border-radius: 14px;
+  background: var(--bg-card);
+}
+
+.bd-aval-destaque strong {
+  color: var(--text-primary);
+  font-size: 1.25rem;
+}
+
+.bd-aval-destaque span:last-child {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.bd-aval-destaque.is-melhor {
+  border-color: var(--accent-border);
+}
+
+.bd-aval-destaque.is-pior {
+  border-color: var(--warning);
+}
+
+.bd-aval-media {
+  color: var(--text-primary);
+  font-size: 1.05rem;
+}
+
+.bd-aval-filtro {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.bd-aval-filtro select {
+  padding: 0.45rem 0.7rem;
+  border: 1px solid var(--border-card);
+  border-radius: 10px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 640px) {
+  .bd-aval-filtro {
+    width: 100%;
+  }
+
+  .bd-aval-filtro select {
+    flex: 1;
+  }
+}

@@ -7,6 +7,8 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
+from avaliacoes.models import Avaliacao
+from avaliacoes.services import reservas_avaliaveis
 from bedesk.concorrencia import travar_sala
 from bedesk.models import Agendamento, Sala
 from notificacoes.services.notificar import (
@@ -92,9 +94,18 @@ def lista_reservas(request):
 
     historico_page = Paginator(reservas_historico, 10).get_page(request.GET.get("page"))
 
+    # O histórico é onde a avaliação cabe: a reserva já foi usada. Os ids
+    # saem prontos para o template decidir entre "Avaliar" e "Avaliada".
+    ids_avaliaveis = {reserva.pk for reserva in reservas_avaliaveis(request.user)}
+    ids_avaliadas = set(
+        Avaliacao.objects.filter(reserva__usuario=request.user).values_list("reserva_id", flat=True)
+    )
+
     context = {
         "reservas_ativas": reservas_ativas,
         "reservas_historico": historico_page,
+        "ids_avaliaveis": ids_avaliaveis,
+        "ids_avaliadas": ids_avaliadas,
         "kpi_proximas": reservas_ativas.count(),
         "kpi_aprovadas": reservas_ativas.filter(status="APROVADO").count(),
         "kpi_pendentes": reservas_ativas.filter(status="PENDENTE").count(),
