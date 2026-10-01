@@ -50,6 +50,13 @@
         .text-primary-saas {
             color: #b5e853;
         }
+        .sala-nota {
+            color: var(--text-primary, #e2eaf2);
+            font-size: 0.95rem;
+        }
+        .sala-nota i {
+            color: #fbbf24;
+        }
         .saas-nav-btn.saas-primary-btn {
             background: #b5e853;
             color: #11141A;
@@ -263,6 +270,19 @@
         </div>
     </div>
     <h2 class="text-center mb-1 text-white">Horários da Sala {{ sala.nome }}</h2>
+
+    <p class="text-center mb-2 sala-nota">
+        {% if media_avaliacao %}
+        <i class="fa-solid fa-star" aria-hidden="true"></i>
+        <strong>{{ media_avaliacao|floatformat:1 }}</strong> de 5
+        <span class="text-muted">
+            · {{ total_avaliacoes }} avaliação{{ total_avaliacoes|pluralize:"ões" }} de quem já usou
+        </span>
+        {% else %}
+        <i class="fa-regular fa-star" aria-hidden="true"></i>
+        <span class="text-muted">Nenhuma avaliação ainda</span>
+        {% endif %}
+    </p>
 
     <h4 class="text-center text-muted mb-4">
         Semana de {{ faixa_datas_semana.inicio }} a {{ faixa_datas_semana.fim }}

@@ -3,6 +3,7 @@ from datetime import date, datetime, timedelta
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render
 
+from avaliacoes.services import mapa_de_medias, media_do_espaco
 from bedesk.models import Agendamento, Sala
 from reservas.models import HorarioFixo
 
@@ -51,7 +52,14 @@ DIAS_SEMANA_NOMES = [
 
 @login_required
 def lista_locais(request):
-    locais = Sala.objects.all().order_by("nome")
+    locais = list(Sala.objects.all().order_by("nome"))
+
+    # Quem escolhe o espaço decide melhor sabendo como ele foi avaliado. As
+    # médias saem de uma consulta agregada só, e não de uma por card.
+    medias = mapa_de_medias()
+    for local in locais:
+        local.media_avaliacao, local.total_avaliacoes = medias.get(local.pk, (None, 0))
+
     return render(request, "reservas/lista_locais.html", {"locais": locais})
 
 
@@ -76,7 +84,11 @@ def detalhe_sala(request, nome_sala):
         for ag in agendamentos
     }
 
+    media_avaliacao, total_avaliacoes = media_do_espaco(sala_obj)
+
     context = {
+        "media_avaliacao": media_avaliacao,
+        "total_avaliacoes": total_avaliacoes,
         "tabela_horarios": _build_tabela_horarios(
             dias_semana_datas, agendamentos_map, mapa_de_horarios_fixos(sala_obj)
         ),

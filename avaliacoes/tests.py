@@ -2,7 +2,9 @@
 from datetime import date, datetime, time, timedelta
 
 from django.contrib.auth import get_user_model
+from django.db import connection
 from django.test import TestCase
+from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 from django.utils import timezone
 
@@ -240,3 +242,67 @@ class MinhasAvaliacoesTests(BaseAvaliacao):
         resposta = self.client.get(reverse('lista_reserva'))
         self.assertIn(reserva.pk, resposta.context['ids_avaliaveis'])
         self.assertContains(resposta, reverse('avaliar_reserva', args=[reserva.pk]))
+
+
+class MediaNasTelasDeEscolhaTests(BaseAvaliacao):
+    """A nota do espaço aparece para quem está escolhendo onde reservar."""
+
+    def espaco_avaliado(self, nome, nota):
+        sala = Sala.objects.create(nome=nome)
+        reserva = Agendamento.objects.create(
+            usuario=self.usuario, sala=sala, nome='Uso', motivo='x', horario=time(7, 0),
+            data_inicio=timezone.make_aware(
+                datetime.combine(date.today() - timedelta(days=1), time(7, 0))
+            ),
+            status='APROVADO',
+        )
+        self.avaliar(reserva, nota=nota)
+        return sala
+
+    def test_card_do_local_mostra_a_media_e_a_quantidade(self):
+        self.avaliar(self.reserva(hora=time(7, 0)), nota=5)
+        self.avaliar(self.reserva(hora=time(7, 45)), nota=4)
+
+        self.client.force_login(self.usuario)
+        resposta = self.client.get(reverse('lista_locais'))
+
+        local = next(l for l in resposta.context['locais'] if l.pk == self.sala.pk)
+        self.assertEqual(local.media_avaliacao, 4.5)
+        self.assertEqual(local.total_avaliacoes, 2)
+        self.assertContains(resposta, '4,5')
+
+    def test_espaco_sem_avaliacao_aparece_como_sem_avaliacoes(self):
+        self.client.force_login(self.usuario)
+        resposta = self.client.get(reverse('lista_locais'))
+
+        local = next(l for l in resposta.context['locais'] if l.pk == self.sala.pk)
+        self.assertIsNone(local.media_avaliacao)
+        self.assertEqual(local.total_avaliacoes, 0)
+        self.assertContains(resposta, 'sem avaliações')
+
+    def test_pagina_da_sala_mostra_a_media(self):
+        self.avaliar(self.reserva(), nota=3)
+        resposta = self.client.get(reverse('detalhe_sala', args=[self.sala.nome]))
+        self.assertEqual(resposta.context['media_avaliacao'], 3.0)
+        self.assertEqual(resposta.context['total_avaliacoes'], 1)
+
+    def test_pagina_da_sala_sem_avaliacao_nao_inventa_nota(self):
+        resposta = self.client.get(reverse('detalhe_sala', args=[self.sala.nome]))
+        self.assertIsNone(resposta.context['media_avaliacao'])
+        self.assertContains(resposta, 'Nenhuma avaliação ainda')
+
+    def test_listagem_nao_faz_uma_consulta_por_espaco(self):
+        """Mais espaços não podem significar mais consultas."""
+        self.client.force_login(self.usuario)
+        self.espaco_avaliado('Auditório', 4)
+
+        with CaptureQueriesContext(connection) as com_dois:
+            self.client.get(reverse('lista_locais'))
+
+        for indice, nome in enumerate(['Quadra', 'Laboratório', 'Sala de Reuniões']):
+            self.espaco_avaliado(nome, 3 + indice % 2)
+
+        with CaptureQueriesContext(connection) as com_cinco:
+            self.client.get(reverse('lista_locais'))
+
+        self.assertEqual(len(com_cinco), len(com_dois))
