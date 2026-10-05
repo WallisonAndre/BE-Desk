@@ -12,7 +12,7 @@ from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from avaliacoes.models import Avaliacao
-from avaliacoes.services import medias_por_espaco
+from avaliacoes.services import medias_por_espaco, melhor_e_pior
 from bedesk.concorrencia import travar_sala
 from bedesk.models import Agendamento, Sala
 from reservas.views.salas import horario_fixo_em
@@ -140,7 +140,11 @@ def gerenciar_reservas(request):
     # --- Avaliação dos espaços ---
     # Fora do filtro de período de propósito: a nota é sobre o espaço, e um
     # recorte curto de datas faria a média pular a cada troca de filtro.
-    medias_avaliacao = list(medias_por_espaco())
+    medias_avaliacao = medias_por_espaco()
+    # Só os espaços já avaliados entram no gráfico: uma barra zerada seria
+    # lida como nota zero, e não como ausência de nota.
+    avaliados = [linha for linha in medias_avaliacao if linha["total"]]
+    _, pior_avaliado = melhor_e_pior(medias_avaliacao)
     resumo_avaliacoes = Avaliacao.objects.aggregate(media=Avg("nota"), total=Count("id"))
     media_geral = resumo_avaliacoes["media"]
 
@@ -170,12 +174,10 @@ def gerenciar_reservas(request):
 
         "kpi_media_avaliacoes": round(media_geral, 1) if media_geral is not None else None,
         "kpi_total_avaliacoes": resumo_avaliacoes["total"],
-        "kpi_espaco_pior": (
-            medias_avaliacao[-1]["reserva__sala__nome"] if medias_avaliacao else "—"
-        ),
-        "aval_labels": json.dumps([l["reserva__sala__nome"] for l in medias_avaliacao]),
-        "aval_data": json.dumps([round(l["media"], 1) for l in medias_avaliacao]),
-        "tem_avaliacoes": bool(medias_avaliacao),
+        "kpi_espaco_pior": pior_avaliado["nome"] if pior_avaliado else "—",
+        "aval_labels": json.dumps([l["nome"] for l in avaliados]),
+        "aval_data": json.dumps([l["media"] for l in avaliados]),
+        "tem_avaliacoes": bool(avaliados),
     }
     return render(request, "core/gerenciar.html", context)
 

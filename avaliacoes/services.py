@@ -2,14 +2,20 @@
 
 from datetime import timedelta
 
-from django.db.models import Avg, Count
+from django.db.models import Avg, Count, F
 from django.utils import timezone
 
 from avaliacoes.models import Avaliacao
+from bedesk.models import Sala
 
 # Faixa fora da grade (reserva antiga) não tem fim declarado; 45 minutos é a
 # duração de todas as faixas da grade atual.
 DURACAO_PADRAO = timedelta(minutes=45)
+
+# Quantas avaliações um espaço precisa ter para disputar melhor e pior. Com
+# uma nota só, a média é a opinião de uma pessoa — e o painel apontaria a
+# manutenção para o espaço errado.
+MINIMO_PARA_RANKING = 3
 
 
 def fim_da_reserva(reserva):
@@ -77,20 +83,61 @@ def reservas_avaliaveis(usuario):
     return [r for r in candidatas if (fim_da_reserva(r) or agora) <= agora]
 
 
+def _arredondar(valor):
+    return round(valor, 1) if valor is not None else None
+
+
 def medias_por_espaco():
-    """Média e quantidade de avaliações de cada espaço, da melhor para a pior."""
-    return (
-        Avaliacao.objects.values('reserva__sala__id', 'reserva__sala__nome')
-        .annotate(
-            media=Avg('nota'),
-            total=Count('id'),
-            media_limpeza=Avg('limpeza'),
-            media_estrutura=Avg('estrutura'),
-            media_organizacao=Avg('organizacao'),
-            media_conservacao=Avg('conservacao'),
-        )
-        .order_by('-media', 'reserva__sala__nome')
-    )
+    """Todos os espaços com as suas médias, da melhor nota para a pior.
+
+    Espaço sem nenhuma avaliação entra na lista com `media` nula e vai para o
+    fim — some da tabela seria pior, porque "ainda não avaliado" é uma
+    informação útil para quem administra.
+
+    Cada linha diz, em `no_ranking`, se já tem avaliações suficientes para
+    entrar na disputa de melhor e pior.
+    """
+    espacos = Sala.objects.annotate(
+        media=Avg('agendamento__avaliacao__nota'),
+        total=Count('agendamento__avaliacao'),
+        media_limpeza=Avg('agendamento__avaliacao__limpeza'),
+        media_estrutura=Avg('agendamento__avaliacao__estrutura'),
+        media_organizacao=Avg('agendamento__avaliacao__organizacao'),
+        media_conservacao=Avg('agendamento__avaliacao__conservacao'),
+    ).order_by(F('media').desc(nulls_last=True), 'nome')
+
+    return [
+        {
+            'sala_id': espaco.pk,
+            'nome': espaco.nome,
+            'media': _arredondar(espaco.media),
+            'total': espaco.total,
+            'media_limpeza': _arredondar(espaco.media_limpeza),
+            'media_estrutura': _arredondar(espaco.media_estrutura),
+            'media_organizacao': _arredondar(espaco.media_organizacao),
+            'media_conservacao': _arredondar(espaco.media_conservacao),
+            'no_ranking': espaco.total >= MINIMO_PARA_RANKING,
+        }
+        for espaco in espacos
+    ]
+
+
+def espacos_no_ranking(medias=None):
+    """Só os espaços com avaliações suficientes, da melhor nota para a pior."""
+    linhas = medias_por_espaco() if medias is None else medias
+    return [linha for linha in linhas if linha['no_ranking']]
+
+
+def melhor_e_pior(medias=None):
+    """(melhor, pior) entre os espaços que entram no ranking.
+
+    Com um espaço só, ele é o melhor e não há pior: dizer que o único espaço
+    avaliado é também o pior não informa nada.
+    """
+    ranking = espacos_no_ranking(medias)
+    if not ranking:
+        return (None, None)
+    return (ranking[0], ranking[-1] if len(ranking) > 1 else None)
 
 
 def media_do_espaco(sala):
@@ -105,6 +152,6 @@ def media_do_espaco(sala):
 def mapa_de_medias():
     """{sala_id: (média, total)} para listar vários espaços sem uma consulta por espaço."""
     return {
-        linha['reserva__sala__id']: (round(linha['media'], 1), linha['total'])
+        linha['sala_id']: (linha['media'], linha['total'])
         for linha in medias_por_espaco()
     }

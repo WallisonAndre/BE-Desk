@@ -26,7 +26,7 @@
     </div>
     <div class="bd-reservas-stat">
       <i class="fa-regular fa-comment" aria-hidden="true"></i>
-      <span><strong>{{ kpi_total }}</strong> avaliação{{ kpi_total|pluralize:"ões" }}</span>
+      <span><strong>{{ kpi_total }}</strong> avalia{{ kpi_total|pluralize:"ção,ções" }}</span>
     </div>
     <div class="bd-reservas-stat">
       <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
@@ -38,16 +38,22 @@
   <div class="bd-aval-destaques">
     <div class="bd-aval-destaque is-melhor">
       <span class="bd-reservas-kicker"><i class="fa-solid fa-arrow-trend-up" aria-hidden="true"></i> Melhor avaliado</span>
-      <strong>{{ melhor.reserva__sala__nome }}</strong>
-      <span>{{ melhor.media|floatformat:1 }} de 5 · {{ melhor.total }} avaliação{{ melhor.total|pluralize:"ões" }}</span>
+      <strong>{{ melhor.nome }}</strong>
+      <span>{{ melhor.media|floatformat:1 }} de 5 · {{ melhor.total }} avalia{{ melhor.total|pluralize:"ção,ções" }}</span>
     </div>
     {% if pior %}
     <div class="bd-aval-destaque is-pior">
       <span class="bd-reservas-kicker"><i class="fa-solid fa-arrow-trend-down" aria-hidden="true"></i> Pior avaliado</span>
-      <strong>{{ pior.reserva__sala__nome }}</strong>
-      <span>{{ pior.media|floatformat:1 }} de 5 · {{ pior.total }} avaliação{{ pior.total|pluralize:"ões" }}</span>
+      <strong>{{ pior.nome }}</strong>
+      <span>{{ pior.media|floatformat:1 }} de 5 · {{ pior.total }} avalia{{ pior.total|pluralize:"ção,ções" }}</span>
     </div>
     {% endif %}
+  </div>
+  {% elif kpi_total %}
+  <div class="bd-reservas-empty">
+    <i class="fa-solid fa-scale-unbalanced" aria-hidden="true"></i>
+    <strong>Ainda não dá para apontar o melhor e o pior</strong>
+    <p>Nenhum espaço chegou a {{ minimo_para_ranking }} avaliações. Com menos que isso, a média é a opinião de uma pessoa só.</p>
   </div>
   {% endif %}
 
@@ -55,6 +61,7 @@
   <section class="bd-reservas-section" aria-labelledby="bd-aval-medias">
     <div class="bd-reservas-section-head">
       <h2 id="bd-aval-medias">Média por espaço</h2>
+      <span class="bd-reservas-count">disputa o ranking a partir de {{ minimo_para_ranking }} avaliações</span>
     </div>
 
     {% if medias %}
@@ -76,17 +83,28 @@
           <tr>
             <td>
               <span class="bd-reservas-th-mobile">Espaço</span>
-              <span class="bd-reservas-sala">{{ linha.reserva__sala__nome }}</span>
+              <span class="bd-reservas-sala">{{ linha.nome }}</span>
             </td>
+            {% if linha.total %}
             <td>
               <span class="bd-reservas-th-mobile">Nota geral</span>
               <strong class="bd-aval-media">{{ linha.media|floatformat:1 }}</strong>
+              {% if not linha.no_ranking %}
+              <span class="bd-reservas-badge is-pendente" title="Fora da disputa de melhor e pior até chegar a {{ minimo_para_ranking }} avaliações">poucas avaliações</span>
+              {% endif %}
             </td>
             <td><span class="bd-reservas-th-mobile">Limpeza</span>{{ linha.media_limpeza|floatformat:1 }}</td>
             <td><span class="bd-reservas-th-mobile">Estrutura</span>{{ linha.media_estrutura|floatformat:1 }}</td>
             <td><span class="bd-reservas-th-mobile">Organização</span>{{ linha.media_organizacao|floatformat:1 }}</td>
             <td><span class="bd-reservas-th-mobile">Conservação</span>{{ linha.media_conservacao|floatformat:1 }}</td>
             <td><span class="bd-reservas-th-mobile">Avaliações</span>{{ linha.total }}</td>
+            {% else %}
+            <td colspan="5">
+              <span class="bd-reservas-th-mobile">Nota geral</span>
+              <span class="bd-reservas-relativo">sem avaliações</span>
+            </td>
+            <td><span class="bd-reservas-th-mobile">Avaliações</span>0</td>
+            {% endif %}
           </tr>
           {% endfor %}
         </tbody>
@@ -95,8 +113,8 @@
     {% else %}
     <div class="bd-reservas-empty">
       <i class="fa-regular fa-star" aria-hidden="true"></i>
-      <strong>Nenhum espaço avaliado ainda</strong>
-      <p>As médias aparecem assim que os usuários avaliarem os espaços que usaram.</p>
+      <strong>Nenhum espaço cadastrado</strong>
+      <p>As médias aparecem assim que houver espaços e avaliações.</p>
     </div>
     {% endif %}
   </section>
