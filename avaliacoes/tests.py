@@ -369,7 +369,11 @@ class RankingComMinimoTests(BaseAvaliacao):
 
         self.client.force_login(self.staff)
         resposta = self.client.get(reverse('indicadores_avaliacoes'))
-        self.assertContains(resposta, 'Auditório')
+        # O nome do espaço também aparece no filtro de comentários: a asserção
+        # precisa ser na célula da tabela, senão passaria com a tabela vazia.
+        self.assertContains(
+            resposta, '<span class="bd-reservas-sala">Auditório</span>', html=True
+        )
         self.assertContains(resposta, 'poucas avaliações')
 
     def test_espaco_sem_avaliacao_aparece_como_sem_avaliacoes(self):
@@ -379,7 +383,9 @@ class RankingComMinimoTests(BaseAvaliacao):
 
         self.client.force_login(self.staff)
         resposta = self.client.get(reverse('indicadores_avaliacoes'))
-        self.assertContains(resposta, 'Sala de Reuniões')
+        self.assertContains(
+            resposta, '<span class="bd-reservas-sala">Sala de Reuniões</span>', html=True
+        )
         self.assertContains(resposta, 'sem avaliações')
 
     def test_espaco_sem_avaliacao_vai_para_o_fim_da_lista(self):
@@ -449,3 +455,58 @@ class TextoDeQuantidadeTests(BaseAvaliacao):
         resposta = self.client.get(reverse('listar_pendentes'))
         self.assertContains(resposta, '3 avaliações')
         self.assertNotContains(resposta, 'avaliaçãoões')
+
+
+class LimitesDoRankingTests(BaseAvaliacao):
+    """Os dois lados do limite, o valor combinado e o arredondamento.
+
+    Lacunas apontadas por revisão: a suíte passava inteira com a regra escrita
+    como `== MINIMO`, não fixava o número combinado com a equipe e nunca
+    exercitava uma média com dízima.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.staff = User.objects.create_user('coord4', password='x', is_staff=True)
+
+    def test_espaco_com_mais_que_o_minimo_continua_no_ranking(self):
+        self.avaliacoes_para(self.sala, [5] * (MINIMO_PARA_RANKING + 4))
+        self.assertEqual([l['nome'] for l in espacos_no_ranking()], ['Quadra'])
+
+    def test_exatamente_o_minimo_entra(self):
+        self.avaliacoes_para(self.sala, [4] * MINIMO_PARA_RANKING)
+        self.assertEqual([l['nome'] for l in espacos_no_ranking()], ['Quadra'])
+
+    def test_uma_abaixo_do_minimo_nao_entra(self):
+        self.avaliacoes_para(self.sala, [4] * (MINIMO_PARA_RANKING - 1))
+        self.assertEqual(espacos_no_ranking(), [])
+
+    def test_duas_avaliacoes_nao_bastam(self):
+        """Fixa o número combinado com a equipe: 2 notas não formam indicador."""
+        self.avaliacoes_para(self.sala, [1, 1])
+        self.assertEqual(espacos_no_ranking(), [])
+        self.assertEqual(MINIMO_PARA_RANKING, 3)
+
+    def test_media_com_dizima_e_arredondada(self):
+        self.avaliacoes_para(self.sala, [5, 4, 4])  # 4,333…
+
+        linha = next(l for l in medias_por_espaco() if l['nome'] == 'Quadra')
+        self.assertEqual(linha['media'], 4.3)
+        self.assertEqual(mapa_de_medias()[self.sala.pk], (4.3, 3))
+
+        self.client.force_login(self.staff)
+        resposta = self.client.get(reverse('listar_pendentes'))
+        self.assertIn('4.3', resposta.context['aval_data'])
+        self.assertNotIn('4.33', resposta.context['aval_data'])
+
+    def test_grafico_do_dashboard_usa_a_mesma_regua_do_kpi(self):
+        """Gráfico e KPI não podem dar respostas diferentes na mesma tela."""
+        self.avaliacoes_para(self.sala, [5, 5, 5])
+        poucas = Sala.objects.create(nome='Sala de Estudos')
+        self.avaliacoes_para(poucas, [1])
+
+        self.client.force_login(self.staff)
+        resposta = self.client.get(reverse('listar_pendentes'))
+        self.assertIn('Quadra', resposta.context['aval_labels'])
+        self.assertNotIn('Sala de Estudos', resposta.context['aval_labels'])
+        self.assertEqual(resposta.context['kpi_espaco_pior'], '—')
