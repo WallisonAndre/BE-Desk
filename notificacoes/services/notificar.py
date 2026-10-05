@@ -71,6 +71,31 @@ def notificar_reserva_recusada_por_concorrencia(agendamento, aprovada):
     )
 
 
+def notificar_avaliacao_baixa(avaliacao):
+    """Avisa o staff de uma nota ruim, assim que ela chega.
+
+    Sem isto, o relato de uma luminária queimada fica esperando alguém abrir
+    o painel de indicadores por conta própria. O comentário entra na
+    mensagem porque é ele que diz o que está errado — a nota só diz que algo
+    está.
+    """
+    from django.contrib.auth.models import User
+
+    sala = avaliacao.sala.nome
+    mensagem = f'A sala "{sala}" recebeu nota {avaliacao.nota} de 5.'
+    if avaliacao.comentario:
+        mensagem += f' Comentário: "{avaliacao.comentario}"'
+
+    for admin in User.objects.filter(is_staff=True, is_active=True):
+        criar_notificacao(
+            destinatario=admin,
+            titulo=f'Avaliação baixa em {sala}',
+            mensagem=mensagem,
+            tipo='AVALIACAO_BAIXA',
+            link='/painel-admin/avaliacoes/',
+        )
+
+
 def notificar_reserva_cancelada(agendamento):
     from django.contrib.auth.models import User
     admins = User.objects.filter(is_staff=True, is_active=True)

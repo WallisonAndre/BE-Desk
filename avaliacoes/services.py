@@ -11,6 +11,10 @@ from avaliacoes.models import Avaliacao
 # duração de todas as faixas da grade atual.
 DURACAO_PADRAO = timedelta(minutes=45)
 
+# Até esta nota, a avaliação é tratada como reclamação e o staff é avisado na
+# hora. Acima dela, o espaço entrou no painel e basta.
+NOTA_QUE_AVISA_O_STAFF = 2
+
 
 def fim_da_reserva(reserva):
     """Instante em que o uso do espaço termina.

@@ -11,6 +11,7 @@ from django.utils import timezone
 from avaliacoes.models import Avaliacao
 from avaliacoes.services import media_do_espaco, motivo_para_nao_avaliar, reservas_avaliaveis
 from bedesk.models import Agendamento, Sala
+from notificacoes.models import Notificacao
 from eventos.models import Evento
 
 User = get_user_model()
@@ -306,3 +307,85 @@ class MediaNasTelasDeEscolhaTests(BaseAvaliacao):
             self.client.get(reverse('lista_locais'))
 
         self.assertEqual(len(com_cinco), len(com_dois))
+
+
+class AvisoDeAvaliacaoBaixaTests(BaseAvaliacao):
+    """Nota ruim avisa o staff na hora, em vez de esperar alguém abrir o painel."""
+
+    def setUp(self):
+        super().setUp()
+        self.staff = User.objects.create_user('coord', password='x', is_staff=True)
+        self.outro_staff = User.objects.create_user('direcao', password='x', is_staff=True)
+        self.inativo = User.objects.create_user(
+            'antigo', password='x', is_staff=True, is_active=False
+        )
+
+    def avisos(self, destinatario=None):
+        avisos = Notificacao.objects.filter(tipo='AVALIACAO_BAIXA')
+        return avisos.filter(destinatario=destinatario) if destinatario else avisos
+
+    def enviar(self, nota, comentario=''):
+        reserva = self.reserva()
+        self.client.force_login(self.usuario)
+        return self.client.post(
+            reverse('avaliar_reserva', args=[reserva.pk]),
+            {**NOTAS_VALIDAS, 'nota': nota, 'comentario': comentario},
+        )
+
+    def test_nota_1_avisa_todo_staff_ativo(self):
+        self.enviar(1)
+        self.assertEqual(self.avisos().count(), 2)
+        self.assertTrue(self.avisos(self.staff).exists())
+        self.assertTrue(self.avisos(self.outro_staff).exists())
+
+    def test_nota_2_tambem_avisa(self):
+        self.enviar(2)
+        self.assertEqual(self.avisos().count(), 2)
+
+    def test_nota_3_nao_avisa(self):
+        self.enviar(3)
+        self.assertFalse(self.avisos().exists())
+
+    def test_nota_5_nao_avisa(self):
+        self.enviar(5)
+        self.assertFalse(self.avisos().exists())
+
+    def test_staff_inativo_nao_recebe(self):
+        self.enviar(1)
+        self.assertFalse(self.avisos(self.inativo).exists())
+
+    def test_quem_avaliou_nao_recebe_o_aviso(self):
+        self.enviar(1)
+        self.assertFalse(self.avisos(self.usuario).exists())
+
+    def test_mensagem_traz_espaco_e_nota(self):
+        self.enviar(2)
+        aviso = self.avisos(self.staff).first()
+        self.assertEqual(aviso.titulo, 'Avaliação baixa em Quadra')
+        self.assertIn('Quadra', aviso.mensagem)
+        self.assertIn('nota 2 de 5', aviso.mensagem)
+
+    def test_comentario_entra_na_mensagem(self):
+        self.enviar(1, comentario='Duas luminárias queimadas.')
+        self.assertIn('Duas luminárias queimadas.', self.avisos(self.staff).first().mensagem)
+
+    def test_sem_comentario_a_mensagem_nao_fica_truncada(self):
+        self.enviar(1)
+        mensagem = self.avisos(self.staff).first().mensagem
+        self.assertNotIn('Comentário', mensagem)
+        self.assertTrue(mensagem.endswith('de 5.'))
+
+    def test_aviso_leva_para_os_indicadores(self):
+        self.enviar(1)
+        self.assertEqual(self.avisos(self.staff).first().link, '/painel-admin/avaliacoes/')
+
+    def test_avaliacao_que_nao_grava_nao_avisa(self):
+        """Formulário inválido não pode gerar aviso de nota baixa."""
+        reserva = self.reserva()
+        self.client.force_login(self.usuario)
+        self.client.post(
+            reverse('avaliar_reserva', args=[reserva.pk]),
+            {**NOTAS_VALIDAS, 'nota': 1, 'limpeza': 99},
+        )
+        self.assertFalse(Avaliacao.objects.filter(reserva=reserva).exists())
+        self.assertFalse(self.avisos().exists())

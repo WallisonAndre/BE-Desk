@@ -15,6 +15,7 @@ class Notificacao(models.Model):
         ('LEMBRETE', 'Lembrete'),
         ('ADMIN_NOVA_SOLICITACAO', 'Nova solicitação'),
         ('CONFLITO_HORARIO', 'Conflito de horário'),
+        ('AVALIACAO_BAIXA', 'Avaliação baixa'),
         ('SISTEMA', 'Sistema'),
     ]
 
@@ -56,6 +57,7 @@ class Notificacao(models.Model):
             'LEMBRETE': 'fa-bell',
             'ADMIN_NOVA_SOLICITACAO': 'fa-user-plus',
             'CONFLITO_HORARIO': 'fa-clock-rotate-left',
+            'AVALIACAO_BAIXA': 'fa-star-half-stroke',
             'SISTEMA': 'fa-circle-info',
         }
         return icons.get(self.tipo, 'fa-bell')
@@ -73,6 +75,7 @@ class Notificacao(models.Model):
             'LEMBRETE': '#8b5cf6',
             'ADMIN_NOVA_SOLICITACAO': '#f59e0b',
             'CONFLITO_HORARIO': '#ef4444',
+            'AVALIACAO_BAIXA': '#f59e0b',
             'SISTEMA': '#6b7280',
         }
         return colors.get(self.tipo, '#6b7280')
