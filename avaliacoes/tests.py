@@ -1,7 +1,9 @@
 """Avaliação dos espaços: quem pode avaliar, o que fica gravado e as médias."""
 from datetime import date, datetime, time, timedelta
+from io import StringIO
 
 from django.contrib.auth import get_user_model
+from django.core.management import call_command
 from django.db import connection
 from django.test import TestCase
 from django.test.utils import CaptureQueriesContext
@@ -9,9 +11,17 @@ from django.urls import reverse
 from django.utils import timezone
 
 from avaliacoes.models import Avaliacao
-from avaliacoes.services import media_do_espaco, motivo_para_nao_avaliar, reservas_avaliaveis
+from avaliacoes.services import (
+    DIAS_DE_LEMBRETE,
+    enviar_lembretes,
+    media_do_espaco,
+    motivo_para_nao_avaliar,
+    reservas_a_lembrar,
+    reservas_avaliaveis,
+)
 from bedesk.models import Agendamento, Sala
 from eventos.models import Evento
+from notificacoes.models import Notificacao
 
 User = get_user_model()
 
@@ -306,3 +316,100 @@ class MediaNasTelasDeEscolhaTests(BaseAvaliacao):
             self.client.get(reverse('lista_locais'))
 
         self.assertEqual(len(com_cinco), len(com_dois))
+
+
+class LembreteDeAvaliacaoTests(BaseAvaliacao):
+    """Quem usou o espaço é convidado a avaliar, uma vez só."""
+
+    def lembretes(self, usuario=None):
+        avisos = Notificacao.objects.filter(tipo='LEMBRETE')
+        return avisos.filter(destinatario=usuario) if usuario else avisos
+
+    def test_uso_sem_avaliacao_recebe_lembrete(self):
+        reserva = self.reserva()
+        enviados = enviar_lembretes()
+
+        self.assertEqual([r.pk for r in enviados], [reserva.pk])
+        lembrete = self.lembretes(self.usuario).get()
+        self.assertIn('Quadra', lembrete.titulo)
+        self.assertEqual(lembrete.link, reverse('avaliar_reserva', args=[reserva.pk]))
+
+    def test_rodar_de_novo_nao_duplica(self):
+        self.reserva()
+        enviar_lembretes()
+        enviar_lembretes()
+        enviar_lembretes()
+        self.assertEqual(self.lembretes().count(), 1)
+
+    def test_reserva_ja_avaliada_nao_recebe(self):
+        self.avaliar(self.reserva())
+        self.assertEqual(enviar_lembretes(), [])
+        self.assertFalse(self.lembretes().exists())
+
+    def test_avaliar_depois_do_lembrete_nao_gera_outro(self):
+        reserva = self.reserva()
+        enviar_lembretes()
+        self.avaliar(reserva)
+        enviar_lembretes()
+        self.assertEqual(self.lembretes().count(), 1)
+
+    def test_reserva_pendente_nao_recebe(self):
+        self.reserva(status='PENDENTE')
+        self.assertEqual(enviar_lembretes(), [])
+
+    def test_reserva_rejeitada_nao_recebe(self):
+        self.reserva(status='REJEITADO')
+        self.assertEqual(enviar_lembretes(), [])
+
+    def test_horario_que_ainda_nao_terminou_nao_recebe(self):
+        self.reserva(dias_atras=-3)
+        self.assertEqual(enviar_lembretes(), [])
+
+    def test_uso_antigo_fora_da_janela_nao_recebe(self):
+        self.reserva(dias_atras=DIAS_DE_LEMBRETE + 5)
+        self.assertEqual(enviar_lembretes(), [])
+
+    def test_janela_pode_ser_alargada(self):
+        self.reserva(dias_atras=DIAS_DE_LEMBRETE + 5)
+        self.assertEqual(len(enviar_lembretes(dias=DIAS_DE_LEMBRETE + 10)), 1)
+
+    def test_faixa_de_evento_nao_gera_lembrete(self):
+        reserva = self.reserva()
+        evento = Evento.objects.create(
+            nome='Jogos', descricao='x', sala=self.sala, responsavel=self.usuario,
+            data_inicio=date.today() - timedelta(days=1),
+            data_fim=date.today() - timedelta(days=1),
+            horario_inicio=time(7, 0), horario_fim=time(7, 45),
+        )
+        evento.agendamentos.add(reserva)
+        self.assertEqual(enviar_lembretes(), [])
+
+    def test_cada_pessoa_recebe_o_seu(self):
+        self.reserva()
+        self.reserva(usuario=self.outro, hora=time(9, 35))
+        enviar_lembretes()
+        self.assertEqual(self.lembretes(self.usuario).count(), 1)
+        self.assertEqual(self.lembretes(self.outro).count(), 1)
+
+    def test_comando_simular_nao_grava(self):
+        self.reserva()
+        saida = StringIO()
+        call_command('lembrar_de_avaliar', '--simular', stdout=saida)
+
+        self.assertIn('1 lembrete(s) seriam enviados', saida.getvalue())
+        self.assertFalse(self.lembretes().exists())
+
+    def test_comando_envia(self):
+        self.reserva()
+        saida = StringIO()
+        call_command('lembrar_de_avaliar', stdout=saida)
+
+        self.assertIn('1 lembrete(s) enviados', saida.getvalue())
+        self.assertEqual(self.lembretes().count(), 1)
+
+    def test_lembrete_leva_ao_formulario_que_abre(self):
+        reserva = self.reserva()
+        enviar_lembretes()
+        self.client.force_login(self.usuario)
+        resposta = self.client.get(self.lembretes(self.usuario).get().link)
+        self.assertEqual(resposta.status_code, 200)
