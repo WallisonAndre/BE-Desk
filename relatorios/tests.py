@@ -54,6 +54,18 @@ class ExportacaoDeAvaliacoesTests(TestCase):
         )
         self.assertEqual(linhas[1], ['Ginásio', '5,0', '5,0', '5,0', '5,0', '5,0', '1'])
 
+    def test_espaco_sem_avaliacao_sai_com_as_notas_em_branco(self):
+        """Desde o PR #34 o serviço devolve também os espaços sem nota.
+
+        Na planilha eles precisam aparecer com as células vazias, e não com
+        zero, que seria lido como nota mínima.
+        """
+        self.avaliar(self.quadra, 5)
+        _, linhas = self.baixar('exportar_medias_de_avaliacao')
+
+        sem_nota = next(l for l in linhas[1:] if l[0] == 'Auditório')
+        self.assertEqual(sem_nota, ['Auditório', '', '', '', '', '', '0'])
+
     def test_decimal_sai_com_virgula(self):
         self.avaliar(self.quadra, 5)
         self.avaliar(self.quadra, 4, hora=time(7, 45))

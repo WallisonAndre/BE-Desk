@@ -45,12 +45,8 @@ def exportar_medias(request):
     ])
 
     for linha in medias_por_espaco():
-        # A chave do nome muda quando o PR #34 (issue #29) entrar: lá o
-        # serviço passa a devolver 'nome'. Aceitar as duas evita que a
-        # exportação quebre em silêncio dependendo da ordem dos merges.
-        nome = linha.get('nome') or linha['reserva__sala__nome']
         escritor.writerow([
-            nome,
+            linha['nome'],
             _numero(linha['media']),
             _numero(linha['media_limpeza']),
             _numero(linha['media_estrutura']),
