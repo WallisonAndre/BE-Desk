@@ -97,7 +97,7 @@
         <span class="bd-dash-kpi-icon is-amber"><i class="fa-solid fa-star" aria-hidden="true"></i></span>
       </div>
       <span class="bd-dash-kpi-label">Nota média dos espaços</span>
-      <span class="bd-dash-kpi-hint">{{ kpi_total_avaliacoes }} avaliação{{ kpi_total_avaliacoes|pluralize:"ões" }}</span>
+      <span class="bd-dash-kpi-hint">{{ kpi_total_avaliacoes }} avalia{{ kpi_total_avaliacoes|pluralize:"ção,ções" }}</span>
     </a>
 
     <a class="bd-dash-kpi" href="{% url 'indicadores_avaliacoes' %}">
@@ -143,7 +143,7 @@
     {% if tem_avaliacoes %}
     <div class="bd-dash-card is-wide">
       <h2><i class="fa-solid fa-star" aria-hidden="true"></i> Avaliação dos espaços</h2>
-      <p class="bd-dash-card-hint">Nota média de 1 a 5, da melhor para a pior. Não depende do filtro de período.</p>
+      <p class="bd-dash-card-hint">Nota média de 1 a 5, da melhor para a pior. Só espaços com pelo menos {{ minimo_para_ranking }} avaliações; não depende do filtro de período.</p>
       <div class="bd-dash-chart"><canvas id="chartAvaliacoes"></canvas></div>
     </div>
     {% endif %}
