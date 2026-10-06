@@ -62,6 +62,9 @@
     <div class="bd-reservas-section-head">
       <h2 id="bd-aval-medias">Média por espaço</h2>
       <span class="bd-reservas-count">disputa o ranking a partir de {{ minimo_para_ranking }} avaliações</span>
+      <a href="{% url 'exportar_medias_de_avaliacao' %}" class="bd-reservas-btn">
+        <i class="fa-solid fa-file-csv" aria-hidden="true"></i> Baixar CSV
+      </a>
     </div>
 
     {% if medias %}
@@ -134,6 +137,10 @@
         <button type="submit" class="bd-reservas-btn">
           <i class="fa-solid fa-filter" aria-hidden="true"></i> Filtrar
         </button>
+        <a href="{% url 'exportar_comentarios_de_avaliacao' %}{% if sala_escolhida %}?sala={{ sala_escolhida }}{% endif %}"
+           class="bd-reservas-btn">
+          <i class="fa-solid fa-file-csv" aria-hidden="true"></i> Baixar CSV
+        </a>
       </form>
     </div>
 
