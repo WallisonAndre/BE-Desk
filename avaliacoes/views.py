@@ -10,8 +10,10 @@ from django.shortcuts import get_object_or_404, redirect, render
 from avaliacoes.forms import AvaliacaoForm
 from avaliacoes.models import Avaliacao
 from avaliacoes.services import (
+    MINIMO_PARA_RANKING,
     NOTA_QUE_AVISA_O_STAFF,
     medias_por_espaco,
+    melhor_e_pior,
     motivo_para_nao_avaliar,
     reservas_avaliaveis,
 )
@@ -84,7 +86,8 @@ def minhas_avaliacoes(request):
 @user_passes_test(is_admin_or_staff)
 def indicadores(request):
     """Médias por espaço, melhores e piores, e os comentários recebidos."""
-    medias = list(medias_por_espaco())
+    medias = medias_por_espaco()
+    melhor, pior = melhor_e_pior(medias)
 
     comentarios = (
         Avaliacao.objects.exclude(comentario="")
@@ -99,13 +102,14 @@ def indicadores(request):
 
     context = {
         "medias": medias,
-        "melhor": medias[0] if medias else None,
-        "pior": medias[-1] if len(medias) > 1 else None,
+        "melhor": melhor,
+        "pior": pior,
+        "minimo_para_ranking": MINIMO_PARA_RANKING,
         "comentarios": pagina,
         "salas": Sala.objects.order_by("nome"),
         "sala_escolhida": sala_escolhida,
         "kpi_total": geral["total"],
         "kpi_media": round(geral["media"], 1) if geral["media"] is not None else None,
-        "kpi_espacos_avaliados": len(medias),
+        "kpi_espacos_avaliados": sum(1 for linha in medias if linha["total"]),
     }
     return render(request, "avaliacoes/indicadores.html", context)
