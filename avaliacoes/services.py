@@ -3,10 +3,12 @@
 from datetime import timedelta
 
 from django.db.models import Avg, Count
+from django.urls import reverse
 from django.utils import timezone
 
 from avaliacoes.models import Avaliacao
 from bedesk.models import Sala
+from notificacoes.models import Notificacao
 
 # Faixa fora da grade (reserva antiga) não tem fim declarado; 45 minutos é a
 # duração de todas as faixas da grade atual.
@@ -20,6 +22,10 @@ MINIMO_PARA_RANKING = 3
 # Até esta nota, a avaliação é tratada como reclamação e o staff é avisado na
 # hora. Acima dela, o espaço entrou no painel e basta.
 NOTA_QUE_AVISA_O_STAFF = 2
+
+# Até quantos dias depois do uso ainda vale lembrar. Mais que isso, a pessoa
+# já não lembra do que achou do espaço.
+DIAS_DE_LEMBRETE = 7
 
 
 def fim_da_reserva(reserva):
@@ -68,23 +74,74 @@ def pode_avaliar(reserva, usuario):
     return motivo_para_nao_avaliar(reserva, usuario) is None
 
 
-def reservas_avaliaveis(usuario):
-    """Reservas já usadas por essa pessoa e ainda sem avaliação."""
+def reservas_usadas_sem_avaliacao(usuario=None, desde=None):
+    """Reservas que já foram usadas e continuam sem avaliação.
+
+    Sem `usuario`, varre o sistema inteiro — é assim que o lembrete encontra
+    quem avisar. `desde` corta o passado distante: não faz sentido lembrar
+    hoje de um uso de três meses atrás.
+    """
     from bedesk.models import Agendamento
 
-    candidatas = (
-        Agendamento.objects.filter(
-            usuario=usuario,
-            status='APROVADO',
-            eventos__isnull=True,
-            avaliacao__isnull=True,
-            data_inicio__isnull=False,
-        )
-        .select_related('sala')
-        .order_by('-data_inicio')
+    candidatas = Agendamento.objects.filter(
+        status='APROVADO',
+        eventos__isnull=True,
+        avaliacao__isnull=True,
+        data_inicio__isnull=False,
     )
+    if usuario is not None:
+        candidatas = candidatas.filter(usuario=usuario)
+    if desde is not None:
+        candidatas = candidatas.filter(data_inicio__gte=desde)
+
+    candidatas = candidatas.select_related('sala', 'usuario').order_by('-data_inicio')
+
     agora = timezone.localtime()
     return [r for r in candidatas if (fim_da_reserva(r) or agora) <= agora]
+
+
+def reservas_avaliaveis(usuario):
+    """Reservas já usadas por essa pessoa e ainda sem avaliação."""
+    return reservas_usadas_sem_avaliacao(usuario=usuario)
+
+
+def link_para_avaliar(reserva):
+    """O endereço do formulário daquela reserva.
+
+    Mora aqui porque é o mesmo valor usado para mandar o lembrete e para
+    saber se ele já foi mandado: se os dois calculassem o link por conta
+    própria, um ajuste em um deles faria a pessoa receber o lembrete de novo.
+    """
+    return reverse('avaliar_reserva', args=[reserva.pk])
+
+
+def reservas_a_lembrar(dias=None):
+    """Usos sem avaliação, dentro da janela, que ainda não receberam lembrete."""
+    dias = DIAS_DE_LEMBRETE if dias is None else dias
+    desde = timezone.localtime() - timedelta(days=dias)
+    candidatas = reservas_usadas_sem_avaliacao(desde=desde)
+    if not candidatas:
+        return []
+
+    # O próprio lembrete é o registro de que ele já foi enviado: as
+    # notificações do BE-Desk nunca são apagadas, só marcadas como lidas.
+    links = {link_para_avaliar(reserva): reserva for reserva in candidatas}
+    ja_lembradas = set(
+        Notificacao.objects.filter(tipo='LEMBRETE', link__in=list(links)).values_list(
+            'link', flat=True
+        )
+    )
+    return [reserva for link, reserva in links.items() if link not in ja_lembradas]
+
+
+def enviar_lembretes(dias=None):
+    """Manda o lembrete de avaliação e devolve quantos foram enviados."""
+    from notificacoes.services.notificar import notificar_lembrete_de_avaliacao
+
+    reservas = reservas_a_lembrar(dias)
+    for reserva in reservas:
+        notificar_lembrete_de_avaliacao(reserva, link_para_avaliar(reserva))
+    return reservas
 
 
 def _arredondar(valor):

@@ -163,6 +163,26 @@ def notificar_evento_cancelado(evento):
         )
 
 
+def notificar_lembrete_de_avaliacao(reserva, link):
+    """Convida quem usou o espaço a avaliá-lo.
+
+    Diferente de `notificar_lembrete`, que avisa de uma reserva que ainda vai
+    acontecer: este chega depois do uso e leva ao formulário daquela reserva.
+    """
+    return criar_notificacao(
+        destinatario=reserva.usuario,
+        titulo=f'Como foi usar a {reserva.sala.nome}?',
+        mensagem=(
+            f'Você usou a sala "{reserva.sala.nome}" em '
+            f'{reserva.data_inicio.strftime("%d/%m/%Y")} às '
+            f'{reserva.horario.strftime("%H:%M")}. Avalie o espaço — leva menos de um minuto '
+            'e ajuda a administração a saber o que precisa de manutenção.'
+        ),
+        tipo='LEMBRETE',
+        link=link,
+    )
+
+
 def notificar_lembrete(usuario, agendamento):
     criar_notificacao(
         destinatario=usuario,
