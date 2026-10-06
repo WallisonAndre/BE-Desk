@@ -13,8 +13,13 @@ from django.utils import timezone
 from avaliacoes.models import Avaliacao
 from avaliacoes.services import (
     DIAS_DE_LEMBRETE,
+    MINIMO_PARA_RANKING,
     enviar_lembretes,
+    espacos_no_ranking,
+    mapa_de_medias,
     media_do_espaco,
+    medias_por_espaco,
+    melhor_e_pior,
     motivo_para_nao_avaliar,
     reservas_a_lembrar,
     reservas_avaliaveis,
@@ -56,6 +61,22 @@ class BaseAvaliacao(TestCase):
         campos = dict(NOTAS_VALIDAS)
         campos.update(notas)
         return Avaliacao.objects.create(reserva=reserva, **campos)
+
+    def avaliacoes_para(self, sala, notas, usuario=None):
+        """Uma reserva usada e avaliada por nota informada, em horários distintos."""
+        horarios = [time(7, 0), time(7, 45), time(8, 50), time(9, 35), time(10, 30), time(11, 15)]
+        criadas = []
+        for indice, nota in enumerate(notas):
+            hora = horarios[indice % len(horarios)]
+            dia = date.today() - timedelta(days=1 + indice // len(horarios))
+            reserva = Agendamento.objects.create(
+                usuario=usuario or self.usuario, sala=sala, nome='Uso', motivo='x',
+                horario=hora,
+                data_inicio=timezone.make_aware(datetime.combine(dia, hora)),
+                status='APROVADO',
+            )
+            criadas.append(self.avaliar(reserva, nota=nota))
+        return criadas
 
 
 class QuemPodeAvaliarTests(BaseAvaliacao):
@@ -194,22 +215,14 @@ class IndicadoresTests(BaseAvaliacao):
         self.outra_sala = Sala.objects.create(nome='Auditório')
 
     def test_pagina_lista_medias_melhor_e_pior(self):
-        self.avaliar(self.reserva(hora=time(7, 0)), nota=5)
-        ruim = Agendamento.objects.create(
-            usuario=self.usuario, sala=self.outra_sala, nome='Aula', motivo='x',
-            horario=time(7, 0),
-            data_inicio=timezone.make_aware(
-                datetime.combine(date.today() - timedelta(days=1), time(7, 0))
-            ),
-            status='APROVADO',
-        )
-        self.avaliar(ruim, nota=2)
+        self.avaliacoes_para(self.sala, [5, 5, 5])
+        self.avaliacoes_para(self.outra_sala, [2, 2, 2])
 
         self.client.force_login(self.staff)
         resposta = self.client.get(reverse('indicadores_avaliacoes'))
         self.assertEqual(resposta.status_code, 200)
-        self.assertEqual(resposta.context['melhor']['reserva__sala__nome'], 'Quadra')
-        self.assertEqual(resposta.context['pior']['reserva__sala__nome'], 'Auditório')
+        self.assertEqual(resposta.context['melhor']['nome'], 'Quadra')
+        self.assertEqual(resposta.context['pior']['nome'], 'Auditório')
         self.assertEqual(resposta.context['kpi_media'], 3.5)
 
     def test_comentarios_podem_ser_filtrados_por_espaco(self):
@@ -223,12 +236,14 @@ class IndicadoresTests(BaseAvaliacao):
         resposta = self.client.get(reverse('indicadores_avaliacoes'))
         self.assertEqual(resposta.status_code, 302)
 
-    def test_dashboard_mostra_a_nota_media(self):
-        self.avaliar(self.reserva(), nota=5)
+    def test_dashboard_mostra_a_nota_media_e_o_pior_espaco(self):
+        self.avaliacoes_para(self.sala, [5, 5, 5])
+        self.avaliacoes_para(self.outra_sala, [2, 2, 2])
+
         self.client.force_login(self.staff)
         resposta = self.client.get(reverse('listar_pendentes'))
-        self.assertEqual(resposta.context['kpi_media_avaliacoes'], 5.0)
-        self.assertEqual(resposta.context['kpi_espaco_pior'], 'Quadra')
+        self.assertEqual(resposta.context['kpi_media_avaliacoes'], 3.5)
+        self.assertEqual(resposta.context['kpi_espaco_pior'], 'Auditório')
 
 
 class MinhasAvaliacoesTests(BaseAvaliacao):
@@ -316,6 +331,191 @@ class MediaNasTelasDeEscolhaTests(BaseAvaliacao):
             self.client.get(reverse('lista_locais'))
 
         self.assertEqual(len(com_cinco), len(com_dois))
+
+
+class RankingComMinimoTests(BaseAvaliacao):
+    """Melhor e pior só entre espaços com avaliações suficientes."""
+
+    def setUp(self):
+        super().setUp()
+        self.staff = User.objects.create_user('coord2', password='x', is_staff=True)
+        self.recem_avaliado = Sala.objects.create(nome='Auditório')
+        self.nunca_avaliado = Sala.objects.create(nome='Sala de Reuniões')
+
+    def test_espaco_com_uma_nota_baixa_nao_vira_o_pior(self):
+        self.avaliacoes_para(self.sala, [4, 4, 4])
+        self.avaliacoes_para(self.recem_avaliado, [1])
+
+        melhor, pior = melhor_e_pior()
+        self.assertEqual(melhor['nome'], 'Quadra')
+        self.assertIsNone(pior, 'com um elegível só, não há pior a apontar')
+
+    def test_pior_aparece_quando_o_espaco_atinge_o_minimo(self):
+        self.avaliacoes_para(self.sala, [4, 4, 4])
+        self.avaliacoes_para(self.recem_avaliado, [1, 1, 1])
+
+        melhor, pior = melhor_e_pior()
+        self.assertEqual(melhor['nome'], 'Quadra')
+        self.assertEqual(pior['nome'], 'Auditório')
+
+    def test_minimo_fica_em_um_lugar_so(self):
+        self.avaliacoes_para(self.sala, [3] * (MINIMO_PARA_RANKING - 1))
+        self.assertEqual(espacos_no_ranking(), [])
+
+        self.avaliacoes_para(self.sala, [3], usuario=self.outro)
+        self.assertEqual([l['nome'] for l in espacos_no_ranking()], ['Quadra'])
+
+    def test_espaco_abaixo_do_minimo_continua_na_tabela_marcado(self):
+        self.avaliacoes_para(self.recem_avaliado, [2])
+
+        linha = next(l for l in medias_por_espaco() if l['nome'] == 'Auditório')
+        self.assertEqual(linha['media'], 2.0)
+        self.assertEqual(linha['total'], 1)
+        self.assertFalse(linha['no_ranking'])
+
+        self.client.force_login(self.staff)
+        resposta = self.client.get(reverse('indicadores_avaliacoes'))
+        # O nome do espaço também aparece no filtro de comentários: a asserção
+        # precisa ser na célula da tabela, senão passaria com a tabela vazia.
+        self.assertContains(
+            resposta, '<span class="bd-reservas-sala">Auditório</span>', html=True
+        )
+        self.assertContains(resposta, 'poucas avaliações')
+
+    def test_espaco_sem_avaliacao_aparece_como_sem_avaliacoes(self):
+        linha = next(l for l in medias_por_espaco() if l['nome'] == 'Sala de Reuniões')
+        self.assertIsNone(linha['media'])
+        self.assertEqual(linha['total'], 0)
+
+        self.client.force_login(self.staff)
+        resposta = self.client.get(reverse('indicadores_avaliacoes'))
+        self.assertContains(
+            resposta, '<span class="bd-reservas-sala">Sala de Reuniões</span>', html=True
+        )
+        self.assertContains(resposta, 'sem avaliações')
+
+    def test_espaco_sem_avaliacao_vai_para_o_fim_da_lista(self):
+        self.avaliacoes_para(self.sala, [3, 3, 3])
+        nomes = [l['nome'] for l in medias_por_espaco()]
+        self.assertEqual(nomes[-1], 'Sala de Reuniões')
+
+    def test_media_nao_e_inflada_por_reserva_sem_avaliacao(self):
+        """A reserva não avaliada entra na junção e não pode mexer na média."""
+        self.avaliacoes_para(self.sala, [2, 4, 3])
+        self.reserva(hora=time(16, 30))  # usada, nunca avaliada
+
+        linha = next(l for l in medias_por_espaco() if l['nome'] == 'Quadra')
+        self.assertEqual(linha['media'], 3.0)
+        self.assertEqual(linha['total'], 3)
+
+    def test_dashboard_nao_aponta_pior_abaixo_do_minimo(self):
+        self.avaliacoes_para(self.recem_avaliado, [1, 1])
+
+        self.client.force_login(self.staff)
+        resposta = self.client.get(reverse('listar_pendentes'))
+        self.assertEqual(resposta.context['kpi_espaco_pior'], '—')
+
+    def test_grafico_do_dashboard_ignora_espaco_sem_avaliacao(self):
+        self.avaliacoes_para(self.sala, [5, 5, 5])
+
+        self.client.force_login(self.staff)
+        resposta = self.client.get(reverse('listar_pendentes'))
+        self.assertIn('Quadra', resposta.context['aval_labels'])
+        self.assertNotIn('Sala de Reuniões', resposta.context['aval_labels'])
+
+    def test_pagina_avisa_quando_ninguem_atinge_o_minimo(self):
+        self.avaliacoes_para(self.sala, [5])
+
+        self.client.force_login(self.staff)
+        resposta = self.client.get(reverse('indicadores_avaliacoes'))
+        self.assertIsNone(resposta.context['melhor'])
+        self.assertContains(resposta, 'Ainda não dá para apontar o melhor e o pior')
+
+    def test_mapa_de_medias_continua_servindo_os_cards(self):
+        self.avaliacoes_para(self.sala, [4, 5])
+        mapa = mapa_de_medias()
+        self.assertEqual(mapa[self.sala.pk], (4.5, 2))
+        self.assertEqual(mapa[self.nunca_avaliado.pk], (None, 0))
+
+
+class TextoDeQuantidadeTests(BaseAvaliacao):
+    """O plural de 'avaliação' já saiu errado uma vez ('avaliaçãoões')."""
+
+    def setUp(self):
+        super().setUp()
+        self.staff = User.objects.create_user('coord3', password='x', is_staff=True)
+
+    def test_singular_na_pagina_do_espaco(self):
+        self.avaliacoes_para(self.sala, [4])
+        resposta = self.client.get(reverse('detalhe_sala', args=[self.sala.nome]))
+        self.assertContains(resposta, '1 avaliação de quem já usou')
+
+    def test_plural_na_pagina_do_espaco(self):
+        self.avaliacoes_para(self.sala, [4, 5])
+        resposta = self.client.get(reverse('detalhe_sala', args=[self.sala.nome]))
+        self.assertContains(resposta, '2 avaliações de quem já usou')
+
+    def test_plural_no_dashboard(self):
+        self.avaliacoes_para(self.sala, [4, 5, 3])
+        self.client.force_login(self.staff)
+        resposta = self.client.get(reverse('listar_pendentes'))
+        self.assertContains(resposta, '3 avaliações')
+        self.assertNotContains(resposta, 'avaliaçãoões')
+
+
+class LimitesDoRankingTests(BaseAvaliacao):
+    """Os dois lados do limite, o valor combinado e o arredondamento.
+
+    Lacunas apontadas por revisão: a suíte passava inteira com a regra escrita
+    como `== MINIMO`, não fixava o número combinado com a equipe e nunca
+    exercitava uma média com dízima.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.staff = User.objects.create_user('coord4', password='x', is_staff=True)
+
+    def test_espaco_com_mais_que_o_minimo_continua_no_ranking(self):
+        self.avaliacoes_para(self.sala, [5] * (MINIMO_PARA_RANKING + 4))
+        self.assertEqual([l['nome'] for l in espacos_no_ranking()], ['Quadra'])
+
+    def test_exatamente_o_minimo_entra(self):
+        self.avaliacoes_para(self.sala, [4] * MINIMO_PARA_RANKING)
+        self.assertEqual([l['nome'] for l in espacos_no_ranking()], ['Quadra'])
+
+    def test_uma_abaixo_do_minimo_nao_entra(self):
+        self.avaliacoes_para(self.sala, [4] * (MINIMO_PARA_RANKING - 1))
+        self.assertEqual(espacos_no_ranking(), [])
+
+    def test_duas_avaliacoes_nao_bastam(self):
+        """Fixa o número combinado com a equipe: 2 notas não formam indicador."""
+        self.avaliacoes_para(self.sala, [1, 1])
+        self.assertEqual(espacos_no_ranking(), [])
+        self.assertEqual(MINIMO_PARA_RANKING, 3)
+
+    def test_media_com_dizima_e_arredondada(self):
+        self.avaliacoes_para(self.sala, [5, 4, 4])  # 4,333…
+
+        linha = next(l for l in medias_por_espaco() if l['nome'] == 'Quadra')
+        self.assertEqual(linha['media'], 4.3)
+        self.assertEqual(mapa_de_medias()[self.sala.pk], (4.3, 3))
+
+        self.client.force_login(self.staff)
+        resposta = self.client.get(reverse('listar_pendentes'))
+        self.assertIn('4.3', resposta.context['aval_data'])
+        self.assertNotIn('4.33', resposta.context['aval_data'])
+
+    def test_grafico_do_dashboard_usa_a_mesma_regua_do_kpi(self):
+        """Gráfico e KPI não podem dar respostas diferentes na mesma tela."""
+        self.avaliacoes_para(self.sala, [5, 5, 5])
+        poucas = Sala.objects.create(nome='Sala de Estudos')
+        self.avaliacoes_para(poucas, [1])
+
+        self.client.force_login(self.staff)
+        resposta = self.client.get(reverse('listar_pendentes'))
+        self.assertIn('Quadra', resposta.context['aval_labels'])
+        self.assertNotIn('Sala de Estudos', resposta.context['aval_labels'])
+        self.assertEqual(resposta.context['kpi_espaco_pior'], '—')
 
 
 class LembreteDeAvaliacaoTests(BaseAvaliacao):
