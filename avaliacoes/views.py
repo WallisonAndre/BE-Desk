@@ -11,12 +11,14 @@ from avaliacoes.forms import AvaliacaoForm
 from avaliacoes.models import Avaliacao
 from avaliacoes.services import (
     MINIMO_PARA_RANKING,
+    NOTA_QUE_AVISA_O_STAFF,
     medias_por_espaco,
     melhor_e_pior,
     motivo_para_nao_avaliar,
     reservas_avaliaveis,
 )
 from bedesk.models import Agendamento, Sala
+from notificacoes.services.notificar import notificar_avaliacao_baixa
 from usuarios.permissions import is_admin_or_staff
 
 COMENTARIOS_POR_PAGINA = 10
@@ -44,6 +46,11 @@ def avaliar_reserva(request, agendamento_id):
                 # vínculo um-para-um e não vira uma segunda avaliação.
                 messages.error(request, "Você já avaliou esta reserva.")
                 return redirect("minhas_avaliacoes")
+            # Nota baixa é reclamação: o staff fica sabendo agora, e não
+            # quando alguém abrir o painel de indicadores.
+            if avaliacao.nota <= NOTA_QUE_AVISA_O_STAFF:
+                notificar_avaliacao_baixa(avaliacao)
+
             messages.success(
                 request,
                 f'Avaliação registrada. Obrigado por avaliar o espaço "{reserva.sala.nome}".',

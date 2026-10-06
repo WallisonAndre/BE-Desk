@@ -1649,19 +1649,6 @@
       const listEl   = document.getElementById('notifList');
       if (!bellBtn || !dropdown || !listEl) return;
 
-      const icons  = {
-        RESERVA_CRIADA:     { icon: 'fa-calendar-plus',  bg: '#2563eb' },
-        RESERVA_APROVADA:   { icon: 'fa-calendar-check', bg: '#16a34a' },
-        RESERVA_REJEITADA:  { icon: 'fa-calendar-xmark', bg: '#dc2626' },
-        RESERVA_CANCELADA:  { icon: 'fa-calendar-minus', bg: '#f59e0b' },
-        EVENTO_CRIADO:      { icon: 'fa-calendar-day',   bg: '#8b5cf6' },
-        EVENTO_ATUALIZADO:  { icon: 'fa-calendar-day',   bg: '#0ea5e9' },
-        EVENTO_CANCELADO:   { icon: 'fa-calendar-xmark', bg: '#ef4444' },
-        LEMBRETE:           { icon: 'fa-clock',          bg: '#0ea5e9' },
-        ADMIN_NOVA_SOLICITACAO: { icon: 'fa-user-plus',  bg: '#f59e0b' },
-        CONFLITO_HORARIO:   { icon: 'fa-clock-rotate-left', bg: '#dc2626' },
-        SISTEMA:            { icon: 'fa-circle-info',    bg: '#6b7280' },
-      };
 
       function timeSince(dateStr) {
         const now = new Date();
@@ -1673,22 +1660,55 @@
         return Math.floor(sec / 86400) + 'd';
       }
 
+      function avisoVazio(texto, icone) {
+        const aviso = document.createElement('div');
+        aviso.className = 'bd-notif-dd-empty';
+        const i = document.createElement('i');
+        i.className = 'fa-solid ' + icone;
+        aviso.appendChild(i);
+        aviso.appendChild(document.createTextNode(texto));
+        return aviso;
+      }
+
+      // O ícone e a cor vêm da API, que os tira do próprio modelo. Antes havia
+      // uma segunda tabela aqui no JS: um tipo novo de notificação não existia
+      // nela, o fallback apontava para uma chave inexistente e a lista inteira
+      // morria em "Carregando...".
       function renderNotifs(items) {
+        listEl.textContent = '';
         if (!items.length) {
-          listEl.innerHTML = '<div class="bd-notif-dd-empty"><i class="fa-solid fa-bell-slash"></i>Nenhuma notificação</div>';
+          listEl.appendChild(avisoVazio('Nenhuma notificação', 'fa-bell-slash'));
           return;
         }
-        listEl.innerHTML = items.map(n => {
-          const info = icons[n.tipo] || icons.info;
-          const href = n.link || '#';
-          return '<a class="bd-notif-dd-item' + (n.lida ? '' : ' unread') + '" href="' + href + '">'
-            + '<div class="bd-notif-dd-icon" style="background:' + info.bg + '"><i class="fa-solid ' + info.icon + '"></i></div>'
-            + '<div class="bd-notif-dd-body">'
-            + '<div class="bd-notif-dd-title">' + n.titulo + '</div>'
-            + '<div class="bd-notif-dd-msg">' + n.mensagem + '</div>'
-            + '<div class="bd-notif-dd-time">' + timeSince(n.criada_em) + '</div>'
-            + '</div></a>';
-        }).join('');
+        items.forEach(n => {
+          const item = document.createElement('a');
+          item.className = 'bd-notif-dd-item' + (n.lida ? '' : ' unread');
+          item.href = n.link || '#';
+
+          const icone = document.createElement('div');
+          icone.className = 'bd-notif-dd-icon';
+          icone.style.background = n.cor || '#6b7280';
+          const marca = document.createElement('i');
+          marca.className = 'fa-solid ' + (n.icone || 'fa-bell');
+          icone.appendChild(marca);
+
+          const corpo = document.createElement('div');
+          corpo.className = 'bd-notif-dd-body';
+          // textContent, e não innerHTML: a mensagem carrega texto escrito por
+          // quem usa o sistema — comentário de avaliação, por exemplo.
+          [['bd-notif-dd-title', n.titulo],
+           ['bd-notif-dd-msg', n.mensagem],
+           ['bd-notif-dd-time', timeSince(n.criada_em)]].forEach(function (par) {
+            const linha = document.createElement('div');
+            linha.className = par[0];
+            linha.textContent = par[1];
+            corpo.appendChild(linha);
+          });
+
+          item.appendChild(icone);
+          item.appendChild(corpo);
+          listEl.appendChild(item);
+        });
       }
 
       async function loadNotifs() {
@@ -1709,7 +1729,13 @@
           } else if (badge) {
             badge.style.display = 'none';
           }
-        } catch(e) { /* ignore */ }
+        } catch(e) {
+          // Silenciar aqui foi o que fez a lista ficar presa em "Carregando..."
+          // sem nenhuma pista do motivo.
+          console.error('Falha ao carregar notificações:', e);
+          listEl.textContent = '';
+          listEl.appendChild(avisoVazio('Não foi possível carregar', 'fa-triangle-exclamation'));
+        }
       }
 
       async function clearAllNotifs() {

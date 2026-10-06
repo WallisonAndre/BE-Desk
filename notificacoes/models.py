@@ -15,8 +15,42 @@ class Notificacao(models.Model):
         ('LEMBRETE', 'Lembrete'),
         ('ADMIN_NOVA_SOLICITACAO', 'Nova solicitação'),
         ('CONFLITO_HORARIO', 'Conflito de horário'),
+        ('AVALIACAO_BAIXA', 'Avaliação baixa'),
         ('SISTEMA', 'Sistema'),
     ]
+
+    # Ícone e cor de cada tipo. O sino do menu lê estes valores pela API, em
+    # vez de manter a própria tabela: quando mantinha, um tipo novo não existia
+    # nela e a lista inteira parava em "Carregando...".
+    ICONES = {
+        'RESERVA_CRIADA': 'fa-calendar-plus',
+        'RESERVA_APROVADA': 'fa-calendar-check',
+        'RESERVA_REJEITADA': 'fa-calendar-xmark',
+        'RESERVA_CANCELADA': 'fa-calendar-minus',
+        'EVENTO_CRIADO': 'fa-calendar-day',
+        'EVENTO_ATUALIZADO': 'fa-calendar-day',
+        'EVENTO_CANCELADO': 'fa-calendar-xmark',
+        'LEMBRETE': 'fa-bell',
+        'ADMIN_NOVA_SOLICITACAO': 'fa-user-plus',
+        'CONFLITO_HORARIO': 'fa-clock-rotate-left',
+        'AVALIACAO_BAIXA': 'fa-star-half-stroke',
+        'SISTEMA': 'fa-circle-info',
+    }
+
+    CORES = {
+        'RESERVA_CRIADA': '#3b82f6',
+        'RESERVA_APROVADA': '#22c55e',
+        'RESERVA_REJEITADA': '#ef4444',
+        'RESERVA_CANCELADA': '#f59e0b',
+        'EVENTO_CRIADO': '#8b5cf6',
+        'EVENTO_ATUALIZADO': '#0ea5e9',
+        'EVENTO_CANCELADO': '#ef4444',
+        'LEMBRETE': '#8b5cf6',
+        'ADMIN_NOVA_SOLICITACAO': '#f59e0b',
+        'CONFLITO_HORARIO': '#ef4444',
+        'AVALIACAO_BAIXA': '#f59e0b',
+        'SISTEMA': '#6b7280',
+    }
 
     destinatario = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -45,34 +79,8 @@ class Notificacao(models.Model):
 
     @property
     def icone(self):
-        icons = {
-            'RESERVA_CRIADA': 'fa-calendar-plus',
-            'RESERVA_APROVADA': 'fa-calendar-check',
-            'RESERVA_REJEITADA': 'fa-calendar-xmark',
-            'RESERVA_CANCELADA': 'fa-calendar-minus',
-            'EVENTO_CRIADO': 'fa-calendar-day',
-            'EVENTO_ATUALIZADO': 'fa-calendar-day',
-            'EVENTO_CANCELADO': 'fa-calendar-xmark',
-            'LEMBRETE': 'fa-bell',
-            'ADMIN_NOVA_SOLICITACAO': 'fa-user-plus',
-            'CONFLITO_HORARIO': 'fa-clock-rotate-left',
-            'SISTEMA': 'fa-circle-info',
-        }
-        return icons.get(self.tipo, 'fa-bell')
+        return self.ICONES.get(self.tipo, 'fa-bell')
 
     @property
     def cor(self):
-        colors = {
-            'RESERVA_CRIADA': '#3b82f6',
-            'RESERVA_APROVADA': '#22c55e',
-            'RESERVA_REJEITADA': '#ef4444',
-            'RESERVA_CANCELADA': '#f59e0b',
-            'EVENTO_CRIADO': '#8b5cf6',
-            'EVENTO_ATUALIZADO': '#0ea5e9',
-            'EVENTO_CANCELADO': '#ef4444',
-            'LEMBRETE': '#8b5cf6',
-            'ADMIN_NOVA_SOLICITACAO': '#f59e0b',
-            'CONFLITO_HORARIO': '#ef4444',
-            'SISTEMA': '#6b7280',
-        }
-        return colors.get(self.tipo, '#6b7280')
+        return self.CORES.get(self.tipo, '#6b7280')
