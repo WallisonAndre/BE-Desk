@@ -17,6 +17,10 @@ DURACAO_PADRAO = timedelta(minutes=45)
 # manutenção para o espaço errado.
 MINIMO_PARA_RANKING = 3
 
+# Até esta nota, a avaliação é tratada como reclamação e o staff é avisado na
+# hora. Acima dela, o espaço entrou no painel e basta.
+NOTA_QUE_AVISA_O_STAFF = 2
+
 
 def fim_da_reserva(reserva):
     """Instante em que o uso do espaço termina.
