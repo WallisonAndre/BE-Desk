@@ -1340,6 +1340,115 @@
         margin-top: 1rem;
         padding-top: 0.9rem;
     }
+
+    /* ── FAQ ──
+       Usa as variáveis do tema, e não as --home-*, para funcionar no modo
+       claro e no escuro sem precisar de override no CSS global. */
+    .bd-faq {
+        display: grid;
+        grid-template-columns: minmax(260px, 0.8fr) 1.2fr;
+        gap: 3rem;
+        align-items: start;
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+    }
+
+    .bd-faq-intro h2 {
+        margin: 0.4rem 0 1rem;
+        color: var(--text-primary);
+        font-size: clamp(2rem, 3.6vw, 3rem);
+        font-weight: 860;
+        line-height: 1.05;
+        letter-spacing: -0.02em;
+    }
+
+    .bd-faq-intro h2 span {
+        color: var(--accent);
+    }
+
+    .bd-faq-intro p {
+        margin: 0;
+        color: var(--text-secondary);
+        font-size: 1rem;
+        line-height: 1.7;
+    }
+
+    .bd-faq-lista {
+        display: grid;
+        gap: 0.5rem;
+    }
+
+    .bd-faq-item {
+        border-bottom: 1px solid var(--border-card);
+    }
+
+    .bd-faq-item summary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 1.15rem 0.25rem;
+        color: var(--text-primary);
+        font-size: 1.02rem;
+        font-weight: 700;
+        line-height: 1.4;
+        cursor: pointer;
+        list-style: none;
+        transition: color 0.2s var(--home-ease);
+    }
+
+    /* o triângulo padrão do <details> some nos dois motores */
+    .bd-faq-item summary::-webkit-details-marker { display: none; }
+    .bd-faq-item summary::marker { content: ''; }
+
+    .bd-faq-item summary:hover { color: var(--accent); }
+
+    .bd-faq-item summary:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+        border-radius: 6px;
+    }
+
+    .bd-faq-item summary i {
+        flex-shrink: 0;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        transition: transform 0.25s var(--home-ease), color 0.2s var(--home-ease);
+    }
+
+    .bd-faq-item[open] summary i {
+        transform: rotate(180deg);
+        color: var(--accent);
+    }
+
+    .bd-faq-item p {
+        margin: 0;
+        padding: 0 2.5rem 1.3rem 0.25rem;
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        line-height: 1.7;
+    }
+
+    .bd-faq-item p a {
+        color: var(--accent);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+    }
+
+    .bd-faq-rodape {
+        margin-top: 1.6rem;
+        /* --text-muted dava 4,04:1 no tema escuro, abaixo do mínimo da WCAG AA */
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+
+    @media (max-width: 860px) {
+        .bd-faq {
+            grid-template-columns: 1fr;
+            gap: 1.8rem;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -1528,7 +1637,51 @@
             </div>
         </section>
 
-       
+        <!-- FAQ -->
+        <section class="bd-section" id="faq" aria-labelledby="bd-faq-title">
+            <div class="bd-faq">
+                <div class="bd-faq-intro bd-scroll-reveal">
+                    <span class="bd-section-kicker">FAQ</span>
+                    <h2 id="bd-faq-title">Perguntas, <span>respondidas.</span></h2>
+                    <p>O que mais perguntam a quem cuida do Bloco E. Se a sua d&uacute;vida n&atilde;o estiver aqui, fale com a coordena&ccedil;&atilde;o.</p>
+                </div>
+
+                <div class="bd-faq-lista bd-scroll-reveal">
+                    <details class="bd-faq-item">
+                        <summary>Como entro no sistema?<i class="fa-solid fa-chevron-down" aria-hidden="true"></i></summary>
+                        <p>Pelo bot&atilde;o <strong>Entrar</strong>, que leva ao login do SUAP. N&atilde;o existe senha separada do BE-Desk: a conta &eacute; a mesma do IFRN, e seu nome e matr&iacute;cula vêm de l&aacute;.</p>
+                    </details>
+
+                    <details class="bd-faq-item">
+                        <summary>Como reservo um espa&ccedil;o?<i class="fa-solid fa-chevron-down" aria-hidden="true"></i></summary>
+                        <p>Em <a href="{% url 'lista_locais' %}">Locais</a>, abra o espa&ccedil;o e clique no <strong>+</strong> da faixa de hor&aacute;rio que quiser. O formul&aacute;rio j&aacute; vem com sala, data e hora preenchidas; voc&ecirc; s&oacute; descreve o uso e envia. O pedido fica pendente at&eacute; algu&eacute;m da coordena&ccedil;&atilde;o aprovar.</p>
+                    </details>
+
+                    <details class="bd-faq-item">
+                        <summary>Posso pedir um hor&aacute;rio que outra pessoa j&aacute; pediu?<i class="fa-solid fa-chevron-down" aria-hidden="true"></i></summary>
+                        <p>Pode. V&aacute;rios pedidos podem disputar a mesma faixa — quem aprova decide. Quando um &eacute; aprovado, os outros s&atilde;o recusados automaticamente e cada pessoa recebe o aviso.</p>
+                    </details>
+
+                    <details class="bd-faq-item">
+                        <summary>Por que um hor&aacute;rio aparece ocupado?<i class="fa-solid fa-chevron-down" aria-hidden="true"></i></summary>
+                        <p>Por tr&ecirc;s motivos: j&aacute; existe reserva <strong>aprovada</strong>, h&aacute; um <strong>evento</strong> naquele per&iacute;odo, ou a faixa &eacute; um <strong>hor&aacute;rio fixo</strong> — treino ou atividade que se repete toda semana. Pedido ainda pendente n&atilde;o ocupa a grade.</p>
+                    </details>
+
+                    <details class="bd-faq-item">
+                        <summary>Como acompanho ou cancelo a minha reserva?<i class="fa-solid fa-chevron-down" aria-hidden="true"></i></summary>
+                        <p>Em <a href="{% url 'lista_reserva' %}">Minhas Reservas</a>. L&aacute; est&atilde;o as pr&oacute;ximas, o hist&oacute;rico e o bot&atilde;o de cancelar. A resposta ao seu pedido tamb&eacute;m chega pelo sino de notifica&ccedil;&otilde;es.</p>
+                    </details>
+
+                    <details class="bd-faq-item">
+                        <summary>Preciso avaliar o espa&ccedil;o depois de usar?<i class="fa-solid fa-chevron-down" aria-hidden="true"></i></summary>
+                        <p>N&atilde;o &eacute; obrigat&oacute;rio, mas ajuda. Depois que o hor&aacute;rio passa, a reserva aparece em Minhas Avalia&ccedil;&otilde;es para receber uma nota e um coment&aacute;rio. &Eacute; assim que a administra&ccedil;&atilde;o descobre o que precisa de manuten&ccedil;&atilde;o.</p>
+                    </details>
+
+                    <p class="bd-faq-rodape">Ainda com d&uacute;vida? Procure a coordena&ccedil;&atilde;o do Bloco E.</p>
+                </div>
+            </div>
+        </section>
+
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {
