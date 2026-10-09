@@ -112,6 +112,22 @@
     max-width: 440px;
   }
 
+  /* ── Ilustração do painel ──
+     Fecha a coluna da esquerda, no lugar que o SUAP usa. É decorativa:
+     sai do fluxo de leitura por aria-hidden e some no celular, onde o
+     painel vira uma faixa de 200px. */
+  .lp-ilustracao {
+    display: block;
+    width: min(100%, 430px);
+    height: auto;
+    margin-top: 0.4rem;
+    filter: drop-shadow(0 16px 28px rgba(0, 0, 0, 0.28));
+  }
+
+  [data-theme="light"] .lp-ilustracao {
+    filter: drop-shadow(0 16px 28px rgba(15, 23, 42, 0.14));
+  }
+
   /* Logo */
   .lp-logo-wrap {
     position: relative;
@@ -575,7 +591,8 @@
     .lp-brand-title { font-size: 1.35rem; }
 
     .lp-tagline,
-    .lp-pills { display: none; }
+    .lp-pills,
+    .lp-ilustracao { display: none; }
 
     .lp-auth { width: 100%; min-height: 0; }
 
@@ -822,6 +839,41 @@
         linear-gradient(158deg, #eef7f3 0%, #f0f9f4 100%) !important;
     }
   }
+  /* ── Painel institucional ──
+     Verde sólido com texto claro nos dois temas, como o SUAP faz na tela de
+     login. O painel é identidade, não conteúdo que acompanha o tema: deixá-lo
+     claro no modo claro apagava a ilustração e descolava do sistema irmão. */
+  .lp-brand,
+  [data-theme="light"] .lp-brand {
+    background: linear-gradient(158deg, #0b5d52 0%, #094e45 55%, #06403a 100%) !important;
+  }
+
+  .lp-brand-title,
+  [data-theme="light"] .lp-brand-title {
+    color: #ffffff !important;
+  }
+
+  .lp-brand-sub,
+  [data-theme="light"] .lp-brand-sub {
+    color: rgba(255, 255, 255, 0.78) !important;
+  }
+
+  .lp-tagline,
+  [data-theme="light"] .lp-tagline {
+    color: rgba(255, 255, 255, 0.82) !important;
+  }
+
+  .lp-pill,
+  [data-theme="light"] .lp-pill {
+    border-color: rgba(255, 255, 255, 0.28) !important;
+    background: rgba(255, 255, 255, 0.10) !important;
+    color: rgba(255, 255, 255, 0.92) !important;
+  }
+
+  [data-theme="light"] .lp-ilustracao {
+    filter: drop-shadow(0 16px 28px rgba(0, 0, 0, 0.3));
+  }
+
 </style>
 {% endblock %}
 
@@ -877,6 +929,16 @@
           <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>OAuth2
         </span>
       </div>
+
+      <img
+        src="{% static 'img/login-estudantes.webp' %}"
+        alt=""
+        class="lp-ilustracao"
+        aria-hidden="true"
+        width="1100" height="761"
+        loading="lazy"
+        decoding="async"
+      />
 
     </div>
   </aside>
