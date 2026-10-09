@@ -5,12 +5,16 @@
 {% block content %}
 <style>
     /* --- Page Vars --- */
-    :root {
-        --lime: #b5e853;
-        --lime-glow: rgba(181, 232, 83, 0.18);
-        --surface: #11141A;
-        --surface-2: #1a1e28;
-        --border: rgba(255, 255, 255, 0.07);
+    /* A paleta desta tela vira apelido da paleta do tema: as regras abaixo
+       continuam usando os mesmos nomes, e passam a acompanhar claro e
+       escuro. Fica no escopo da página — antes estava em :root e vazava
+       para o site inteiro. */
+    .locais-page {
+        --lime: var(--accent);
+        --lime-glow: var(--accent-glow);
+        --surface: var(--bg-base);
+        --surface-2: var(--bg-card);
+        --border: var(--border-card);
         --ease: cubic-bezier(0.22, 1, 0.36, 1);
     }
 
@@ -38,9 +42,9 @@
         gap: 0.5rem;
         padding: 0.3rem 1rem;
         margin-bottom: 1.4rem;
-        border: 1px solid rgba(181, 232, 83, 0.22);
+        border: 1px solid var(--accent-border);
         border-radius: 999px;
-        background: rgba(181, 232, 83, 0.06);
+        background: var(--accent-glow);
         color: var(--lime);
         font-size: 0.78rem;
         font-weight: 700;
@@ -55,11 +59,11 @@
         height: 0.45rem;
         border-radius: 999px;
         background: var(--lime);
-        box-shadow: 0 0 12px rgba(181, 232, 83, 0.7);
+        box-shadow: 0 0 12px var(--accent);
     }
 
     .locais-hero h1 {
-        color: #fff;
+        color: var(--text-primary);
         font-size: clamp(2rem, 5vw, 3.5rem);
         font-weight: 880;
         line-height: 1.1;
@@ -70,11 +74,11 @@
 
     .locais-hero h1 span {
         color: var(--lime);
-        text-shadow: 0 0 30px rgba(181, 232, 83, 0.2);
+        text-shadow: 0 0 30px var(--accent-glow);
     }
 
     .locais-hero p {
-        color: rgba(226, 234, 242, 0.65);
+        color: var(--text-secondary);
         font-size: 1.05rem;
         max-width: 520px;
         margin: 0 auto;
@@ -99,10 +103,10 @@
         align-items: center;
         gap: 0.5rem;
         padding: 0.45rem 1.1rem;
-        background: rgba(255,255,255,0.04);
+        background: var(--bg-card);
         border: 1px solid var(--border);
         border-radius: 999px;
-        color: #9ca3af;
+        color: var(--text-secondary);
         font-size: 0.84rem;
         font-weight: 600;
     }
@@ -136,8 +140,8 @@
 
     .local-card:hover {
         transform: translateY(-6px);
-        border-color: rgba(181, 232, 83, 0.3);
-        box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 0 1px rgba(181, 232, 83, 0.1);
+        border-color: var(--accent-border);
+        box-shadow: var(--shadow-card), 0 0 0 1px var(--accent-border);
     }
 
     /* glow corner accent on hover */
@@ -146,7 +150,7 @@
         position: absolute;
         inset: 0;
         border-radius: inherit;
-        background: radial-gradient(400px circle at var(--mx, 50%) var(--my, 50%), rgba(181, 232, 83, 0.06) 0%, transparent 70%);
+        background: radial-gradient(400px circle at var(--mx, 50%) var(--my, 50%), var(--accent-glow) 0%, transparent 70%);
         opacity: 0;
         transition: opacity 0.3s;
         pointer-events: none;
@@ -178,11 +182,11 @@
     /* image placeholder */
     .local-card-img-placeholder {
         height: 190px;
-        background: linear-gradient(135deg, #1a1e28 0%, #0d1018 100%);
+        background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-card-hover) 100%);
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #3a3f50;
+        color: var(--text-muted);
         font-size: 3rem;
         position: relative;
         z-index: 1;
@@ -214,8 +218,8 @@
         gap: 0.35rem;
         padding: 0.2rem 0.65rem;
         border-radius: 999px;
-        background: rgba(181, 232, 83, 0.1);
-        border: 1px solid rgba(181, 232, 83, 0.2);
+        background: var(--accent-glow);
+        border: 1px solid var(--accent-border);
         color: var(--lime);
         font-size: 0.72rem;
         font-weight: 700;
@@ -227,7 +231,7 @@
 
     /* Title */
     .local-card h3 {
-        color: #f3f4f6;
+        color: var(--text-primary);
         font-size: 1.2rem;
         font-weight: 800;
         margin: 0 0 0.4rem;
@@ -236,7 +240,7 @@
 
     /* Description */
     .local-card-desc {
-        color: #9ca3af;
+        color: var(--text-secondary);
         font-size: 0.875rem;
         line-height: 1.6;
         flex: 1;
@@ -259,13 +263,13 @@
         display: flex;
         align-items: center;
         gap: 0.4rem;
-        color: #6b7280;
+        color: var(--text-muted);
         font-size: 0.82rem;
         font-weight: 600;
     }
 
     .local-meta-item i {
-        color: #4b5563;
+        color: var(--text-muted);
         font-size: 0.85em;
     }
 
@@ -288,8 +292,8 @@
         width: 100%;
         padding: 0.75rem 1.1rem;
         border-radius: 0.75rem;
-        background: rgba(181, 232, 83, 0.08);
-        border: 1px solid rgba(181, 232, 83, 0.18);
+        background: var(--accent-glow);
+        border: 1px solid var(--accent-border);
         color: var(--lime);
         font-size: 0.875rem;
         font-weight: 700;
@@ -299,28 +303,28 @@
     }
 
     .local-card-btn:hover {
-        background: rgba(181, 232, 83, 0.15);
-        border-color: rgba(181, 232, 83, 0.4);
+        background: var(--accent-glow);
+        border-color: var(--accent);
         color: var(--lime);
-        box-shadow: 0 0 20px rgba(181, 232, 83, 0.12);
+        box-shadow: var(--shadow-glow);
     }
 
     /* ── Empty state ── */
     .locais-empty {
         text-align: center;
         padding: 5rem 1rem;
-        color: #6b7280;
+        color: var(--text-muted);
     }
 
     .locais-empty i {
         font-size: 3rem;
-        color: #374151;
+        color: var(--text-muted);
         margin-bottom: 1rem;
         display: block;
     }
 
     .locais-empty h3 {
-        color: #9ca3af;
+        color: var(--text-secondary);
         margin-bottom: 0.5rem;
     }
 
@@ -335,7 +339,8 @@
     }
 
     .locais-section-header span {
-        color: #6b7280;
+        /* --text-muted dá 3,97:1 sobre o branco, abaixo do mínimo da WCAG AA */
+        color: var(--text-secondary);
         font-size: 0.82rem;
         font-weight: 700;
         text-transform: uppercase;
@@ -374,7 +379,7 @@
             </div>
             <div class="stat-pill">
                 <i class="fa-solid fa-check-circle"></i>
-                <span>Aprovação instantânea</span>
+                <span>Pedido acompanhado</span>
             </div>
         </div>
 
