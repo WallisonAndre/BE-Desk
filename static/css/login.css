@@ -43,54 +43,47 @@ body.bd-login-page .floating-navbar-wrapper {
   overflow: hidden;
 }
 
-/* ── Traços decorativos, como no desenho ── */
-.bd-login-tracos {
+/* ── Fundo decorativo ──
+   Ondas e formas soltas atrás da cena, no traço claro sobre o verde. O
+   desenho inteiro é um SVG só, que escala com a tela; `currentColor`
+   deixa a cor num lugar só. */
+.bd-login-fundo {
   position: absolute;
   inset: 0;
+  color: rgba(235, 255, 238, 0.16);
   pointer-events: none;
-  opacity: 0.5;
 }
 
-.bd-login-tracos span {
-  position: absolute;
-  border: 1.5px solid rgba(235, 255, 238, 0.16);
+.bd-login-fundo svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
-.bd-login-tracos span:nth-child(1) {
-  left: 2%; top: 26%;
-  width: 190px; height: 130px;
-  border-radius: 22px;
+.bd-login-fundo .bd-login-formas { color: rgba(235, 255, 238, 0.13); }
+.bd-login-fundo .bd-login-riscos { color: rgba(235, 255, 238, 0.2); }
+
+/* As ondas se deslocam devagar, só o suficiente para a cena não parecer
+   parada. Quem pediu menos animação no sistema não vê nada disso. */
+@keyframes bd-login-deriva {
+  from { transform: translateX(-28px); }
+  to   { transform: translateX(28px); }
 }
 
-.bd-login-tracos span:nth-child(2) {
-  left: 24%; top: 20%;
-  width: 150px; height: 150px;
-  border-radius: 26px;
+.bd-login-fundo .bd-login-ondas {
+  animation: bd-login-deriva 18s ease-in-out infinite alternate;
 }
 
-.bd-login-tracos span:nth-child(3) {
-  left: 3%; bottom: 22%;
-  width: 34px; height: 34px;
-  border-radius: 9px;
-  transform: rotate(14deg);
+.bd-login-fundo .bd-login-riscos {
+  animation: bd-login-deriva 12s ease-in-out infinite alternate-reverse;
 }
 
-.bd-login-tracos span:nth-child(4) {
-  left: 29%; bottom: 20%;
-  width: 28px; height: 28px;
-  border-radius: 8px;
-  transform: rotate(-12deg);
+@media (prefers-reduced-motion: reduce) {
+  .bd-login-fundo .bd-login-ondas,
+  .bd-login-fundo .bd-login-riscos {
+    animation: none;
+  }
 }
-
-.bd-login-tracos span:nth-child(5),
-.bd-login-tracos span:nth-child(6) {
-  width: 96px; height: 0;
-  border-width: 1.5px 0 0;
-  transform: rotate(-24deg);
-}
-
-.bd-login-tracos span:nth-child(5) { left: 1%; top: 46%; }
-.bd-login-tracos span:nth-child(6) { left: 26%; top: 57%; width: 70px; }
 
 /* ── Ilustração ── */
 .bd-login-arte {
@@ -258,7 +251,7 @@ body.bd-login-page .floating-navbar-wrapper {
   .bd-login-logo { max-width: 220px; }
   .bd-login .bd-login-titulo { font-size: 1.45rem; }
 
-  .bd-login-tracos { display: none; }
+  .bd-login-fundo { display: none; }
   .bd-login-rodape { position: static; margin-top: 0.5rem; }
 }
 
