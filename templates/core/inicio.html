@@ -834,15 +834,6 @@
         line-height: 1.7;
     }
 
-    .bd-stats-strip {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 0.85rem;
-        margin-top: -1.6rem;
-        padding-bottom: 2rem;
-    }
-
-    .bd-stat-card,
     .bd-feature-card,
     .bd-step-card,
     .bd-final-cta {
@@ -859,13 +850,6 @@
         will-change: transform;
     }
 
-    .bd-stat-card {
-        min-height: 8.2rem;
-        padding: 1rem;
-        border-radius: 18px;
-    }
-
-    .bd-stat-card::before,
     .bd-feature-card::before,
     .bd-step-card::before {
         content: "";
@@ -876,8 +860,6 @@
         opacity: 0;
         transition: opacity 0.26s var(--home-ease);
     }
-
-    .bd-stat-card::after,
     .bd-feature-card::after,
     .bd-step-card::after,
     .bd-scroll-panel::after,
@@ -895,32 +877,12 @@
             opacity 0.34s var(--home-ease),
             transform 0.54s var(--home-ease);
     }
-
-    .bd-stat-card:hover::before,
     .bd-feature-card:hover::before,
     .bd-step-card:hover::before {
         opacity: 1;
     }
 
-    .bd-stat-card strong {
-        position: relative;
-        z-index: 1;
-        display: block;
-        color: #fff;
-        font-size: 2rem;
-        font-weight: 860;
-        line-height: 1;
-    }
 
-    .bd-stat-card span {
-        position: relative;
-        z-index: 1;
-        display: block;
-        margin-top: 0.55rem;
-        color: rgba(226, 234, 242, 0.62);
-        font-size: 0.84rem;
-        line-height: 1.45;
-    }
 
     .bd-steps-grid {
         display: grid;
@@ -1074,13 +1036,11 @@
                 0 0 42px rgba(200, 255, 31, 0.035),
                 inset 0 1px 0 rgba(255, 255, 255, 0.07);
         }
-
-        .bd-preview-card:hover::before,
-        .bd-preview-card:hover::after,
-        .bd-stat-card:hover::after,
-        .bd-feature-card:hover::after,
-        .bd-step-card:hover::after,
-        .bd-scroll-panel:hover::after {
+    .bd-preview-card:hover::before,
+    .bd-preview-card:hover::after,
+    .bd-feature-card:hover::after,
+    .bd-step-card:hover::after,
+    .bd-scroll-panel:hover::after {
             opacity: 1;
             transform: translateX(0);
         }
@@ -1090,10 +1050,8 @@
             border-color: rgba(200, 255, 31, 0.22);
             background: rgba(200, 255, 31, 0.055);
         }
-
-        .bd-stat-card.bd-scroll-reveal.is-visible:hover,
-        .bd-feature-card.bd-scroll-reveal.is-visible:hover,
-        .bd-step-card.bd-scroll-reveal.is-visible:hover {
+    .bd-feature-card.bd-scroll-reveal.is-visible:hover,
+    .bd-step-card.bd-scroll-reveal.is-visible:hover {
             transform: translateY(-7px) scale(1.012);
             border-color: rgba(200, 255, 31, 0.3);
             background:
@@ -1131,16 +1089,10 @@
             filter: drop-shadow(0 0 10px rgba(200, 255, 31, 0.36));
         }
 
-        .bd-stat-card:hover strong {
-            color: var(--home-lime);
-            text-shadow: 0 0 24px rgba(200, 255, 31, 0.16);
-        }
-
-        .bd-stat-card:active,
-        .bd-feature-card:active,
-        .bd-step-card:active,
-        .bd-scroll-panel:active,
-        .bd-preview-card:active {
+    .bd-feature-card:active,
+    .bd-step-card:active,
+    .bd-scroll-panel:active,
+    .bd-preview-card:active {
             transform: translateY(-2px) scale(0.998);
         }
     }
@@ -1200,10 +1152,8 @@
             margin: 0 auto;
             width: 100%;
         }
-
-        .bd-stats-strip,
-        .bd-steps-grid,
-        .bd-features-grid {
+    .bd-steps-grid,
+    .bd-features-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
         }
     }
@@ -1261,10 +1211,8 @@
         .bd-section {
             padding: 4rem 0;
         }
-
-        .bd-stats-strip,
-        .bd-steps-grid,
-        .bd-features-grid {
+    .bd-steps-grid,
+    .bd-features-grid {
             grid-template-columns: 1fr;
         }
 
@@ -1449,6 +1397,93 @@
             gap: 1.8rem;
         }
     }
+    /* ── Faixas alternadas ──
+       Cada seção é uma faixa de cor, clara e verde se revezando, com o topo
+       arredondado — o mesmo recurso do portal do IFRN. A faixa seguinte sobe
+       por cima da anterior (margem negativa), e é isso que faz o canto
+       arredondado revelar a cor de baixo em vez do fundo da página.
+       Verde e texto medidos no portal: #93d2a6 e #1e492f. */
+    .bd-faixa {
+        position: relative;
+        border-radius: 2.5rem 2.5rem 0 0;
+        /* Sai da coluna de 1.180px e vai de ponta a ponta, devolvendo o
+           alinhamento do conteúdo pelo padding. `.bd-home` já é 100vw e
+           tem `overflow: hidden`, então os 100vw daqui não criam rolagem
+           lateral. */
+        width: 100vw;
+        margin-inline: calc(50% - 50vw);
+        padding-inline: calc(50vw - 50%);
+    }
+
+    .bd-faixa + .bd-faixa {
+        margin-top: -2.5rem;
+        padding-top: 4.5rem;
+    }
+
+    .bd-faixa--clara { background: #ffffff; }
+    .bd-faixa--verde { background: #93d2a6; }
+
+    /* O empilhamento precisa crescer, senão a faixa de cima cobre a de baixo */
+    .bd-faixa:nth-of-type(1) { z-index: 1; }
+    .bd-faixa:nth-of-type(2) { z-index: 2; }
+    .bd-faixa:nth-of-type(3) { z-index: 3; }
+    .bd-faixa:nth-of-type(4) { z-index: 4; }
+
+    /* Texto sobre o verde claro: verde escuro, como no portal */
+    .bd-faixa--verde .bd-section-title,
+    .bd-faixa--verde .bd-section-title span,
+    .bd-faixa--verde h2,
+    .bd-faixa--verde h3 {
+        color: #1e492f !important;
+    }
+
+    .bd-faixa--verde .bd-section-copy,
+    .bd-faixa--verde p {
+        color: #2c5a3f !important;
+    }
+
+    .bd-faixa--verde .bd-section-kicker {
+        border-color: rgba(30, 73, 47, 0.3);
+        background: rgba(255, 255, 255, 0.45);
+        color: #1e492f;
+    }
+
+    /* Texto sobre a faixa clara acompanha o tema, como já era */
+    .bd-faixa--clara .bd-section-copy { color: rgba(30, 41, 59, 0.7) !important; }
+
+    [data-theme="light"] .bd-faixa--clara { background: #ffffff; }
+
+    /* No tema escuro as faixas viram verde fechado e superfície escura */
+    html:not([data-theme="light"]) .bd-faixa--clara { background: #0a1014; }
+    html:not([data-theme="light"]) .bd-faixa--verde { background: #0c3824; }
+
+    html:not([data-theme="light"]) .bd-faixa--verde .bd-section-title,
+    html:not([data-theme="light"]) .bd-faixa--verde .bd-section-title span,
+    html:not([data-theme="light"]) .bd-faixa--verde h2,
+    html:not([data-theme="light"]) .bd-faixa--verde h3 {
+        color: #ecfdf5 !important;
+    }
+
+    html:not([data-theme="light"]) .bd-faixa--verde .bd-section-copy,
+    html:not([data-theme="light"]) .bd-faixa--verde p {
+        color: rgba(236, 253, 245, 0.78) !important;
+    }
+
+    html:not([data-theme="light"]) .bd-faixa--verde .bd-section-kicker {
+        border-color: rgba(236, 253, 245, 0.28);
+        background: rgba(236, 253, 245, 0.1);
+        color: #ecfdf5;
+    }
+
+    html:not([data-theme="light"]) .bd-faixa--clara .bd-section-copy {
+        color: rgba(226, 234, 242, 0.66) !important;
+    }
+
+    @media (max-width: 720px) {
+        .bd-faixa { border-radius: 1.75rem 1.75rem 0 0; }
+        .bd-faixa + .bd-faixa { margin-top: -1.75rem; padding-top: 3.5rem; }
+    }
+
 </style>
 {% endblock %}
 
@@ -1462,7 +1497,7 @@
     </div>
 
     <div class="bd-home-shell">
-        <section class="bd-home-hero" aria-labelledby="bd-home-title">
+        <section class="bd-home-hero bd-faixa bd-faixa--clara" aria-labelledby="bd-home-title">
             <div class="bd-home-copy-wrap">
                 <div class="bd-home-status">Sistema online para o IFRN Bloco E</div>
 
@@ -1537,28 +1572,8 @@
                     </div>
                 </div>
             </div>
-        </section>
 
-        <div class="bd-stats-strip" aria-label="Resumo da plataforma">
-            <div class="bd-stat-card bd-scroll-reveal">
-                <strong>1</strong>
-                <span>ponto central para reservas, eventos e disponibilidade.</span>
-            </div>
-            <div class="bd-stat-card bd-scroll-reveal">
-                <strong>4</strong>
-                <span>etapas simples do pedido ao uso do espa&ccedil;o.</span>
-            </div>
-            <div class="bd-stat-card bd-scroll-reveal">
-                <strong>24h</strong>
-                <span>hist&oacute;rico acess&iacute;vel para consulta e acompanhamento.</span>
-            </div>
-            <div class="bd-stat-card bd-scroll-reveal">
-                <strong>IFRN</strong>
-                <span>experi&ecirc;ncia institucional alinhada ao Bloco E.</span>
-            </div>
-        </div>
 
-        
         <div class="bd-section-progress" aria-hidden="true">
             <div class="bd-section-progress-inner">
                 <span class="is-active"></span>
@@ -1567,8 +1582,9 @@
                 <span></span>
             </div>
         </div>
+        </section>
 
-        <section class="bd-scroll-panels" aria-labelledby="bd-motion-title">
+        <section class="bd-scroll-panels bd-faixa bd-faixa--verde" aria-labelledby="bd-motion-title">
             <div class="bd-scroll-panels-copy">
                 <span class="bd-section-kicker">Login institucional</span>
                 <h2 id="bd-motion-title">Acesso seguro via <span>API do SUAP.</span></h2>
@@ -1599,7 +1615,7 @@
             </div>
         </section>
 
-        <section class="bd-section" aria-labelledby="bd-flow-title">
+        <section class="bd-section bd-faixa bd-faixa--clara" aria-labelledby="bd-flow-title">
             <div class="bd-section-header bd-scroll-reveal">
                 <span class="bd-section-kicker">Fluxo de uso</span>
                 <h2 class="bd-section-title" id="bd-flow-title">Do pedido ao espa&ccedil;o reservado, <span>sem confus&atilde;o.</span></h2>
@@ -1638,7 +1654,7 @@
         </section>
 
         <!-- FAQ -->
-        <section class="bd-section" id="faq" aria-labelledby="bd-faq-title">
+        <section class="bd-section bd-faixa bd-faixa--verde" id="faq" aria-labelledby="bd-faq-title">
             <div class="bd-faq">
                 <div class="bd-faq-intro bd-scroll-reveal">
                     <span class="bd-section-kicker">FAQ</span>
@@ -1692,7 +1708,7 @@
         const sectionDots = document.querySelectorAll(".bd-section-progress-inner span");
         const sectionTargets = document.querySelectorAll(".bd-scroll-panels, .bd-section, .bd-final-cta");
         const scrollPanels = document.querySelectorAll(".bd-scroll-panel");
-        const hoverCards = document.querySelectorAll(".bd-stat-card, .bd-feature-card, .bd-step-card, .bd-scroll-panel, .bd-preview-card");
+        const hoverCards = document.querySelectorAll(".bd-feature-card, .bd-step-card, .bd-scroll-panel, .bd-preview-card");
 
         if (reduceMotion) {
             revealItems.forEach((item) => item.classList.add("is-visible"));
