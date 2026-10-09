@@ -834,15 +834,6 @@
         line-height: 1.7;
     }
 
-    .bd-stats-strip {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 0.85rem;
-        margin-top: -1.6rem;
-        padding-bottom: 2rem;
-    }
-
-    .bd-stat-card,
     .bd-feature-card,
     .bd-step-card,
     .bd-final-cta {
@@ -859,13 +850,6 @@
         will-change: transform;
     }
 
-    .bd-stat-card {
-        min-height: 8.2rem;
-        padding: 1rem;
-        border-radius: 18px;
-    }
-
-    .bd-stat-card::before,
     .bd-feature-card::before,
     .bd-step-card::before {
         content: "";
@@ -876,8 +860,6 @@
         opacity: 0;
         transition: opacity 0.26s var(--home-ease);
     }
-
-    .bd-stat-card::after,
     .bd-feature-card::after,
     .bd-step-card::after,
     .bd-scroll-panel::after,
@@ -895,32 +877,12 @@
             opacity 0.34s var(--home-ease),
             transform 0.54s var(--home-ease);
     }
-
-    .bd-stat-card:hover::before,
     .bd-feature-card:hover::before,
     .bd-step-card:hover::before {
         opacity: 1;
     }
 
-    .bd-stat-card strong {
-        position: relative;
-        z-index: 1;
-        display: block;
-        color: #fff;
-        font-size: 2rem;
-        font-weight: 860;
-        line-height: 1;
-    }
 
-    .bd-stat-card span {
-        position: relative;
-        z-index: 1;
-        display: block;
-        margin-top: 0.55rem;
-        color: rgba(226, 234, 242, 0.62);
-        font-size: 0.84rem;
-        line-height: 1.45;
-    }
 
     .bd-steps-grid {
         display: grid;
@@ -1074,13 +1036,11 @@
                 0 0 42px rgba(200, 255, 31, 0.035),
                 inset 0 1px 0 rgba(255, 255, 255, 0.07);
         }
-
-        .bd-preview-card:hover::before,
-        .bd-preview-card:hover::after,
-        .bd-stat-card:hover::after,
-        .bd-feature-card:hover::after,
-        .bd-step-card:hover::after,
-        .bd-scroll-panel:hover::after {
+    .bd-preview-card:hover::before,
+    .bd-preview-card:hover::after,
+    .bd-feature-card:hover::after,
+    .bd-step-card:hover::after,
+    .bd-scroll-panel:hover::after {
             opacity: 1;
             transform: translateX(0);
         }
@@ -1090,10 +1050,8 @@
             border-color: rgba(200, 255, 31, 0.22);
             background: rgba(200, 255, 31, 0.055);
         }
-
-        .bd-stat-card.bd-scroll-reveal.is-visible:hover,
-        .bd-feature-card.bd-scroll-reveal.is-visible:hover,
-        .bd-step-card.bd-scroll-reveal.is-visible:hover {
+    .bd-feature-card.bd-scroll-reveal.is-visible:hover,
+    .bd-step-card.bd-scroll-reveal.is-visible:hover {
             transform: translateY(-7px) scale(1.012);
             border-color: rgba(200, 255, 31, 0.3);
             background:
@@ -1131,16 +1089,10 @@
             filter: drop-shadow(0 0 10px rgba(200, 255, 31, 0.36));
         }
 
-        .bd-stat-card:hover strong {
-            color: var(--home-lime);
-            text-shadow: 0 0 24px rgba(200, 255, 31, 0.16);
-        }
-
-        .bd-stat-card:active,
-        .bd-feature-card:active,
-        .bd-step-card:active,
-        .bd-scroll-panel:active,
-        .bd-preview-card:active {
+    .bd-feature-card:active,
+    .bd-step-card:active,
+    .bd-scroll-panel:active,
+    .bd-preview-card:active {
             transform: translateY(-2px) scale(0.998);
         }
     }
@@ -1200,10 +1152,8 @@
             margin: 0 auto;
             width: 100%;
         }
-
-        .bd-stats-strip,
-        .bd-steps-grid,
-        .bd-features-grid {
+    .bd-steps-grid,
+    .bd-features-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
         }
     }
@@ -1261,10 +1211,8 @@
         .bd-section {
             padding: 4rem 0;
         }
-
-        .bd-stats-strip,
-        .bd-steps-grid,
-        .bd-features-grid {
+    .bd-steps-grid,
+    .bd-features-grid {
             grid-template-columns: 1fr;
         }
 
@@ -1625,24 +1573,6 @@
                 </div>
             </div>
 
-        <div class="bd-stats-strip" aria-label="Resumo da plataforma">
-            <div class="bd-stat-card bd-scroll-reveal">
-                <strong>1</strong>
-                <span>ponto central para reservas, eventos e disponibilidade.</span>
-            </div>
-            <div class="bd-stat-card bd-scroll-reveal">
-                <strong>4</strong>
-                <span>etapas simples do pedido ao uso do espa&ccedil;o.</span>
-            </div>
-            <div class="bd-stat-card bd-scroll-reveal">
-                <strong>24h</strong>
-                <span>hist&oacute;rico acess&iacute;vel para consulta e acompanhamento.</span>
-            </div>
-            <div class="bd-stat-card bd-scroll-reveal">
-                <strong>IFRN</strong>
-                <span>experi&ecirc;ncia institucional alinhada ao Bloco E.</span>
-            </div>
-        </div>
 
         <div class="bd-section-progress" aria-hidden="true">
             <div class="bd-section-progress-inner">
@@ -1778,7 +1708,7 @@
         const sectionDots = document.querySelectorAll(".bd-section-progress-inner span");
         const sectionTargets = document.querySelectorAll(".bd-scroll-panels, .bd-section, .bd-final-cta");
         const scrollPanels = document.querySelectorAll(".bd-scroll-panel");
-        const hoverCards = document.querySelectorAll(".bd-stat-card, .bd-feature-card, .bd-step-card, .bd-scroll-panel, .bd-preview-card");
+        const hoverCards = document.querySelectorAll(".bd-feature-card, .bd-step-card, .bd-scroll-panel, .bd-preview-card");
 
         if (reduceMotion) {
             revealItems.forEach((item) => item.classList.add("is-visible"));
