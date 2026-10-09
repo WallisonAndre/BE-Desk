@@ -44,7 +44,7 @@ body.bd-login-page .floating-navbar-wrapper {
 }
 
 /* ── Fundo decorativo ──
-   Ondas e formas soltas atrás da cena, no traço claro sobre o verde. O
+   Ondas atravessando a tela inteira, no traço claro sobre o verde. O
    desenho inteiro é um SVG só, que escala com a tela; `currentColor`
    deixa a cor num lugar só. */
 .bd-login-fundo {
@@ -60,9 +60,6 @@ body.bd-login-page .floating-navbar-wrapper {
   height: 100%;
 }
 
-.bd-login-fundo .bd-login-formas { color: rgba(235, 255, 238, 0.13); }
-.bd-login-fundo .bd-login-riscos { color: rgba(235, 255, 238, 0.2); }
-
 /* As ondas se deslocam devagar, só o suficiente para a cena não parecer
    parada. Quem pediu menos animação no sistema não vê nada disso. */
 @keyframes bd-login-deriva {
@@ -74,13 +71,8 @@ body.bd-login-page .floating-navbar-wrapper {
   animation: bd-login-deriva 18s ease-in-out infinite alternate;
 }
 
-.bd-login-fundo .bd-login-riscos {
-  animation: bd-login-deriva 12s ease-in-out infinite alternate-reverse;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .bd-login-fundo .bd-login-ondas,
-  .bd-login-fundo .bd-login-riscos {
+  .bd-login-fundo .bd-login-ondas {
     animation: none;
   }
 }
