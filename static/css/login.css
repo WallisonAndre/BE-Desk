@@ -36,9 +36,9 @@ body.bd-login-page .floating-navbar-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(1.5rem, 4vw, 4rem);
+  gap: clamp(1.25rem, 3vw, 3rem);
   min-height: calc(100vh - 6.5rem);
-  padding: clamp(1.5rem, 4vw, 3rem) clamp(1rem, 5vw, 4rem) clamp(3rem, 6vw, 4rem);
+  padding: clamp(0.75rem, 2vw, 1.5rem) clamp(1rem, 2.5vw, 2rem) clamp(2.5rem, 4vw, 3rem);
   background: var(--login-verde);
   overflow: hidden;
 }
@@ -96,8 +96,8 @@ body.bd-login-page .floating-navbar-wrapper {
 .bd-login-arte {
   position: relative;
   z-index: 1;
-  flex: 1 1 520px;
-  max-width: 620px;
+  flex: 1 1 620px;
+  max-width: 880px;
   display: flex;
   justify-content: center;
 }
@@ -105,7 +105,7 @@ body.bd-login-page .floating-navbar-wrapper {
 .bd-login-arte img {
   width: 100%;
   height: auto;
-  max-height: 60vh;
+  max-height: 76vh;
   object-fit: contain;
 }
 
@@ -113,12 +113,12 @@ body.bd-login-page .floating-navbar-wrapper {
 .bd-login-cartao {
   position: relative;
   z-index: 1;
-  flex: 0 1 380px;
+  flex: 0 1 470px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.6rem;
-  padding: clamp(2rem, 4vw, 2.8rem);
+  gap: 2.1rem;
+  padding: clamp(2.6rem, 4.5vw, 3.8rem) clamp(2.2rem, 3.5vw, 3rem);
   border-radius: 28px;
   background: var(--login-cartao);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
@@ -132,7 +132,7 @@ body.bd-login-page .floating-navbar-wrapper {
   align-items: center;
   justify-content: center;
   width: 100%;
-  max-width: 200px;
+  max-width: 290px;
 }
 
 .bd-login-logo img {
@@ -148,7 +148,7 @@ body.bd-login-page .floating-navbar-wrapper {
 .bd-login .bd-login-titulo {
   margin: 0;
   color: #0b2a18;
-  font-size: 1.35rem;
+  font-size: 1.72rem;
   font-weight: 760;
   line-height: 1.25;
 }
@@ -169,12 +169,12 @@ body.bd-login-page .floating-navbar-wrapper {
   justify-content: center;
   gap: 0.6rem;
   width: 100%;
-  padding: 0.95rem 1.4rem;
+  padding: 1.15rem 1.6rem;
   border: 0;
   border-radius: 999px;
   background: var(--login-botao);
   color: #ffffff;
-  font-size: 1rem;
+  font-size: 1.08rem;
   font-weight: 700;
   text-decoration: none;
   transition: background 0.2s ease, transform 0.2s ease;
@@ -199,8 +199,8 @@ body.bd-login-page .floating-navbar-wrapper {
 .bd-login .bd-login-nota {
   margin: 0;
   color: #3c5a4a;
-  font-size: 0.82rem;
-  line-height: 1.5;
+  font-size: 0.9rem;
+  line-height: 1.55;
 }
 
 /* ── Rodapé da página ── */
