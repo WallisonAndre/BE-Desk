@@ -17,13 +17,27 @@
   --login-texto-no-verde: rgba(235, 255, 238, 0.88);
 }
 
+/* O verde vai até o topo: sem isto, o fundo do tema aparece como uma faixa
+   clara atrás da pílula do menu, que flutua sobre a página.
+   A regra precisa alcançar o <html>: o fundo declarado no <body> é
+   propagado para a tela pelo navegador, e pintar o body não muda a faixa.
+   Como a classe mora no body, o alcance vem do :has(). */
+html:has(body.bd-login-page),
+body.bd-login-page {
+  background: var(--login-verde) !important;
+}
+
+body.bd-login-page .floating-navbar-wrapper {
+  margin-bottom: 0;
+}
+
 .bd-login {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: clamp(1.5rem, 4vw, 4rem);
-  min-height: calc(100vh - 7.5rem);
+  min-height: calc(100vh - 6.5rem);
   padding: clamp(1.5rem, 4vw, 3rem) clamp(1rem, 5vw, 4rem) clamp(3rem, 6vw, 4rem);
   background: var(--login-verde);
   overflow: hidden;
