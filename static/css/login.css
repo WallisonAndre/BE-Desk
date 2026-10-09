@@ -230,17 +230,48 @@ body.bd-login-page .floating-navbar-wrapper {
 @media (max-width: 860px) {
   .bd-login {
     flex-direction: column;
-    gap: 2rem;
-    min-height: calc(100vh - 6rem);
+    justify-content: center;
+    gap: 1.6rem;
+    min-height: calc(100vh - 4.5rem);
+    padding: 1rem 1rem 2rem;
   }
 
-  .bd-login-arte { max-width: 340px; }
-  .bd-login-arte img { max-height: 32vh; }
-  .bd-login-cartao { width: 100%; max-width: 420px; }
+  /* Em coluna o eixo principal vira o vertical, e o `flex-basis` das colunas
+     passaria a valer como ALTURA: a caixa da ilustração ia a 620px e empurrava
+     o cartão para fora da tela. Aqui cada bloco volta a ter a altura do
+     próprio conteúdo. */
+  .bd-login-arte {
+    flex: 0 0 auto;
+    max-width: 320px;
+  }
+
+  .bd-login-arte img { max-height: 26vh; }
+
+  .bd-login-cartao {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 420px;
+    gap: 1.5rem;
+    padding: 2rem 1.8rem;
+  }
+
+  .bd-login-logo { max-width: 220px; }
+  .bd-login .bd-login-titulo { font-size: 1.45rem; }
+
   .bd-login-tracos { display: none; }
-  .bd-login-rodape { position: static; margin-top: 1rem; }
+  .bd-login-rodape { position: static; margin-top: 0.5rem; }
 }
 
+/* No celular a ilustração encolhe, mas continua: ela é o que dá contexto à
+   tela. Só sai quando a altura fica curta demais para o cartão respirar. */
 @media (max-width: 520px) {
+  .bd-login { gap: 1.2rem; }
+  .bd-login-arte { max-width: 240px; }
+  .bd-login-arte img { max-height: 18vh; }
+  .bd-login-cartao { padding: 1.8rem 1.4rem; gap: 1.3rem; }
+  .bd-login-logo { max-width: 190px; }
+}
+
+@media (max-height: 620px) and (max-width: 860px) {
   .bd-login-arte { display: none; }
 }
