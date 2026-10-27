@@ -356,7 +356,7 @@
 
 [data-theme="light"] .bd-adminform-field input::placeholder,
 [data-theme="light"] .bd-adminform-field textarea::placeholder {
-  color: #94a3b8;
+  color: #5f6e82;
 }
 
 [data-theme="light"] .bd-adminform-field input:focus,
@@ -368,7 +368,7 @@
 }
 
 [data-theme="light"] .bd-adminform-help {
-  color: #718198;
+  color: #5f6e82;
 }
 
 [data-theme="light"] .bd-adminform-dropzone {
@@ -392,7 +392,7 @@
 }
 
 [data-theme="light"] .bd-adminform-dropzone-text small {
-  color: #718198;
+  color: #5f6e82;
 }
 
 [data-theme="light"] .bd-adminform-btn-primary {
@@ -710,7 +710,7 @@
 }
 
 [data-theme="light"] .bd-perm-self {
-  color: #94a3b8;
+  color: #5f6e82;
 }
 
 @media (max-width: 576px) {
