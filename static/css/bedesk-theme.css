@@ -15,11 +15,15 @@
   --bg-card-hover: #252a37;
   --bg-elevated:   #2a2f3d;
 
-  /* Accent — Lime green */
-  --accent:        #b5e853;
-  --accent-dim:    #8bbf35;
-  --accent-glow:   rgba(181, 232, 83, 0.15);
-  --accent-border: rgba(181, 232, 83, 0.25);
+  /* Accent — Lime green & Institutional Brand Tokens */
+  --accent:          #b5e853;
+  --accent-dim:      #8bbf35;
+  --accent-glow:     rgba(181, 232, 83, 0.15);
+  --accent-border:   rgba(181, 232, 83, 0.25);
+  --brand-lime:      #c8ff1f;
+  --brand-lime-text: #c8ff1f;
+  --brand-lime-soft: #9ed900;
+  --brand-ifrn-red:  #d71920;
 
   /* Text */
   --text-primary:   #f0f2f5;
@@ -53,6 +57,42 @@
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --transition-fast: 0.2s var(--ease-out);
   --transition-med:  0.35s var(--ease-out);
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+  --bg-base: #f4f7fa;
+  --bg-surface: #f8fbfd;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f1f6f8;
+  --bg-elevated: #e6edf2;
+  --accent: #047857;
+  --accent-dim: #065f46;
+  --accent-glow: rgba(4, 120, 87, 0.12);
+  --accent-border: rgba(4, 120, 87, 0.2);
+  --brand-lime: #059669;
+  --brand-lime-text: #047857;
+  --brand-lime-soft: #10b981;
+  --brand-ifrn-red: #d71920;
+  --text-primary: #102033;
+  --text-secondary: #41566f;
+  --text-muted: #5f6e82;
+  --text-on-accent: #ffffff;
+  --success: #047857;
+  --warning: #b45309;
+  --danger: #b91c1c;
+  --info: #2563eb;
+  --border-subtle: rgba(15, 23, 42, 0.08);
+  --border-card: rgba(15, 23, 42, 0.11);
+  --shadow-card: 0 14px 34px rgba(15, 23, 42, 0.08);
+  --shadow-glow: 0 18px 44px rgba(4, 120, 87, 0.1);
+  --shadow-heavy: 0 22px 50px rgba(15, 23, 42, 0.12);
+  --bd-bg: #f4f7fa;
+  --bd-surface: #ffffff;
+  --bd-accent: #047857;
+  --bd-accent-2: #059669;
+  --bd-muted: #64748b;
+  --bd-text: #102033;
 }
 
 /* ---------- Reset & Base ---------- */
@@ -1769,6 +1809,7 @@ a:hover {
   padding: 0;
   background: #0b0e13 !important;
   border-top: 1px solid rgba(148, 163, 184, 0.12);
+  color: #9fb0cf;
 }
 
 .bd-simple-footer::before {
@@ -1801,7 +1842,7 @@ a:hover {
 .bd-footer-logo {
   display: inline-flex;
   margin-bottom: 0.65rem;
-  color: #c8ff1f;
+  color: #c8ff1f !important;
   font-size: 1.15rem;
   font-weight: 950;
   letter-spacing: 0.08em;
@@ -1810,7 +1851,7 @@ a:hover {
 }
 
 .bd-footer-logo:hover {
-  color: #fff;
+  color: #fff !important;
   filter: drop-shadow(0 0 16px rgba(200, 255, 31, 0.45));
   transform: translateY(-1px);
 }
@@ -1838,7 +1879,7 @@ a:hover {
   border: 1px solid rgba(148, 163, 184, 0.14);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.045);
-  color: #9fb0cf;
+  color: #9fb0cf !important;
   font-size: 0.86rem;
   font-weight: 700;
   text-decoration: none;
@@ -1849,7 +1890,7 @@ a:hover {
   transform: translateY(-2px);
   border-color: rgba(200, 255, 31, 0.34);
   background: rgba(200, 255, 31, 0.08);
-  color: #fff;
+  color: #fff !important;
 }
 
 .bd-footer-status {
@@ -1899,7 +1940,8 @@ a:hover {
   border-top: 1px solid rgba(148, 163, 184, 0.12);
 }
 
-.bd-simple-footer small {
+.bd-simple-footer small,
+.bd-footer-bottom-line small {
   color: #9fb0cf;
   font-size: 0.95rem;
   font-weight: 500;
