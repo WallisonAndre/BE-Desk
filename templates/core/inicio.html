@@ -1,6 +1,6 @@
 {% extends 'core/base.html' %}
 
-{% block title %}Bem-vindo ao BE-Desk{% endblock %}
+{% block title %}BE-Desk — IFRN · Campus São Paulo do Potengi · Bloco E{% endblock %}
 
 {% block main_container_class %}bd-home-main flex-grow-1{% endblock %}
 
@@ -35,37 +35,6 @@
             radial-gradient(circle at 50% 100%, rgba(16, 33, 39, 0.92), transparent 38rem),
             var(--home-bg);
         color: var(--home-text);
-        --home-scroll: 0;
-        --hero-progress: 0;
-        --grid-shift: 0px;
-        --preview-y: 0px;
-        --preview-rotate: 0deg;
-        --stripe-shift: 0px;
-    }
-
-    /* Precisa vencer o `.bd-home > *` mais abaixo, que torna tudo relative e
-       tirava a trilha do lugar, empurrando o hero 220px para baixo. */
-    .bd-home > .bd-scroll-rail {
-        position: fixed;
-        right: 1rem;
-        top: 50%;
-        z-index: 20;
-        width: 3px;
-        height: min(26vh, 220px);
-        overflow: hidden;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.08);
-        transform: translateY(-50%);
-        pointer-events: none;
-    }
-
-    .bd-scroll-rail span {
-        display: block;
-        width: 100%;
-        height: calc(var(--home-scroll) * 100%);
-        border-radius: inherit;
-        background: linear-gradient(180deg, var(--home-lime), rgba(200, 255, 31, 0.16));
-        box-shadow: 0 0 18px rgba(200, 255, 31, 0.38);
     }
 
     .bd-home-main {
@@ -139,10 +108,6 @@
             linear-gradient(90deg, rgba(255, 255, 255, 0.024) 1px, transparent 1px),
             radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.13) 1px, transparent 0);
         background-size: 92px 92px, 92px 92px, 3px 3px;
-        background-position:
-            0 var(--grid-shift),
-            var(--grid-shift) 0,
-            0 0;
         mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.72) 45%, transparent 100%);
     }
 
@@ -156,43 +121,6 @@
             linear-gradient(180deg, transparent, rgba(7, 13, 16, 0.88));
     }
 
-    .bd-speed-lines {
-        position: absolute;
-        inset: 0;
-        z-index: 0;
-        overflow: hidden;
-        pointer-events: none;
-        opacity: 0.42;
-    }
-
-    .bd-speed-lines span {
-        position: absolute;
-        right: -18vw;
-        width: min(48vw, 680px);
-        height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(200, 255, 31, 0.32), transparent);
-        transform: translate3d(calc(var(--home-scroll) * -32vw), 0, 0) rotate(-12deg);
-        filter: blur(0.2px);
-    }
-
-    .bd-speed-lines span:nth-child(1) {
-        top: 18%;
-    }
-
-    .bd-speed-lines span:nth-child(2) {
-        top: 37%;
-        width: min(36vw, 520px);
-        opacity: 0.58;
-        transform: translate3d(calc(var(--home-scroll) * -46vw), 0, 0) rotate(-12deg);
-    }
-
-    .bd-speed-lines span:nth-child(3) {
-        top: 71%;
-        width: min(56vw, 760px);
-        opacity: 0.46;
-        transform: translate3d(calc(var(--home-scroll) * -24vw), 0, 0) rotate(-12deg);
-    }
-
     .bd-home > * {
         position: relative;
         z-index: 1;
@@ -201,45 +129,6 @@
     .bd-home-shell {
         width: min(calc(100% - 2rem), 1180px);
         margin: 0 auto;
-    }
-
-    /* Hide the centered pagination/progress dots under the hero (requested) */
-    .bd-section-progress {
-        display: none !important;
-        position: sticky;
-        top: 4.9rem;
-        z-index: 5;
-        justify-content: center;
-        margin: -1.4rem 0 1.1rem;
-        pointer-events: none;
-    }
-
-    .bd-section-progress-inner {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.45rem;
-        padding: 0.34rem 0.48rem;
-        border: 1px solid rgba(210, 225, 235, 0.12);
-        border-radius: 999px;
-        background: rgba(8, 14, 18, 0.62);
-        box-shadow: 0 12px 38px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(16px) saturate(145%);
-        -webkit-backdrop-filter: blur(16px) saturate(145%);
-    }
-
-    .bd-section-progress-inner span {
-        width: 0.48rem;
-        height: 0.48rem;
-        border-radius: 999px;
-        background: rgba(226, 234, 242, 0.24);
-        transform: scale(0.9);
-        transition: background 0.22s var(--home-ease), transform 0.22s var(--home-ease), box-shadow 0.22s var(--home-ease);
-    }
-
-    .bd-section-progress-inner span.is-active {
-        background: var(--home-lime);
-        box-shadow: 0 0 18px rgba(200, 255, 31, 0.5);
-        transform: scale(1.25);
     }
 
     .bd-home-hero {
@@ -253,8 +142,6 @@
 
     .bd-home-copy-wrap {
         max-width: 660px;
-        transform: translate3d(0, calc(var(--hero-progress) * -20px), 0);
-        transition: transform 0.08s linear;
     }
 
     .bd-home-status {
@@ -419,13 +306,8 @@
     .bd-product-preview {
         position: relative;
         opacity: 0;
-        transform:
-            translate3d(0, calc(20px + var(--preview-y)), 0)
-            rotateX(var(--preview-rotate))
-            scale(0.98);
-        transform-origin: center;
-        animation: bdHomeFadeUp 0.82s var(--home-ease) 0.22s forwards;
-        will-change: transform;
+        transform: translateY(14px);
+        animation: bdHomeFadeUp 0.6s var(--home-ease) 0.16s forwards;
     }
 
     .bd-product-preview::before {
@@ -454,8 +336,6 @@
             inset 0 1px 0 rgba(255, 255, 255, 0.07);
         backdrop-filter: blur(24px) saturate(150%);
         -webkit-backdrop-filter: blur(24px) saturate(150%);
-        transform: perspective(1200px) rotateY(calc(var(--hero-progress) * -3deg));
-        transition: transform 0.08s linear;
     }
 
     .bd-product-window::before {
@@ -730,8 +610,7 @@
         box-shadow: 0 26px 72px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.055);
         backdrop-filter: blur(18px) saturate(145%);
         -webkit-backdrop-filter: blur(18px) saturate(145%);
-        transform: translate3d(0, var(--panel-shift, 0px), 0);
-        transition: transform 0.12s linear, border-color 0.24s var(--home-ease), box-shadow 0.24s var(--home-ease);
+        transition: transform 0.24s var(--home-ease), border-color 0.24s var(--home-ease), box-shadow 0.24s var(--home-ease);
     }
 
     .bd-scroll-panel::before {
@@ -1020,18 +899,18 @@
 
     .bd-scroll-reveal {
         opacity: 0;
-        transform: translateY(28px) scale(0.985);
-        transition: opacity 0.72s var(--home-ease), transform 0.72s var(--home-ease);
+        transform: translateY(14px);
+        transition: opacity 0.5s var(--home-ease), transform 0.5s var(--home-ease);
     }
 
     .bd-scroll-reveal.is-visible {
         opacity: 1;
-        transform: translateY(0) scale(1);
+        transform: translateY(0);
     }
 
     @media (hover: hover) and (pointer: fine) {
         .bd-preview-card:hover {
-            transform: translateY(-4px) scale(1.01);
+            transform: translateY(-3px);
             border-color: rgba(200, 255, 31, 0.24);
             background: rgba(255, 255, 255, 0.06);
             box-shadow:
@@ -1055,7 +934,7 @@
         }
     .bd-feature-card.bd-scroll-reveal.is-visible:hover,
     .bd-step-card.bd-scroll-reveal.is-visible:hover {
-            transform: translateY(-7px) scale(1.012);
+            transform: translateY(-4px);
             border-color: rgba(200, 255, 31, 0.3);
             background:
                 linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.026)),
@@ -1067,7 +946,7 @@
         }
 
         .bd-scroll-panel.bd-scroll-reveal.is-visible:hover {
-            transform: translate3d(0, calc(var(--panel-shift, 0px) - 7px), 0) scale(1.008);
+            transform: translateY(-4px);
             border-color: rgba(200, 255, 31, 0.3);
             background:
                 linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.026)),
@@ -1127,14 +1006,7 @@
             transform: none;
         }
 
-        .bd-scroll-rail,
-        .bd-section-progress,
-        .bd-speed-lines {
-            display: none;
-        }
-
-        .bd-scroll-panels-copy,
-        .bd-section-progress {
+        .bd-scroll-panels-copy {
             position: static;
         }
     }
@@ -1172,10 +1044,6 @@
 
         .bd-home-hero {
             padding: 7rem 0 3rem;
-        }
-
-        .bd-scroll-rail {
-            display: none;
         }
 
         .bd-home-title {
@@ -1531,45 +1399,39 @@
 
 {% block content %}
 <section class="bd-home">
-    <div class="bd-scroll-rail" aria-hidden="true"><span></span></div>
-    <div class="bd-speed-lines" aria-hidden="true">
-        <span></span>
-        <span></span>
-        <span></span>
-    </div>
-
     <div class="bd-home-shell">
         <section class="bd-home-hero bd-faixa bd-faixa--clara" aria-labelledby="bd-home-title">
             <div class="bd-home-copy-wrap">
-                <div class="bd-home-status">Sistema online para o IFRN Bloco E</div>
+                <div class="bd-home-status">IFRN &middot; Campus S&atilde;o Paulo do Potengi &middot; Bloco E</div>
 
                 <h1 class="bd-home-title" id="bd-home-title">
-                    Reservas do Bloco E,
-                    <span>sem atrito.</span>
+                    Reserva de espa&ccedil;os e eventos
+                    <span>do Bloco E.</span>
                 </h1>
 
                 <p class="bd-home-copy">
-                    O BE-Desk centraliza <strong>espa&ccedil;os</strong>, <strong>hor&aacute;rios</strong> e
-                    <strong>eventos</strong> em uma experi&ecirc;ncia institucional moderna, r&aacute;pida e segura.
+                    O BE-Desk &eacute; o sistema institucional para <strong>alunos</strong> e <strong>servidores</strong>
+                    do campus consultarem a grade de hor&aacute;rios, solicitarem o uso das salas e do gin&aacute;sio
+                    e acompanharem os eventos do Bloco E.
                 </p>
 
                 <div class="bd-home-actions">
                     <a href="{% url 'lista_locais' %}" class="bd-home-btn bd-home-btn-primary">
-                        Fazer uma reserva <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                        Ver espa&ccedil;os e hor&aacute;rios <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
                     </a>
-                    <a href="{% url 'detalhe_sala' 'Ginásio' %}" class="bd-home-btn bd-home-btn-secondary">
-                        Ver hor&aacute;rios
+                    <a href="{% url 'lista_eventos' %}" class="bd-home-btn bd-home-btn-secondary">
+                        Agenda de eventos
                     </a>
                 </div>
 
-                <div class="bd-home-trust-row" aria-label="Indicadores de confianca">
-                    <span><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Login institucional</span>
-                    <span><i class="fa-solid fa-clock" aria-hidden="true"></i> Disponibilidade clara</span>
-                    <span><i class="fa-solid fa-layer-group" aria-hidden="true"></i> Fluxo centralizado</span>
+                <div class="bd-home-trust-row" aria-label="Informa&ccedil;&otilde;es de acesso e funcionamento">
+                    <span><i class="fa-solid fa-id-card" aria-hidden="true"></i> Acesso com a conta do SUAP</span>
+                    <span><i class="fa-solid fa-users" aria-hidden="true"></i> Alunos e servidores do IFRN</span>
+                    <span><i class="fa-solid fa-clipboard-check" aria-hidden="true"></i> Pedidos analisados pela coordena&ccedil;&atilde;o</span>
                 </div>
             </div>
 
-            <div class="bd-product-preview" aria-label="Previa da interface BE-Desk">
+            <div class="bd-product-preview" aria-label="Resumo do que o sistema oferece">
                 <div class="bd-product-window">
                     <div class="bd-window-bar">
                         <div class="bd-window-dots" aria-hidden="true">
@@ -1577,36 +1439,36 @@
                             <span></span>
                             <span></span>
                         </div>
-                        <div class="bd-window-badge">Painel BE-Desk</div>
+                        <div class="bd-window-badge">Bloco E &middot; Educa&ccedil;&atilde;o F&iacute;sica</div>
                     </div>
 
                     <div class="bd-preview-body">
                         <div class="bd-preview-grid">
                             <div class="bd-preview-card bd-preview-main">
-                                <span class="bd-preview-label">BE-Desk Bloco E</span>
-                                <h3 class="bd-preview-title">Tudo para reservar em um s&oacute; lugar</h3>
-                                <p class="bd-preview-copy">Acesse locais, hor&aacute;rios, reservas e eventos em uma plataforma institucional integrada ao SUAP.</p>
+                                <span class="bd-preview-label">O que d&aacute; para fazer</span>
+                                <h3 class="bd-preview-title">Consulta, solicita&ccedil;&atilde;o e acompanhamento</h3>
+                                <p class="bd-preview-copy">Verifique a ocupa&ccedil;&atilde;o da semana antes de ir ao setor e acompanhe seus pedidos de reserva pelo sistema.</p>
 
                                 <div class="bd-schedule-mini">
-                                    <span><strong>Locais</strong> Salas, gin&aacute;sio e ambientes <i aria-hidden="true"></i></span>
-                                    <span><strong>Reservas</strong> Solicita&ccedil;&otilde;es com data e hor&aacute;rio <i aria-hidden="true"></i></span>
+                                    <span><strong>Locais</strong> Gin&aacute;sio, quadra e salas do bloco <i aria-hidden="true"></i></span>
+                                    <span><strong>Reservas</strong> Pedido na grade com aprova&ccedil;&atilde;o <i aria-hidden="true"></i></span>
                                     <span><strong>Eventos</strong> Atividades abertas com inscri&ccedil;&atilde;o <i aria-hidden="true"></i></span>
-                                    <span><strong>Notifica&ccedil;&otilde;es</strong> Avisos de aprova&ccedil;&atilde;o e mudan&ccedil;a <i aria-hidden="true"></i></span>
+                                    <span><strong>Avalia&ccedil;&otilde;es</strong> Registro das condi&ccedil;&otilde;es p&oacute;s-uso <i aria-hidden="true"></i></span>
                                 </div>
                             </div>
 
                             <div class="bd-preview-side">
                                 <div class="bd-preview-card bd-preview-metric">
-                                    <span class="bd-preview-label">Login</span>
+                                    <span class="bd-preview-label">P&uacute;blico</span>
                                     <strong>SUAP</strong>
-                                    <small>O login acontece na p&aacute;gina do SUAP e volta autenticado ao BE-Desk.</small>
+                                    <small>Alunos e servidores entram com a mesma matr&iacute;cula e senha do IFRN.</small>
                                     <div class="bd-preview-progress"><span></span></div>
                                 </div>
 
                                 <div class="bd-preview-card bd-preview-metric">
-                                    <span class="bd-preview-label">Fluxo</span>
-                                    <strong>4</strong>
-                                    <small>Escolha o local, defina o hor&aacute;rio, envie o pedido e acompanhe a aprova&ccedil;&atilde;o.</small>
+                                    <span class="bd-preview-label">Grade</span>
+                                    <strong>7h&ndash;18h</strong>
+                                    <small>Hor&aacute;rios organizados por turno &mdash; manh&atilde;, tarde e noite &mdash; ao longo da semana.</small>
                                     <div class="bd-preview-progress"><span style="width: 64%"></span></div>
                                 </div>
                             </div>
@@ -1614,44 +1476,34 @@
                     </div>
                 </div>
             </div>
-
-
-        <div class="bd-section-progress" aria-hidden="true">
-            <div class="bd-section-progress-inner">
-                <span class="is-active"></span>
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </div>
         </section>
 
         <section class="bd-scroll-panels bd-faixa bd-faixa--verde" aria-labelledby="bd-motion-title">
             <div class="bd-scroll-panels-copy">
-                <span class="bd-section-kicker">Login institucional</span>
-                <h2 id="bd-motion-title">Acesso seguro via <span>API do SUAP.</span></h2>
-                <p>O BE-Desk utiliza a autentica&ccedil;&atilde;o institucional do IFRN para validar o acesso com praticidade, seguran&ccedil;a e confian&ccedil;a.</p>
+                <span class="bd-section-kicker">Acesso institucional</span>
+                <h2 id="bd-motion-title">Quem pode usar e <span>como obter acesso.</span></h2>
+                <p>N&atilde;o &eacute; preciso criar conta separada. O BE-Desk usa o login oficial do SUAP para identificar alunos, bolsistas e servidores do campus.</p>
             </div>
 
             <div class="bd-scroll-panels-list">
                 <article class="bd-scroll-panel bd-scroll-reveal">
-                    <small>Autentica&ccedil;&atilde;o</small>
-                    <h3>Login conectado diretamente ao SUAP.</h3>
-                    <p>Voc&ecirc; entra pela p&aacute;gina do pr&oacute;prio SUAP e o BE-Desk recebe a confirma&ccedil;&atilde;o, mantendo o fluxo familiar para alunos e servidores.</p>
+                    <small>Como entrar</small>
+                    <h3>Autentica&ccedil;&atilde;o direta pela conta do SUAP.</h3>
+                    <p>Ao clicar em Entrar, voc&ecirc; &eacute; direcionado ao SUAP, autoriza o acesso e retorna ao sistema com seu nome, matr&iacute;cula e v&iacute;nculo institucional sincronizados.</p>
                     <div class="bd-scroll-panel-metric" aria-hidden="true">01</div>
                 </article>
 
                 <article class="bd-scroll-panel bd-scroll-reveal">
-                    <small>Seguran&ccedil;a</small>
-                    <h3>Credenciais institucionais, acesso controlado.</h3>
-                    <p>O sistema valida a identidade do usu&aacute;rio antes de liberar reservas, eventos e as &aacute;reas internas do Bloco E.</p>
+                    <small>Para alunos</small>
+                    <h3>Consulta da grade, pedidos de hor&aacute;rio e eventos.</h3>
+                    <p>Estudantes com matr&iacute;cula ativa podem verificar hor&aacute;rios livres, solicitar reservas de espa&ccedil;o, inscrever-se em eventos do bloco e avaliar o local ap&oacute;s o uso.</p>
                     <div class="bd-scroll-panel-metric" aria-hidden="true">02</div>
                 </article>
 
                 <article class="bd-scroll-panel bd-scroll-reveal">
-                    <small>Confian&ccedil;a</small>
-                    <h3>Uma experi&ecirc;ncia oficial para o IFRN.</h3>
-                    <p>A integra&ccedil;&atilde;o com o SUAP refor&ccedil;a a legitimidade da plataforma e reduz atrito no primeiro acesso.</p>
+                    <small>Para servidores e bolsistas</small>
+                    <h3>Aprova&ccedil;&atilde;o de solicita&ccedil;&otilde;es e gest&atilde;o do Bloco E.</h3>
+                    <p>A equipe respons&aacute;vel pelo setor analisa os pedidos pendentes, cadastra hor&aacute;rios fixos de aulas e treinos, organiza eventos e publica comunicados no blog.</p>
                     <div class="bd-scroll-panel-metric" aria-hidden="true">03</div>
                 </article>
             </div>
@@ -1659,38 +1511,38 @@
 
         <section class="bd-section bd-faixa bd-faixa--clara" aria-labelledby="bd-flow-title">
             <div class="bd-section-header bd-scroll-reveal">
-                <span class="bd-section-kicker">Fluxo de uso</span>
-                <h2 class="bd-section-title" id="bd-flow-title">Do pedido ao espa&ccedil;o reservado, <span>sem confus&atilde;o.</span></h2>
-                <p class="bd-section-copy">Uma jornada clara para alunos e servidores, com menos ru&iacute;do operacional e mais previsibilidade.</p>
+                <span class="bd-section-kicker">Passo a passo</span>
+                <h2 class="bd-section-title" id="bd-flow-title">Como solicitar um <span>hor&aacute;rio no Bloco E.</span></h2>
+                <p class="bd-section-copy">Todo pedido passa pela an&aacute;lise da coordena&ccedil;&atilde;o para evitar sobreposi&ccedil;&atilde;o com aulas, treinos regulares e eventos.</p>
             </div>
 
             <div class="bd-steps-grid">
                 <article class="bd-step-card bd-scroll-reveal">
                     <span class="bd-step-index">Etapa 01</span>
                     <div class="bd-card-icon"><i class="fa-solid fa-location-dot" aria-hidden="true"></i></div>
-                    <h3>Escolha o local</h3>
-                    <p>Consulte salas, gin&aacute;sio e ambientes dispon&iacute;veis no Bloco E.</p>
+                    <h3>Escolha o espa&ccedil;o</h3>
+                    <p>Abra a lista de locais do Bloco E e consulte a grade semanal da sala, quadra ou gin&aacute;sio.</p>
                 </article>
 
                 <article class="bd-step-card bd-scroll-reveal">
                     <span class="bd-step-index">Etapa 02</span>
                     <div class="bd-card-icon"><i class="fa-solid fa-calendar-check" aria-hidden="true"></i></div>
-                    <h3>Defina o hor&aacute;rio</h3>
-                    <p>Veja disponibilidade e envie a solicita&ccedil;&atilde;o com data e per&iacute;odo.</p>
+                    <h3>Envie a solicita&ccedil;&atilde;o</h3>
+                    <p>Selecione um hor&aacute;rio livre na grade, informe a finalidade de uso e confirme o pedido.</p>
                 </article>
 
                 <article class="bd-step-card bd-scroll-reveal">
                     <span class="bd-step-index">Etapa 03</span>
                     <div class="bd-card-icon"><i class="fa-solid fa-user-check" aria-hidden="true"></i></div>
-                    <h3>Aguarde a aprova&ccedil;&atilde;o</h3>
-                    <p>Um administrador do Bloco E analisa a solicita&ccedil;&atilde;o e aprova ou rejeita.</p>
+                    <h3>An&aacute;lise da coordena&ccedil;&atilde;o</h3>
+                    <p>Um servidor ou bolsista do Bloco E avalia o pedido e aprova ou recusa conforme a disponibilidade.</p>
                 </article>
 
                 <article class="bd-step-card bd-scroll-reveal">
                     <span class="bd-step-index">Etapa 04</span>
                     <div class="bd-card-icon"><i class="fa-solid fa-circle-check" aria-hidden="true"></i></div>
-                    <h3>Acompanhe tudo</h3>
-                    <p>A resposta chega por notifica&ccedil;&atilde;o e a reserva fica no seu hist&oacute;rico.</p>
+                    <h3>Acompanhe o retorno</h3>
+                    <p>Voc&ecirc; recebe uma notifica&ccedil;&atilde;o no sistema e pode consultar ou cancelar o agendamento em Minhas Reservas.</p>
                 </article>
             </div>
         </section>
@@ -1745,11 +1597,6 @@
     document.addEventListener("DOMContentLoaded", () => {
         const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         const revealItems = document.querySelectorAll(".bd-scroll-reveal");
-        const home = document.querySelector(".bd-home");
-        const hero = document.querySelector(".bd-home-hero");
-        const sectionDots = document.querySelectorAll(".bd-section-progress-inner span");
-        const sectionTargets = document.querySelectorAll(".bd-scroll-panels, .bd-section, .bd-final-cta");
-        const scrollPanels = document.querySelectorAll(".bd-scroll-panel");
         const hoverCards = document.querySelectorAll(".bd-feature-card, .bd-step-card, .bd-scroll-panel, .bd-preview-card");
 
         if (reduceMotion) {
@@ -1786,64 +1633,6 @@
                 card.style.removeProperty("--card-y");
             });
         });
-
-        if (!home || !hero) return;
-
-        let ticking = false;
-
-        const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
-
-        const updateScrollEffects = () => {
-            const doc = document.documentElement;
-            const scrollTop = window.scrollY || doc.scrollTop;
-            const scrollMax = Math.max(1, doc.scrollHeight - window.innerHeight);
-            const homeRect = home.getBoundingClientRect();
-            const heroRect = hero.getBoundingClientRect();
-            const heroTravel = Math.max(1, heroRect.height + window.innerHeight);
-
-            const pageProgress = clamp(scrollTop / scrollMax, 0, 1);
-            const heroProgress = clamp((window.innerHeight - heroRect.top) / heroTravel, 0, 1);
-            const homeProgress = clamp((window.innerHeight - homeRect.top) / Math.max(1, homeRect.height + window.innerHeight), 0, 1);
-
-            home.style.setProperty("--home-scroll", pageProgress.toFixed(4));
-            home.style.setProperty("--hero-progress", heroProgress.toFixed(4));
-            home.style.setProperty("--grid-shift", `${Math.round(homeProgress * 96)}px`);
-            home.style.setProperty("--preview-y", `${(heroProgress - 0.35) * -34}px`);
-            home.style.setProperty("--preview-rotate", `${(heroProgress - 0.5) * 3.5}deg`);
-            home.style.setProperty("--stripe-shift", `${Math.round(Math.sin(homeProgress * Math.PI) * 38)}px`);
-
-            let activeIndex = 0;
-            sectionTargets.forEach((section, index) => {
-                const rect = section.getBoundingClientRect();
-                if (rect.top < window.innerHeight * 0.45) {
-                    activeIndex = index;
-                }
-            });
-
-            sectionDots.forEach((dot, index) => {
-                dot.classList.toggle("is-active", index === activeIndex);
-            });
-
-            scrollPanels.forEach((panel, index) => {
-                const rect = panel.getBoundingClientRect();
-                const panelProgress = clamp((window.innerHeight - rect.top) / (window.innerHeight + rect.height), 0, 1);
-                const shift = (0.5 - panelProgress) * (index + 1) * 18;
-                panel.style.setProperty("--panel-shift", `${shift.toFixed(1)}px`);
-            });
-
-            ticking = false;
-        };
-
-        const requestScrollUpdate = () => {
-            if (!ticking) {
-                window.requestAnimationFrame(updateScrollEffects);
-                ticking = true;
-            }
-        };
-
-        updateScrollEffects();
-        window.addEventListener("scroll", requestScrollUpdate, { passive: true });
-        window.addEventListener("resize", requestScrollUpdate);
     });
 </script>
 {% endblock %}
@@ -1854,25 +1643,26 @@
         <div class="bd-footer-top">
             <div class="bd-footer-identity">
                 <a href="{% url 'inicio' %}" class="bd-footer-logo">BE-DESK</a>
-                <p>Plataforma institucional para reservas, hor&aacute;rios e eventos do IFRN Bloco E.</p>
+                <p>Sistema de reserva de espa&ccedil;os e organiza&ccedil;&atilde;o de eventos do Bloco E &mdash; IFRN Campus S&atilde;o Paulo do Potengi.</p>
             </div>
 
             <nav class="bd-footer-nav" aria-label="Links do rodap&eacute;">
                 <a href="{% url 'inicio' %}">In&iacute;cio</a>
                 <a href="{% url 'lista_locais' %}">Locais</a>
                 <a href="{% url 'lista_reserva' %}">Reservas</a>
+                <a href="{% url 'lista_eventos' %}">Eventos</a>
                 <a href="{% url 'blog_index' %}">Blog</a>
                 {% if user.is_authenticated %}<a href="{% url 'user_profile' %}">Perfil</a>{% endif %}
             </nav>
 
             <div class="bd-footer-status">
-                <span>Sistema online</span>
-                <strong>IFRN Bloco E</strong>
+                <span>Sistema institucional</span>
+                <strong>IFRN &middot; Campus S&atilde;o Paulo do Potengi &middot; Bloco E</strong>
             </div>
         </div>
 
         <div class="bd-footer-bottom-line">
-            <small>&copy; {% now "Y" %} BE-Desk &middot; IFRN Bloco E</small>
+            <small>&copy; {% now "Y" %} BE-Desk &middot; IFRN &middot; Campus S&atilde;o Paulo do Potengi &middot; Bloco E</small>
         </div>
     </div>
 </footer>

@@ -227,7 +227,6 @@
     }
     [data-theme="light"] .bd-home::before { opacity: 0.08 !important; }
     [data-theme="light"] .bd-home::after { background: none !important; }
-    [data-theme="light"] .bd-speed-lines { opacity: 0.12 !important; }
     [data-theme="light"] .bd-home-title { color: #0f172a !important; }
     [data-theme="light"] .bd-home-title span { color: #047857 !important; text-shadow: none !important; }
     [data-theme="light"] .bd-home-copy { color: rgba(30, 41, 59, 0.75) !important; }
@@ -246,12 +245,6 @@
     [data-theme="light"] .bd-home-shell [class*="bd-"] h3,
     [data-theme="light"] .bd-home-shell [class*="bd-"] h4 { color: #0f172a !important; }
     [data-theme="light"] .bd-home-shell [class*="bd-"] p  { color: #475569 !important; }
-    /* Scroll rail */
-    [data-theme="light"] .bd-scroll-rail { background: rgba(0,0,0,0.08) !important; }
-    [data-theme="light"] .bd-scroll-rail span {
-      background: linear-gradient(180deg, #059669, rgba(5,150,105,0.16)) !important;
-      box-shadow: 0 0 12px rgba(5,150,105,0.35) !important;
-    }
     /* Navbar overrides on home */
     [data-theme="light"] .bd-home .custom-pill-navbar,
     [data-theme="light"] .bd-home-main .custom-pill-navbar {
@@ -1072,6 +1065,11 @@
         height: 30px;
       }
 
+      .pill-brand-sub {
+        font-size: 0.48rem;
+        letter-spacing: 0.04em;
+      }
+
       .pill-nav-actions {
         gap: 8px;
       }
@@ -1241,7 +1239,7 @@
       <a href="{% url 'inicio' %}" class="pill-brand">
         <img src="{% static 'img/logo1.png' %}" alt="BE-Desk Logo">
         <div class="pill-brand-text">
-          <span class="pill-brand-sub">IFRN &middot; BLOCO E</span>
+          <span class="pill-brand-sub">IFRN &middot; SPP &middot; BLOCO E</span>
         </div>
       </a>
 
@@ -1399,25 +1397,26 @@
       <div class="bd-footer-top">
         <div class="bd-footer-identity">
           <a href="{% url 'inicio' %}" class="bd-footer-logo">BE-DESK</a>
-          <p>Gerenciamento de espaços e recursos para o IFRN Bloco E.</p>
+          <p>Sistema de reserva de espaços e organização de eventos do Bloco E — IFRN Campus São Paulo do Potengi.</p>
         </div>
 
         <nav class="bd-footer-nav" aria-label="Links do rodapé">
           <a href="{% url 'inicio' %}">Início</a>
           <a href="{% url 'lista_locais' %}">Locais</a>
           <a href="{% url 'lista_reserva' %}">Reservas</a>
+          <a href="{% url 'lista_eventos' %}">Eventos</a>
           <a href="{% url 'blog_index' %}">Blog</a>
           {% if user.is_authenticated %}<a href="{% url 'user_profile' %}">Perfil</a>{% endif %}
         </nav>
 
         <div class="bd-footer-status">
-          <span>Sistema online</span>
-          <strong>IFRN Bloco E</strong>
+          <span>Sistema institucional</span>
+          <strong>IFRN &middot; Campus S&atilde;o Paulo do Potengi &middot; Bloco E</strong>
         </div>
       </div>
 
       <div class="bd-footer-bottom-line">
-        <small>&copy; {% now "Y" %} BE-Desk &middot; IFRN Bloco E</small>
+        <small>&copy; {% now "Y" %} BE-Desk &middot; IFRN &middot; Campus S&atilde;o Paulo do Potengi &middot; Bloco E</small>
       </div>
     </div>
   </footer>
