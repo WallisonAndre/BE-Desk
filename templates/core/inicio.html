@@ -35,58 +35,17 @@
                         Agenda de eventos
                     </a>
                 </div>
-
-                <div class="bd-home-trust-row" aria-label="Informa&ccedil;&otilde;es de acesso e funcionamento">
-                    <span><i class="fa-solid fa-id-card" aria-hidden="true"></i> Acesso com a conta do SUAP</span>
-                    <span><i class="fa-solid fa-users" aria-hidden="true"></i> Alunos e servidores do IFRN</span>
-                    <span><i class="fa-solid fa-clipboard-check" aria-hidden="true"></i> Pedidos analisados pela coordena&ccedil;&atilde;o</span>
-                </div>
             </div>
 
-            <div class="bd-product-preview" aria-label="Resumo do que o sistema oferece">
-                <div class="bd-product-window">
-                    <div class="bd-window-bar">
-                        <div class="bd-window-dots" aria-hidden="true">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </div>
-                        <div class="bd-window-badge">Bloco E &middot; Educa&ccedil;&atilde;o F&iacute;sica</div>
-                    </div>
-
-                    <div class="bd-preview-body">
-                        <div class="bd-preview-grid">
-                            <div class="bd-preview-card bd-preview-main">
-                                <span class="bd-preview-label">O que d&aacute; para fazer</span>
-                                <h3 class="bd-preview-title">Consulta, solicita&ccedil;&atilde;o e acompanhamento</h3>
-                                <p class="bd-preview-copy">Verifique a ocupa&ccedil;&atilde;o da semana antes de ir ao setor e acompanhe seus pedidos de reserva pelo sistema.</p>
-
-                                <div class="bd-schedule-mini">
-                                    <span><strong>Locais</strong> Gin&aacute;sio, quadra e salas do bloco <i aria-hidden="true"></i></span>
-                                    <span><strong>Reservas</strong> Pedido na grade com aprova&ccedil;&atilde;o <i aria-hidden="true"></i></span>
-                                    <span><strong>Eventos</strong> Atividades abertas com inscri&ccedil;&atilde;o <i aria-hidden="true"></i></span>
-                                    <span><strong>Avalia&ccedil;&otilde;es</strong> Registro das condi&ccedil;&otilde;es p&oacute;s-uso <i aria-hidden="true"></i></span>
-                                </div>
-                            </div>
-
-                            <div class="bd-preview-side">
-                                <div class="bd-preview-card bd-preview-metric">
-                                    <span class="bd-preview-label">P&uacute;blico</span>
-                                    <strong>SUAP</strong>
-                                    <small>Alunos e servidores entram com a mesma matr&iacute;cula e senha do IFRN.</small>
-                                    <div class="bd-preview-progress"><span></span></div>
-                                </div>
-
-                                <div class="bd-preview-card bd-preview-metric">
-                                    <span class="bd-preview-label">Grade</span>
-                                    <strong>7h&ndash;18h</strong>
-                                    <small>Hor&aacute;rios organizados por turno &mdash; manh&atilde;, tarde e noite &mdash; ao longo da semana.</small>
-                                    <div class="bd-preview-progress"><span style="width: 64%"></span></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="bd-home-illustration" aria-hidden="true">
+                <img
+                    src="{% static 'img/home-bloco-e.webp' %}"
+                    alt=""
+                    width="1041"
+                    height="766"
+                    decoding="async"
+                    class="bd-home-hero-img"
+                >
             </div>
         </section>
 
@@ -210,7 +169,7 @@
     document.addEventListener("DOMContentLoaded", () => {
         const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         const revealItems = document.querySelectorAll(".bd-scroll-reveal");
-        const hoverCards = document.querySelectorAll(".bd-feature-card, .bd-step-card, .bd-scroll-panel, .bd-preview-card");
+        const hoverCards = document.querySelectorAll(".bd-feature-card, .bd-step-card, .bd-scroll-panel");
 
         if (reduceMotion) {
             revealItems.forEach((item) => item.classList.add("is-visible"));

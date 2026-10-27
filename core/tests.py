@@ -24,6 +24,10 @@ class HomeInstitucionalTests(TestCase):
         self.assertIn('Reservas', conteudo)
         self.assertIn('Eventos', conteudo)
 
+        # Ilustração institucional no hero (sem o antigo quadro de prévia)
+        self.assertIn('home-bloco-e.webp', conteudo)
+        self.assertNotIn('bd-product-preview', conteudo)
+
         # Seção de dúvidas frequentes permanece
         self.assertIn('id="faq"', conteudo)
         self.assertIn('frequentes', conteudo)
