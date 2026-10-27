@@ -18,13 +18,15 @@ O **BE-Desk** nasceu para modernizar e digitalizar o uso dos espaços do Bloco E
 Combinamos a necessidade de um controle interno rigoroso com a facilidade de acesso para alunos e servidores. O sistema substitui os antigos registros manuais por uma plataforma digital, com login pela conta institucional do SUAP.
 
 ### 🚀 Funcionalidades Principais
-- [x] **Reserva de Espaços:** Pedido de horário na grade da sala, com aprovação pela administração.
-- [x] **Grade de Horários:** Visualização por sala e por semana, mostrando o que já está ocupado.
+- [x] **Reserva de Espaços:** Pedido de horário na grade da sala, com aprovação pela administração. Vários pedidos podem disputar a mesma faixa; ao aprovar um, os concorrentes são recusados automaticamente e avisados.
+- [x] **Grade de Horários:** Visualização por sala e por semana, mostrando o que já está ocupado — reservas aprovadas, eventos e horários fixos. Pedido pendente não ocupa a grade.
+- [x] **Horários Fixos:** Aulas, treinos e atividades que se repetem toda semana, cadastrados pela administração e bloqueados na grade.
 - [x] **Eventos:** Atividades esportivas, acadêmicas e institucionais com inscrição de participantes e limite de vagas. O evento reserva o espaço automaticamente e bloqueia conflitos.
+- [x] **Avaliação dos Espaços:** Depois do uso, quem reservou dá nota geral e por critério (limpeza, estrutura, organização e conservação), com comentário opcional. A média aparece nas telas do espaço, notas baixas avisam a administração na hora e um lembrete é enviado a quem ainda não avaliou.
 - [x] **Login Institucional:** Autenticação pelo SUAP, sem senha separada.
-- [x] **Notificações:** Avisos de aprovação, recusa e mudança em reservas e eventos.
+- [x] **Notificações:** Avisos de aprovação, recusa e mudança em reservas e eventos, além dos lembretes e alertas de avaliação.
 - [x] **Blog:** Publicações e comunicados do bloco.
-- [x] **Painel Administrativo:** Aprovação de pedidos, gestão de salas e permissões.
+- [x] **Painel Administrativo:** Aprovação de pedidos, gestão de salas e permissões, indicadores de avaliação (ranking de melhor e pior espaço) e exportação das médias e comentários em CSV.
 
 ---
 
@@ -146,12 +148,13 @@ BE-Desk/
 ├── bedesk/              # modelos do núcleo: Sala, Agendamento e Profile
 ├── core/                # página inicial e painel administrativo
 ├── usuarios/            # login, cadastro, perfil e permissões
-├── reservas/            # locais, grade de horários e pedido de reserva
+├── reservas/            # locais, grade de horários, pedido de reserva e horários fixos
+├── avaliacoes/          # avaliação dos espaços após o uso, médias e lembretes
 ├── eventos/             # eventos nos espaços, com inscrição de participantes
 ├── notificacoes/        # notificações internas (sino e listagem)
 ├── blog/                # publicações e administração do blog
 ├── integracao_suap/     # autenticação OAuth2 com o SUAP
-├── relatorios/          # app reservado para relatórios (ainda sem rotas)
+├── relatorios/          # exportação de relatórios em CSV (médias e comentários das avaliações)
 │
 ├── templates/           # templates HTML, uma pasta por app
 ├── static/              # css, js e imagens
@@ -168,17 +171,30 @@ BE-Desk/
 
 ### Como os apps se organizam
 
-O `bedesk` guarda os modelos usados por todo o sistema e não tem rotas próprias. Quem expõe as telas de sala e reserva é o `reservas`, e quem expõe o painel do administrador é o `core`. Já `eventos`, `notificacoes` e `blog` são autocontidos: têm modelo, rotas e telas próprios.
+O `bedesk` guarda os modelos usados por todo o sistema e não tem rotas próprias. Quem expõe as telas de sala e reserva é o `reservas`, que também tem o modelo de horário fixo, e quem expõe o painel do administrador é o `core`. Já `avaliacoes`, `eventos`, `notificacoes` e `blog` são autocontidos: têm modelo, rotas e telas próprios. O `relatorios` não tem modelo: só lê os dados dos outros apps e os entrega em CSV.
 
 Onde a quantidade de telas justifica, as views ficam em pacote em vez de arquivo único:
 
 ```text
-reservas/views/     salas.py, reservas.py, ajax.py
+reservas/views/     salas.py, reservas.py, horarios_fixos.py, ajax.py
 core/views/         public.py (site), dashboard.py (administração)
 eventos/views/      eventos.py
+relatorios/views/   avaliacoes.py — exportação das avaliações em CSV
 notificacoes/services/   notificar.py — funções que disparam as notificações
 eventos/services.py      ocupa e libera a grade de horários do evento
+avaliacoes/services.py   quem pode avaliar, médias, ranking e lembretes
 ```
+
+### Lembrete de avaliação
+
+O lembrete para quem usou um espaço e ainda não o avaliou é enviado por um comando, feito para rodar uma vez por dia no servidor (por exemplo, via cron):
+
+```bash
+python manage.py lembrar_de_avaliar            # envia os lembretes
+python manage.py lembrar_de_avaliar --simular  # mostra quem receberia, sem enviar
+```
+
+Rodar mais de uma vez no mesmo dia não duplica nada: cada reserva recebe um único lembrete.
 
 ---
 
