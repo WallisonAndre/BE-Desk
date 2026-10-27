@@ -1468,7 +1468,7 @@
 }
 
 [data-theme="light"] .bd-blog-form-header p {
-  color: #64748b;
+  color: #5f6e82;
 }
 
 [data-theme="light"] .bd-blog-form {
@@ -1498,7 +1498,7 @@
 
 [data-theme="light"] .bd-blog-field input::placeholder,
 [data-theme="light"] .bd-blog-field textarea::placeholder {
-  color: #94a3b8;
+  color: #5f6e82;
 }
 
 [data-theme="light"] .bd-blog-field input:focus,
@@ -1510,7 +1510,7 @@
 }
 
 [data-theme="light"] .bd-blog-field .bd-blog-help {
-  color: #718198;
+  color: #5f6e82;
 }
 
 [data-theme="light"] .bd-blog-field .bd-blog-field-error {
@@ -1544,7 +1544,7 @@
 }
 
 [data-theme="light"] .bd-blog-dropzone-text small {
-  color: #718198;
+  color: #5f6e82;
 }
 
 [data-theme="light"] .bd-blog-current-cover {

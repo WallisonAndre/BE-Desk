@@ -24,7 +24,7 @@
   /* Text */
   --text-primary:   #f0f2f5;
   --text-secondary: #9ca3af;
-  --text-muted:     #6b7280;
+  --text-muted:     #8b93a1;
   --text-on-accent: #111;
 
   /* Status */
@@ -86,6 +86,16 @@ a {
 
 a:hover {
   color: var(--accent-dim);
+}
+
+/* ---------- Foco visivel ---------- */
+/* Varios componentes zeram o outline no estado normal (campos de formulario,
+   filtros, o logo da barra), e isso tambem apaga o anel que o navegador
+   desenha no foco por teclado. Esta regra devolve o anel em tudo que recebe
+   Tab, com peso suficiente para vencer esses "outline: none". */
+:focus-visible {
+  outline: 2px solid var(--accent) !important;
+  outline-offset: 2px !important;
 }
 
 /* ---------- Selection ---------- */
@@ -1545,7 +1555,11 @@ a:hover {
   letter-spacing: 0;
 }
 
-.bd-app .text-muted {
+/* Os utilitarios de cor do Bootstrap (#6c757d) ficam abaixo de 4,5:1 nos dois
+   temas, entao seguem o token de texto apagado do BE-Desk. */
+.bd-app .text-muted,
+.bd-app .text-secondary,
+.bd-app .text-body-secondary {
   color: var(--text-muted) !important;
 }
 
@@ -1893,7 +1907,7 @@ a:hover {
 }
 
 .bd-footer-bottom-line span {
-  color: #64748b;
+  color: #8b93a1;
   font-size: 0.86rem;
   font-weight: 600;
 }

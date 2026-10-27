@@ -304,9 +304,9 @@
             <table class="schedule-table text-center">
                 <thead>
                     <tr>
-                        <th style="width: 12%;">Horário</th>
+                        <th scope="col" style="width: 12%;">Horário</th>
                         {% for dia in dias_com_data %}
-                        <th style="width: 17.6%;">
+                        <th scope="col" style="width: 17.6%;">
                             {{ dia.nome_dia }} <br>
                             <span class="text-secondary fw-medium" style="font-size: 0.8em;">{{ dia.data_formatada }}</span>
                         </th>
@@ -326,9 +326,9 @@
 
                     {% elif linha.tipo == 'intervalo' %}
                     <tr class="row-interval">
-                        <td class="cell-time">
+                        <th scope="row" class="cell-time">
                             {{ linha.inicio }} - {{ linha.fim }}
-                        </td>
+                        </th>
                         <td colspan="5" class="fst-italic text-center">
                             {{ linha.nome }}
                         </td>
@@ -336,9 +336,9 @@
 
                     {% elif linha.tipo == 'hora' %}
                     <tr>
-                        <td class="cell-time">
+                        <th scope="row" class="cell-time">
                             {{ linha.horario_str }}
-                        </td>
+                        </th>
 
                         {% for celula in linha.celulas %}
                         <td>
@@ -370,7 +370,8 @@
                                 </div>
                             </div>
                             {% else %}
-                            <a href="{% url 'agendar_sala' %}?hora={{ linha.hora_para_link }}&data={{ celula.data|date:'Y-m-d' }}&sala={{ sala.nome }}" class="btn-add-schedule" data-bs-toggle="tooltip" title="Clique para agendar">
+                            <a href="{% url 'agendar_sala' %}?hora={{ linha.hora_para_link }}&data={{ celula.data|date:'Y-m-d' }}&sala={{ sala.nome }}" class="btn-add-schedule" data-bs-toggle="tooltip" title="Clique para agendar"
+                               aria-label="Reservar {{ sala.nome }} em {{ celula.data|date:'d/m' }} às {{ linha.horario_str }}">
                                 <i class="fa-solid fa-plus"></i>
                             </a>
                             {% endif %}

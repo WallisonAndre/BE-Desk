@@ -128,7 +128,6 @@ a:focus, button:focus, input:focus, textarea:focus{ outline:3px solid rgba(200,2
   transform: none !important;
   filter: none !important;
   transition: none !important;
-  outline: none !important;
 }
 
 /* Keep small carousel dots hidden, but show the nav indicator underline for active menu */
