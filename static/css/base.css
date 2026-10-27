@@ -20,13 +20,13 @@
 [data-theme="light"] .bd-home-copy { color: rgba(30, 41, 59, 0.75) !important; }
 [data-theme="light"] .bd-home-copy strong { color: #0f172a !important; }
 [data-theme="light"] .bd-home-status {
-  background: rgba(5, 150, 105, 0.06) !important;
-  border-color: rgba(5, 150, 105, 0.2) !important;
+  background: transparent !important;
+  border-color: transparent !important;
   color: #047857 !important;
 }
 [data-theme="light"] .bd-home-status::before {
   background: #059669 !important;
-  box-shadow: 0 0 14px rgba(5,150,105,0.5) !important;
+  box-shadow: 0 0 12px rgba(5,150,105,0.45) !important;
 }
 /* Feature / Bento cards */
 [data-theme="light"] .bd-home-shell [class*="bd-"] h2,
@@ -41,34 +41,7 @@
   box-shadow: 0 4px 20px rgba(0,0,0,0.08) !important;
 }
 
-/* Home cards light mode */
-[data-theme="light"] .bd-preview-card {
-  background: rgba(255,255,255,0.72) !important;
-  border-color: rgba(15,23,42,0.1) !important;
-  box-shadow: 0 14px 34px rgba(15,23,42,0.06), inset 0 1px 0 rgba(255,255,255,0.9) !important;
-}
-[data-theme="light"] .bd-preview-card::before { background: radial-gradient(circle at var(--card-x,50%) var(--card-y,0%), rgba(4,120,87,0.1), transparent 44%) !important; }
-[data-theme="light"] .bd-preview-label { color: #047857 !important; }
-[data-theme="light"] .bd-preview-title { color: #0f172a !important; }
-[data-theme="light"] .bd-preview-copy { color: #475569 !important; }
-[data-theme="light"] .bd-preview-metric { background: rgba(255,255,255,0.72) !important; }
-[data-theme="light"] .bd-preview-metric strong { color: #0f172a !important; }
-[data-theme="light"] .bd-preview-metric small { color: #5f6e82 !important; }
-[data-theme="light"] .bd-preview-progress { display: none !important; }
-[data-theme="light"] .bd-product-window { background: rgba(255,255,255,0.86) !important; border-color: rgba(15,23,42,0.1) !important; }
-[data-theme="light"] .bd-schedule-mini span {
-  background: rgba(15,23,42,0.04) !important;
-  border-color: rgba(15,23,42,0.09) !important;
-  color: #475569 !important;
-}
-[data-theme="light"] .bd-schedule-mini strong { color: #0f172a !important; }
-[data-theme="light"] .bd-schedule-mini i { background: #047857 !important; box-shadow: 0 0 14px rgba(4,120,87,0.3) !important; }
-[data-theme="light"] .bd-window-badge { color: #334155 !important; }
-[data-theme="light"] .bd-home-trust-row span {
-  background: rgba(15,23,42,0.035) !important;
-  border-color: rgba(15,23,42,0.1) !important;
-  color: #334155 !important;
-}
+/* Home buttons light mode */
 [data-theme="light"] .bd-home-btn-secondary {
   border-color: rgba(15,23,42,0.14) !important;
   background: rgba(255,255,255,0.72) !important;
