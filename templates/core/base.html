@@ -23,13 +23,13 @@
 
   <!-- Tailwind should be built into static/css/bedesk-theme.css for production. Removed CDN usage. -->
 
-  <link rel="stylesheet" href="{% static 'css/bedesk-theme.css' %}">
-  <link rel="stylesheet" href="{% static 'css/brand.css' %}">
-  <link rel="stylesheet" href="{% static 'css/modal.css' %}?v=20260814">
+  <link rel="stylesheet" href="{% static 'css/bedesk-theme.css' %}?v=20261104b">
+  <link rel="stylesheet" href="{% static 'css/brand.css' %}?v=20261104b">
+  <link rel="stylesheet" href="{% static 'css/modal.css' %}?v=20261104b">
 
   {% block extra_head %}{% endblock %}
 
-  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  <link rel="stylesheet" href="{% static 'css/base.css' %}?v=20261104b">
 
   {% endblock %}
 </head>
@@ -47,19 +47,19 @@
         </div>
       </a>
 
-      <!-- Center Links (matching the screenshot) -->
+      <!-- Center Links -->
       <div class="pill-nav-links">
         <div class="nav-indicator"></div>
-        <a href="{% url 'inicio' %}" class="pill-nav-item">Inicio</a>
+        <a href="{% url 'inicio' %}" class="pill-nav-item">Início</a>
         <a href="{% url 'lista_locais' %}" class="pill-nav-item">Locais</a>
         <a href="{% url 'lista_reserva' %}" class="pill-nav-item">Reservas</a>
         <a href="{% url 'lista_eventos' %}" class="pill-nav-item">Eventos</a>
         <a href="{% url 'blog_index' %}" class="pill-nav-item">Blog</a>
-        <a href="#" class="pill-nav-item">Feedback</a>
         {% if user.is_staff %}
-        <a href="{% url 'admin_dashboard' %}" class="pill-nav-item">Admin</a>
-        <a href="{% url 'listar_pendentes' %}" class="pill-nav-item">Dashboard</a>
+        <span class="pill-nav-sep" aria-hidden="true"></span>
         <a href="{% url 'aprovacoes' %}" class="pill-nav-item">Solicitações</a>
+        <a href="{% url 'listar_pendentes' %}" class="pill-nav-item">Dashboard</a>
+        <a href="{% url 'admin_dashboard' %}" class="pill-nav-item">Admin</a>
         {% endif %}
       </div>
 
@@ -148,12 +148,11 @@
     </div>
     <div class="offcanvas-body">
       <div class="d-flex flex-column gap-3 mt-2">
-        <a href="{% url 'inicio' %}" class="text-white text-decoration-none fs-5"><i class="fa-solid fa-house me-3 text-secondary"></i>Inicio</a>
+        <a href="{% url 'inicio' %}" class="text-white text-decoration-none fs-5"><i class="fa-solid fa-house me-3 text-secondary"></i>Início</a>
         <a href="{% url 'lista_locais' %}" class="text-white text-decoration-none fs-5"><i class="fa-solid fa-map-location-dot me-3 text-secondary"></i>Locais</a>
         <a href="{% url 'lista_reserva' %}" class="text-white text-decoration-none fs-5"><i class="fa-solid fa-calendar-check me-3 text-secondary"></i>Reservas</a>
-        <a href="#" class="text-white text-decoration-none fs-5"><i class="fa-solid fa-gift me-3 text-secondary"></i>Benefícios</a>
+        <a href="{% url 'lista_eventos' %}" class="text-white text-decoration-none fs-5"><i class="fa-solid fa-calendar-days me-3 text-secondary"></i>Eventos</a>
         <a href="{% url 'blog_index' %}" class="text-white text-decoration-none fs-5"><i class="fa-solid fa-newspaper me-3 text-secondary"></i>Blog</a>
-        <a href="#" class="text-white text-decoration-none fs-5"><i class="fa-solid fa-comment-dots me-3 text-secondary"></i>Feedback</a>
         {% if user.is_authenticated %}
         <a href="{% url 'minhas_avaliacoes' %}" class="text-white text-decoration-none fs-5"><i class="fa-solid fa-star me-3 text-secondary"></i>Minhas Avaliações</a>
         {% endif %}
@@ -179,7 +178,7 @@
 
   <main class="{% block main_container_class %}container mt-5 flex-grow-1 bd-main bd-page-enter{% endblock %}">
     {% if messages %}
-    <div class="row">
+    <div class="row bd-flash-messages">
       <div class="col-md-12">
         {% for message in messages %}
         <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
@@ -281,28 +280,12 @@
         indicator.style.width = '0px'; // hide if no active tab
       }
 
-      // Handle clicks for animation before navigation
+      // Move indicator immediately on click without delaying navigation
       links.forEach(link => {
-        link.addEventListener('click', function (e) {
-          // Only intercept left clicks without modifier keys
-          if (e.button === 0 && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
-            const href = this.getAttribute('href');
-            if (href && href !== '#') {
-              e.preventDefault();
-
-              links.forEach(l => l.classList.remove('active'));
-              this.classList.add('active');
-              moveIndicator(this);
-
-              setTimeout(() => {
-                window.location.href = href;
-              }, 300); // Wait for transition to finish
-            } else {
-              links.forEach(l => l.classList.remove('active'));
-              this.classList.add('active');
-              moveIndicator(this);
-            }
-          }
+        link.addEventListener('click', function () {
+          links.forEach(l => l.classList.remove('active'));
+          this.classList.add('active');
+          moveIndicator(this);
         });
       });
 

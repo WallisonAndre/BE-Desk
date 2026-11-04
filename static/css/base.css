@@ -4,16 +4,16 @@
 
 /* ── HOME LIGHT MODE ── */
 [data-theme="light"] .bd-home {
-  background: #f4f7fa !important;
+  background: #ffffff !important;
   color: #1e293b !important;
-  --home-bg: #f4f7fa;
+  --home-bg: #ffffff;
   --home-text: #1e293b;
   --home-muted: #64748b;
   --home-lime: var(--brand-lime);
   --home-lime-text: var(--brand-lime-text);
   --home-lime-soft: var(--brand-lime-soft);
 }
-[data-theme="light"] .bd-home::before { opacity: 0.08 !important; }
+[data-theme="light"] .bd-home::before { display: none !important; }
 [data-theme="light"] .bd-home::after { background: none !important; }
 [data-theme="light"] .bd-home-title { color: #0f172a !important; }
 [data-theme="light"] .bd-home-title span { color: #047857 !important; text-shadow: none !important; }
@@ -42,15 +42,27 @@
 }
 
 /* Home buttons light mode */
+[data-theme="light"] .bd-home-btn-primary {
+  background: #047857 !important;
+  border-color: transparent !important;
+  color: #ffffff !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08) !important;
+}
+[data-theme="light"] .bd-home-btn-primary:hover {
+  background: #065f46 !important;
+  border-color: transparent !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(4, 120, 87, 0.16) !important;
+}
 [data-theme="light"] .bd-home-btn-secondary {
-  border-color: rgba(15,23,42,0.14) !important;
-  background: rgba(255,255,255,0.72) !important;
+  border-color: rgba(15, 23, 42, 0.14) !important;
+  background: #ffffff !important;
   color: #334155 !important;
-  box-shadow: 0 4px 16px rgba(15,23,42,0.04), inset 0 1px 0 rgba(255,255,255,0.9) !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
 }
 [data-theme="light"] .bd-home-btn-secondary:hover {
-  border-color: rgba(4,120,87,0.28) !important;
-  background: rgba(4,120,87,0.06) !important;
+  border-color: rgba(4, 120, 87, 0.32) !important;
+  background: #f8fafc !important;
   color: #047857 !important;
 }
 
@@ -153,14 +165,26 @@
   color: #047857 !important;
 }
 /* Buttons */
+[data-theme="light"] .bd-blog-btn-primary {
+  background: #047857 !important;
+  border-color: transparent !important;
+  color: #ffffff !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08) !important;
+}
+[data-theme="light"] .bd-blog-btn-primary:hover {
+  background: #065f46 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(4, 120, 87, 0.16) !important;
+}
 [data-theme="light"] .bd-blog-btn-secondary {
-  background: rgba(0,0,0,0.04) !important;
-  border-color: rgba(0,0,0,0.1) !important;
-  color: #1e293b !important;
+  background: #ffffff !important;
+  border-color: rgba(15, 23, 42, 0.14) !important;
+  color: #334155 !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
 }
 [data-theme="light"] .bd-blog-btn-secondary:hover {
-  border-color: rgba(5,150,105,0.3) !important;
-  background: rgba(5,150,105,0.07) !important;
+  border-color: rgba(4, 120, 87, 0.32) !important;
+  background: #f8fafc !important;
   color: #047857 !important;
 }
 /* Pagination */
@@ -181,10 +205,17 @@
 }
 [data-theme="light"] .bd-blog-cover-placeholder span { color: #5f6e82 !important; }
 
-[data-theme="light"] html,
+html[data-theme="light"],
+html[data-theme="light"] body,
 [data-theme="light"] body {
   background: #f4f7fa !important;
   color: #102033 !important;
+}
+html[data-theme="light"]:has(.bd-home),
+html[data-theme="light"] body:has(.bd-home),
+html[data-theme="light"]:has(body.bd-login-page),
+html[data-theme="light"] body.bd-login-page {
+  background: #ffffff !important;
 }
 [data-theme="light"] ::selection {
   background: rgba(4, 120, 87, 0.22);
@@ -194,9 +225,9 @@
 [data-theme="light"] ::-webkit-scrollbar-thumb { background: #cbd7df; }
 [data-theme="light"] ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 [data-theme="light"] .custom-pill-navbar {
-  background: rgba(255, 255, 255, 0.82) !important;
-  border-color: rgba(15, 23, 42, 0.1) !important;
-  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.12) !important;
+  background: rgba(255, 255, 255, 0.88) !important;
+  border-color: rgba(15, 23, 42, 0.09) !important;
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.08) !important;
   backdrop-filter: blur(18px) saturate(145%);
 }
 [data-theme="light"] .pill-nav-links {
@@ -210,19 +241,19 @@
 [data-theme="light"] .pill-nav-item.active { color: #0f172a !important; }
 [data-theme="light"] .nav-indicator {
   background-color: #047857 !important;
-  box-shadow: 0 0 0 1px rgba(4,120,87,0.12), 0 0 16px rgba(4,120,87,0.22);
+  box-shadow: none !important;
 }
 [data-theme="light"] .pill-login-link { color: #475569 !important; }
 [data-theme="light"] .pill-login-link:hover { color: #0f172a !important; }
 [data-theme="light"] .pill-cta-btn {
   background: #047857 !important;
   color: #ffffff !important;
-  box-shadow: 0 12px 24px rgba(4, 120, 87, 0.2) !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08) !important;
 }
 [data-theme="light"] .pill-cta-btn:hover {
   background: #065f46 !important;
   color: #ffffff !important;
-  box-shadow: 0 16px 28px rgba(4, 120, 87, 0.26) !important;
+  box-shadow: 0 4px 12px rgba(4, 120, 87, 0.16) !important;
 }
 [data-theme="light"] .pill-profile-dropdown .dropdown-toggle { color: #475569 !important; }
 [data-theme="light"] .pill-profile-dropdown .dropdown-menu {
@@ -241,7 +272,29 @@
 }
 /* Main content light */
 [data-theme="light"] .bd-app {
-  background: transparent !important;
+  background: #f4f7fa !important;
+}
+[data-theme="light"] .bd-app:has(.bd-home),
+[data-theme="light"] body.bd-login-page.bd-app {
+  background: #ffffff !important;
+}
+
+/* Global flash messages on full-bleed pages: float cleanly below navbar instead of pushing hero down */
+main.bd-home-main > .bd-flash-messages,
+main.bd-blog-main > .bd-flash-messages,
+body.bd-login-page main > .bd-flash-messages {
+  position: fixed;
+  top: 5.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(calc(100% - 2rem), 680px);
+  z-index: 1060;
+  margin: 0;
+}
+main.bd-home-main > .bd-flash-messages .col-md-12,
+main.bd-blog-main > .bd-flash-messages .col-md-12,
+body.bd-login-page main > .bd-flash-messages .col-md-12 {
+  padding: 0;
 }
 [data-theme="light"] .bd-main { color: #102033; }
 [data-theme="light"] .bd-card,
@@ -443,34 +496,39 @@
   color: #991b1b !important;
 }
 [data-theme="light"] .bd-app .btn-outline-light {
-  border-color: #cbd5e1 !important;
+  border-color: rgba(15, 23, 42, 0.14) !important;
+  background: #ffffff !important;
   color: #334155 !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
 }
 [data-theme="light"] .bd-app .btn-outline-light:hover {
-  background: #f1f5f9 !important;
-  color: #0f172a !important;
+  background: #f8fafc !important;
+  border-color: rgba(4, 120, 87, 0.32) !important;
+  color: #047857 !important;
 }
 [data-theme="light"] .bd-app .btn-primary,
 [data-theme="light"] .bd-btn-primary {
   background: #047857 !important;
-  border-color: #047857 !important;
+  border-color: transparent !important;
   color: #ffffff !important;
-  box-shadow: 0 12px 24px rgba(4,120,87,0.2) !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08) !important;
 }
 [data-theme="light"] .bd-app .btn-primary:hover,
 [data-theme="light"] .bd-btn-primary:hover {
   background: #065f46 !important;
-  border-color: #065f46 !important;
+  border-color: transparent !important;
+  box-shadow: 0 4px 12px rgba(4, 120, 87, 0.16) !important;
 }
 [data-theme="light"] .bd-btn-outline,
 [data-theme="light"] .bd-btn-ghost {
-  border-color: #cbd5e1 !important;
+  border-color: rgba(15, 23, 42, 0.14) !important;
+  background: #ffffff !important;
   color: #334155 !important;
 }
 [data-theme="light"] .bd-btn-outline:hover,
 [data-theme="light"] .bd-btn-ghost:hover {
-  background: rgba(4,120,87,0.08) !important;
-  border-color: rgba(4,120,87,0.24) !important;
+  background: #f8fafc !important;
+  border-color: rgba(4, 120, 87, 0.32) !important;
   color: #047857 !important;
 }
 [data-theme="light"] .bd-app .badge.bg-secondary,
@@ -686,6 +744,25 @@
   gap: 2px;
 }
 
+.pill-nav-sep {
+  width: 1px;
+  height: 18px;
+  margin: 0 4px;
+  background: rgba(255, 255, 255, 0.12);
+  flex-shrink: 0;
+}
+
+[data-theme="light"] .pill-nav-sep {
+  background: rgba(15, 23, 42, 0.12);
+}
+
+@media (max-width: 1200px) {
+  .pill-nav-item {
+    padding: 7px 12px;
+    font-size: 0.8rem;
+  }
+}
+
 .nav-indicator {
   position: absolute;
   bottom: 8px;
@@ -739,24 +816,27 @@
 
 .pill-cta-btn {
   background: #b5e853;
-  color: #000;
+  color: #0b120a;
   text-decoration: none;
   font-weight: 600;
   font-size: 0.85rem;
-  padding: 10px 20px;
-  border-radius: 50px;
-  display: flex;
+  letter-spacing: -0.01em;
+  padding: 9px 18px;
+  border-radius: 999px;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  transition: all 0.2s ease;
-  box-shadow: 0 0 20px rgba(181, 232, 83, 0.15);
+  gap: 7px;
+  transition: background-color 160ms ease, color 160ms ease, box-shadow 160ms ease, transform 140ms cubic-bezier(0.23, 1, 0.32, 1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .pill-cta-btn:hover {
-  background: #9ecc44;
-  box-shadow: 0 0 25px rgba(181, 232, 83, 0.3);
-  color: #000;
-  transform: translateY(-1px);
+  background: #c8ff1f;
+  color: #0b120a;
+}
+
+.pill-cta-btn:active {
+  transform: scale(0.98);
 }
 
 /* Mobile responsive */

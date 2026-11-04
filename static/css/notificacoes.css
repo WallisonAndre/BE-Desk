@@ -38,21 +38,27 @@
 .bd-notif-mark-all {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.45rem 0.9rem;
-  border: 1px solid rgba(255,255,255,0.1);
+  gap: 0.45rem;
+  padding: 0.48rem 0.95rem;
+  border: 1px solid var(--border-card);
   border-radius: 10px;
-  background: rgba(255,255,255,0.04);
+  background: var(--bg-card);
   color: var(--text-secondary);
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 600;
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
 }
 
 .bd-notif-mark-all:hover {
-  background: rgba(255,255,255,0.08);
-  color: var(--text-primary);
+  background: var(--bg-card-hover);
+  border-color: var(--accent-border);
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.bd-notif-mark-all:active {
+  transform: scale(0.98);
 }
 
 .bd-notif-list {
@@ -66,24 +72,24 @@
   align-items: flex-start;
   gap: 0.85rem;
   padding: 0.9rem 1rem;
-  border: 1px solid rgba(255,255,255,0.06);
+  border: 1px solid var(--border-card);
   border-radius: 14px;
-  background: rgba(255,255,255,0.03);
+  background: var(--bg-card);
   text-decoration: none;
   color: inherit;
-  transition: background 0.2s, border-color 0.2s, transform 0.2s;
+  transition: background-color 0.2s, border-color 0.2s, transform 0.2s;
   position: relative;
 }
 
 .bd-notif-item:hover {
-  background: rgba(255,255,255,0.06);
-  border-color: rgba(255,255,255,0.1);
+  background: var(--bg-card-hover);
+  border-color: var(--accent-border);
   transform: translateY(-1px);
 }
 
 .bd-notif-item.unread {
-  border-color: rgba(181, 232, 83, 0.15);
-  background: rgba(181, 232, 83, 0.03);
+  border-color: var(--accent-border);
+  background: var(--accent-glow);
 }
 
 .bd-notif-item.unread::before {
@@ -93,7 +99,7 @@
   left: 0;
   width: 3px;
   height: calc(100% - 1.8rem);
-  background: #b5e853;
+  background: var(--accent);
   border-radius: 0 3px 3px 0;
 }
 

@@ -1,30 +1,31 @@
 /* ===================================================================
-   BE-DESK — TELA DE LOGIN
-   Desenho aprovado pela equipe (Figma, out/2026): página inteira em
-   verde institucional, ilustração à esquerda e um cartão claro à direita
-   com o logotipo e o acesso pelo SUAP.
-
-   O verde vale nos dois temas: a tela de entrada é identidade, não
-   conteúdo que acompanha a preferência de quem ainda nem entrou.
+   BE-DESK — TELAS DE LOGIN E AUTENTICAÇÃO
+   Suporte completo ao Tema Claro ([data-theme="light"]) e Tema Escuro,
+   sem faixa superior atrás do menu flutuante e com botões limpos.
    =================================================================== */
 
 :root {
   --login-verde: #024023;
   --login-verde-claro: #034124;
   --login-cartao: #ebffee;
-  --login-botao: #02542d;
-  --login-botao-hover: #013d20;
+  --login-botao: #047857;
+  --login-botao-hover: #065f46;
   --login-texto-no-verde: rgba(235, 255, 238, 0.88);
 }
 
-/* O verde vai até o topo: sem isto, o fundo do tema aparece como uma faixa
-   clara atrás da pílula do menu, que flutua sobre a página.
-   A regra precisa alcançar o <html>: o fundo declarado no <body> é
-   propagado para a tela pelo navegador, e pintar o body não muda a faixa.
-   Como a classe mora no body, o alcance vem do :has(). */
-html:has(body.bd-login-page),
-body.bd-login-page {
+/* No modo escuro, a tela inteira usa o verde profundo institucional */
+html:not([data-theme="light"]):has(body.bd-login-page),
+html:not([data-theme="light"]) body.bd-login-page {
   background: var(--login-verde) !important;
+}
+
+/* No modo claro, fundo branco puro do topo ao rodapé para integrar
+   a pílula do menu e a ilustração sem nenhuma faixa no topo */
+html[data-theme="light"]:has(body.bd-login-page),
+html[data-theme="light"] body.bd-login-page,
+[data-theme="light"] body.bd-login-page {
+  background: #ffffff !important;
+  color: #0f172a;
 }
 
 body.bd-login-page .floating-navbar-wrapper {
@@ -36,22 +37,31 @@ body.bd-login-page .floating-navbar-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(1.25rem, 3vw, 3rem);
-  min-height: calc(100vh - 6.5rem);
-  padding: clamp(0.75rem, 2vw, 1.5rem) clamp(1rem, 2.5vw, 2rem) clamp(2.5rem, 4vw, 3rem);
+  gap: clamp(1.5rem, 3.5vw, 3.5rem);
+  min-height: 100vh;
+  margin-top: -6.5rem;
+  padding: 7.5rem clamp(1rem, 2.5vw, 2.5rem) clamp(3.5rem, 5vw, 4.5rem);
   background: var(--login-verde);
   overflow: hidden;
 }
 
-/* ── Fundo decorativo ──
-   Ondas atravessando a tela inteira, no traço claro sobre o verde. O
-   desenho inteiro é um SVG só, que escala com a tela; `currentColor`
-   deixa a cor num lugar só. */
+[data-theme="light"] .bd-login {
+  background:
+    radial-gradient(circle at 18% 20%, rgba(4, 120, 87, 0.05), transparent 34rem),
+    radial-gradient(circle at 85% 80%, rgba(4, 120, 87, 0.06), transparent 36rem),
+    #ffffff;
+}
+
+/* ── Fundo decorativo (ondas SVG) ── */
 .bd-login-fundo {
   position: absolute;
   inset: 0;
-  color: rgba(235, 255, 238, 0.16);
+  color: rgba(235, 255, 238, 0.14);
   pointer-events: none;
+}
+
+[data-theme="light"] .bd-login-fundo {
+  color: rgba(4, 120, 87, 0.09);
 }
 
 .bd-login-fundo svg {
@@ -60,8 +70,6 @@ body.bd-login-page .floating-navbar-wrapper {
   height: 100%;
 }
 
-/* As ondas se deslocam devagar, só o suficiente para a cena não parecer
-   parada. Quem pediu menos animação no sistema não vê nada disso. */
 @keyframes bd-login-deriva {
   from { transform: translateX(-28px); }
   to   { transform: translateX(28px); }
@@ -81,43 +89,55 @@ body.bd-login-page .floating-navbar-wrapper {
 .bd-login-arte {
   position: relative;
   z-index: 1;
-  flex: 1 1 620px;
-  max-width: 880px;
+  flex: 1 1 580px;
+  max-width: 780px;
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
 .bd-login-arte img {
   width: 100%;
   height: auto;
-  max-height: 76vh;
+  max-height: 72vh;
   object-fit: contain;
+  border-radius: 24px;
+}
+
+[data-theme="light"] .bd-login-arte img {
+  border-radius: 0;
+  mix-blend-mode: multiply;
 }
 
 /* ── Cartão de acesso ── */
 .bd-login-cartao {
   position: relative;
   z-index: 1;
-  flex: 0 1 470px;
+  flex: 0 1 440px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2.1rem;
-  padding: clamp(2.6rem, 4.5vw, 3.8rem) clamp(2.2rem, 3.5vw, 3rem);
-  border-radius: 28px;
-  background: var(--login-cartao);
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+  gap: 1.85rem;
+  padding: clamp(2.25rem, 4vw, 3.25rem) clamp(2rem, 3.2vw, 2.75rem);
+  border-radius: 24px;
+  background: #141920;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
   text-align: center;
 }
 
-/* O quadrado verde do desenho era só marcação de onde a logo entra:
-   aqui fica a logo sozinha, sobre o cartão. */
+[data-theme="light"] .bd-login-cartao {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.09);
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08), 0 4px 12px rgba(15, 23, 42, 0.03);
+}
+
 .bd-login-logo {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
-  max-width: 290px;
+  max-width: 240px;
 }
 
 .bd-login-logo img {
@@ -125,27 +145,35 @@ body.bd-login-page .floating-navbar-wrapper {
   height: auto;
 }
 
-/* Escopado em .bd-login de propósito: o tema global traz
-   `.bd-app h1 { color: var(--text-primary) }`, que vence um seletor de
-   classe só — e no tema escuro pintava o título de branco sobre o cartão
-   claro, 1,07:1 de contraste. O cartão é sempre claro, então o texto dele
-   é sempre escuro, independente do tema. */
+[data-theme="light"] .bd-login-logo img {
+  filter: contrast(1.15) brightness(0.84);
+}
+
 .bd-login .bd-login-titulo {
   margin: 0;
-  color: #0b2a18;
-  font-size: 1.72rem;
-  font-weight: 760;
+  color: #f0f4f8;
+  font-size: 1.65rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   line-height: 1.25;
+}
+
+[data-theme="light"] .bd-login .bd-login-titulo {
+  color: #0f172a;
 }
 
 .bd-login .bd-login-titulo span {
   display: block;
-  margin-top: 0.3rem;
-  color: #2f5c43;
-  font-size: 0.86rem;
+  margin-top: 0.35rem;
+  color: #b5e853;
+  font-size: 0.82rem;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+
+[data-theme="light"] .bd-login .bd-login-titulo span {
+  color: #047857;
 }
 
 .bd-login-botao {
@@ -154,35 +182,54 @@ body.bd-login-page .floating-navbar-wrapper {
   justify-content: center;
   gap: 0.6rem;
   width: 100%;
-  padding: 1.15rem 1.6rem;
-  border: 0;
-  border-radius: 999px;
-  background: var(--login-botao);
-  color: #ffffff;
-  font-size: 1.08rem;
-  font-weight: 700;
+  min-height: 3.1rem;
+  padding: 0.85rem 1.5rem;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: #b5e853;
+  color: #0b0d12;
+  font-size: 0.98rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   text-decoration: none;
-  transition: background 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12);
+  transition: background-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
 }
 
 .bd-login-botao:hover,
 .bd-login-botao:focus-visible {
-  background: var(--login-botao-hover);
-  color: #ffffff;
+  background: #96c93d;
+  color: #0b0d12;
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(181, 232, 83, 0.22);
+}
+
+.bd-login-botao:active {
+  transform: scale(0.98);
+}
+
+[data-theme="light"] .bd-login-botao {
+  background: #047857;
+  color: #ffffff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+[data-theme="light"] .bd-login-botao:hover,
+[data-theme="light"] .bd-login-botao:focus-visible {
+  background: #065f46;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(4, 120, 87, 0.2);
 }
 
 .bd-login-botao:focus-visible {
-  outline: 3px solid #ffffff;
-  outline-offset: 3px;
+  outline: 3px solid rgba(4, 120, 87, 0.35);
+  outline-offset: 2px;
 }
 
 .bd-login-botao.is-loading .bd-login-botao-rotulo { display: none; }
 .bd-login-botao .bd-login-botao-giro { display: none; }
 .bd-login-botao.is-loading .bd-login-botao-giro { display: inline-flex; }
 
-/* Enquanto redireciona, só a palavra e três pontos que piscam em sequência.
-   A roda girando do Font Awesome saiu: destoava do resto da tela. */
 .bd-login-pontos {
   display: inline-flex;
   width: 1.1em;
@@ -206,9 +253,13 @@ body.bd-login-page .floating-navbar-wrapper {
 
 .bd-login .bd-login-nota {
   margin: 0;
-  color: #3c5a4a;
-  font-size: 0.9rem;
+  color: #94a3b8;
+  font-size: 0.88rem;
   line-height: 1.55;
+}
+
+[data-theme="light"] .bd-login .bd-login-nota {
+  color: #64748b;
 }
 
 /* ── Rodapé da página ── */
@@ -234,20 +285,111 @@ body.bd-login-page .floating-navbar-wrapper {
 
 .bd-login-rodape a:hover { color: #ffffff; }
 
-/* ── Celular: a ilustração sai e o cartão ocupa a tela ── */
+[data-theme="light"] .bd-login-rodape {
+  color: #64748b;
+  border-top: 1px solid rgba(15, 23, 42, 0.06);
+  background: rgba(255, 255, 255, 0.85);
+}
+
+[data-theme="light"] .bd-login-rodape a {
+  color: #047857;
+}
+
+[data-theme="light"] .bd-login-rodape a:hover {
+  color: #065f46;
+}
+
+/* ── Páginas auxiliares de autenticação (Cadastro / Redefinir Senha) ── */
+.bd-auth-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 8rem);
+  padding: 2rem 1rem 3.5rem;
+}
+
+.bd-auth-shell {
+  width: 100%;
+  max-width: 460px;
+  margin: 0 auto;
+}
+
+.bd-auth-card {
+  padding: clamp(1.75rem, 3.5vw, 2.5rem);
+  border-radius: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  box-shadow: var(--shadow-card);
+}
+
+[data-theme="light"] .bd-auth-card {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.09);
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.07), 0 4px 12px rgba(15, 23, 42, 0.03);
+}
+
+.bd-auth-card h2,
+.bd-auth-card h3 {
+  color: var(--text-primary);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+[data-theme="light"] .bd-auth-card h2,
+[data-theme="light"] .bd-auth-card h3 {
+  color: #0f172a;
+}
+
+.bd-auth-card .form-label,
+.bd-auth-card label {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: var(--text-primary);
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+[data-theme="light"] .bd-auth-card .form-label,
+[data-theme="light"] .bd-auth-card label {
+  color: #1e293b;
+}
+
+[data-theme="light"] .bd-auth-card .form-control {
+  background-color: #f8fafc !important;
+  border-color: rgba(15, 23, 42, 0.14) !important;
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .bd-auth-card .form-control:focus {
+  background-color: #ffffff !important;
+  border-color: #047857 !important;
+  box-shadow: 0 0 0 3px rgba(4, 120, 87, 0.14) !important;
+}
+
+.bd-auth-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  margin-bottom: 1rem;
+  border-radius: 999px;
+  background: var(--accent-glow);
+  border: 1px solid var(--accent-border);
+  color: var(--accent);
+  font-size: 1.25rem;
+}
+
+/* ── Responsividade Mobile ── */
 @media (max-width: 860px) {
   .bd-login {
     flex-direction: column;
     justify-content: center;
     gap: 1.6rem;
-    min-height: calc(100vh - 4.5rem);
-    padding: 1rem 1rem 2rem;
+    min-height: 100vh;
+    padding: 6.5rem 1rem 2.5rem;
   }
 
-  /* Em coluna o eixo principal vira o vertical, e o `flex-basis` das colunas
-     passaria a valer como ALTURA: a caixa da ilustração ia a 620px e empurrava
-     o cartão para fora da tela. Aqui cada bloco volta a ter a altura do
-     próprio conteúdo. */
   .bd-login-arte {
     flex: 0 0 auto;
     max-width: 320px;
@@ -263,21 +405,19 @@ body.bd-login-page .floating-navbar-wrapper {
     padding: 2rem 1.8rem;
   }
 
-  .bd-login-logo { max-width: 220px; }
+  .bd-login-logo { max-width: 210px; }
   .bd-login .bd-login-titulo { font-size: 1.45rem; }
 
   .bd-login-fundo { display: none; }
   .bd-login-rodape { position: static; margin-top: 0.5rem; }
 }
 
-/* No celular a ilustração encolhe, mas continua: ela é o que dá contexto à
-   tela. Só sai quando a altura fica curta demais para o cartão respirar. */
 @media (max-width: 520px) {
   .bd-login { gap: 1.2rem; }
   .bd-login-arte { max-width: 240px; }
   .bd-login-arte img { max-height: 18vh; }
   .bd-login-cartao { padding: 1.8rem 1.4rem; gap: 1.3rem; }
-  .bd-login-logo { max-width: 190px; }
+  .bd-login-logo { max-width: 180px; }
 }
 
 @media (max-height: 620px) and (max-width: 860px) {

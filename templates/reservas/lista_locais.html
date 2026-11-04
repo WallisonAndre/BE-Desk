@@ -4,35 +4,37 @@
 {% block title %}Locais — BE-Desk{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/locais.css' %}">
+<link rel="stylesheet" href="{% static 'css/locais.css' %}?v=20261104b">
 {% endblock %}
 
 {% block content %}
 <div class="locais-page">
     <div class="container-fluid px-3 px-md-5">
 
-        <!-- Hero -->
-        <div class="locais-hero">
-            <div class="locais-hero-badge">
-                <i class="fa-solid fa-location-dot"></i> Espaços disponíveis
+        <!-- Header Operacional -->
+        <div class="locais-top-bar">
+            <div class="locais-hero">
+                <div class="locais-hero-badge">
+                    <i class="fa-solid fa-location-dot"></i> Espaços disponíveis
+                </div>
+                <h1>Escolha o <span>local ideal</span></h1>
+                <p>Consulte a disponibilidade e reserve um espaço do Bloco E com poucos cliques.</p>
             </div>
-            <h1>Escolha o <span>local ideal</span></h1>
-            <p>Consulte a disponibilidade e reserve um espaço do Bloco E com poucos cliques.</p>
-        </div>
 
-        <!-- Stats -->
-        <div class="locais-stats">
-            <div class="stat-pill">
-                <i class="fa-solid fa-building-columns"></i>
-                <span><span class="stat-num">{{ locais|length }}</span> espaços disponíveis</span>
-            </div>
-            <div class="stat-pill">
-                <i class="fa-regular fa-clock"></i>
-                <span>Reservas em tempo real</span>
-            </div>
-            <div class="stat-pill">
-                <i class="fa-solid fa-check-circle"></i>
-                <span>Pedido acompanhado</span>
+            <!-- Stats -->
+            <div class="locais-stats">
+                <div class="stat-pill">
+                    <i class="fa-solid fa-building-columns"></i>
+                    <span><span class="stat-num">{{ locais|length }}</span> espaços disponíveis</span>
+                </div>
+                <div class="stat-pill">
+                    <i class="fa-regular fa-clock"></i>
+                    <span>Reservas em tempo real</span>
+                </div>
+                <div class="stat-pill">
+                    <i class="fa-solid fa-check-circle"></i>
+                    <span>Pedido acompanhado</span>
+                </div>
             </div>
         </div>
 
