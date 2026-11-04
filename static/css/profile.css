@@ -1,220 +1,302 @@
-/* Profile page styles - SaaS premium look */
-:root{
+/* =============================================
+   BE-DESK — PÁGINA DE PERFIL DO USUÁRIO
+   Layout unificado em coluna única centralizada:
+   1. Cartão de Informações do Usuário
+   2. Cartão de Atividades Recentes
+   ============================================= */
+
+:root {
   --profile-banner-height: 220px;
 }
 
-.profile-page { padding: 2rem 1rem; }
+.profile-page {
+  padding: 2rem 1rem 3.5rem;
+}
 
 .profile-page-user {
-  padding-top: 4.75rem;
+  max-width: 920px;
+  margin: 0 auto;
+  padding-top: 2rem;
 }
 
-.profile-banner {
-  height: var(--profile-banner-height);
-  border-radius: 14px;
-  background: linear-gradient(125deg, var(--bg-surface, #181b23) 0%, var(--bg-elevated, #2a2f3d) 60%);
-  position: relative;
-  overflow: hidden;
+.profile-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
 }
 
-.profile-banner::after{
-  content: '';
-  position: absolute; inset:0; pointer-events:none;
-  background-image: radial-gradient( circle at 10% 20%, var(--accent-glow, rgba(200,255,31,0.06)), transparent 12%), radial-gradient(circle at 85% 80%, rgba(80,120,200,0.03), transparent 10%);
+.profile-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: 20px;
+  padding: 1.75rem;
+  box-shadow: var(--shadow-card);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.profile-shell{ margin-top: -64px; display: grid; grid-template-columns: 1fr 360px; gap: 1.25rem; align-items:start }
-
-.profile-page-user .profile-shell {
-  margin-top: 0;
+.profile-meta {
+  display: flex;
+  gap: 1.25rem;
+  align-items: center;
 }
 
-.profile-card { background: var(--bg-card); border:1px solid var(--border-card); border-radius:12px; padding:1.1rem; box-shadow: var(--shadow-card); transition: transform 0.25s var(--ease-out, ease), box-shadow 0.25s var(--ease-out, ease), border-color 0.25s var(--ease-out, ease); }
+.profile-meta-info {
+  flex: 1;
+  min-width: 0;
+}
 
-.profile-meta { display:flex; gap:1rem; align-items:center }
-.profile-avatar { width:112px; height:112px; border-radius:999px; overflow:hidden; border:6px solid var(--border-subtle); background:linear-gradient(180deg, rgba(0,0,0,0.2), rgba(255,255,255,0.02)); box-shadow: 0 8px 36px rgba(0,0,0,0.2), 0 0 20px var(--accent-glow, rgba(200,255,31,0.06)); flex-shrink: 0; transition: box-shadow 0.25s var(--ease-out, ease); }
-.profile-avatar img{ width:100%; height:100%; object-fit:cover }
-
-.profile-name{ font-size:1.45rem; font-weight:800; color: var(--text-primary); letter-spacing: -0.01em; }
-.profile-sub{ color: var(--text-secondary); font-weight:600; margin-top: 0.2rem; }
-.profile-badges{ display:flex; gap:0.5rem; margin-top:0.7rem; flex-wrap: wrap; }
-.badge { padding:0.3rem 0.7rem; background: var(--accent-glow); color: var(--accent); font-weight:700; border-radius:999px; font-size:0.76rem; transition: opacity 0.2s ease; }
-.badge:hover { opacity: 0.82; }
-
-.profile-actions{ display:flex; gap:0.6rem }
-.btn { padding:0.5rem 0.9rem; border-radius:10px; font-weight:700; cursor:pointer }
-.btn-primary{ background: var(--accent); color: var(--text-on-accent, #071014) }
-.btn-ghost{ background:transparent; border:1px solid var(--border-card); color: var(--text-secondary) }
-
-.profile-divider { border: none; border-top: 1px solid var(--border-subtle); margin: 1.2rem 0; }
-
-.profile-card-title{ margin:0 0 1rem 0; color: var(--text-primary); font-weight:800; font-size: 1rem; letter-spacing: -0.005em; }
-.profile-card-empty{ color: var(--text-secondary); display: flex; align-items: center; gap: 0.55rem; }
-
-.security-dot {
-  width: 0.5rem;
-  height: 0.5rem;
+.profile-avatar {
+  width: 104px;
+  height: 104px;
   border-radius: 999px;
-  background: var(--accent);
-  box-shadow: 0 0 10px var(--accent-glow);
+  overflow: hidden;
+  border: 4px solid var(--border-subtle);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.2), rgba(255, 255, 255, 0.02));
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
   flex-shrink: 0;
 }
 
-.info-grid{ display:grid; grid-template-columns: repeat(2,1fr); gap:1rem }
-.info-row{ display:flex; flex-direction:column; gap:0.35rem; padding:0.9rem 1.1rem; border-radius:14px; background: var(--bg-card-hover); border: 1px solid var(--border-subtle); transition: border-color 0.2s ease, background 0.2s ease; }
-.info-row:hover { border-color: var(--accent-border); }
-.info-label{ color: var(--text-secondary); font-weight:700; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.06em; }
-.info-value{ color: var(--text-primary); font-weight:700; font-size:1.02rem; word-break:break-word; }
+.profile-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 
-.stats-grid{ display:grid; grid-template-columns: repeat(2,1fr); gap:0.8rem }
-.stat { padding:1.1rem 0.8rem; border-radius:14px; background: var(--bg-card-hover); text-align:center; border: 1px solid var(--border-subtle); }
-.stat .num{ font-weight:900; font-size:1.9rem; color: var(--text-primary); line-height: 1; }
-.stat .lbl{ display:block; margin-top: 0.4rem; color: var(--text-secondary); font-weight:700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.profile-name {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
 
-.profile-activities { margin-top: 1.25rem; }
+.profile-sub {
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  font-weight: 600;
+  margin-top: 0.25rem;
+}
+
+.profile-badges {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.7rem;
+  flex-wrap: wrap;
+}
+
+.badge {
+  padding: 0.32rem 0.75rem;
+  background: var(--accent-glow);
+  border: 1px solid var(--accent-border);
+  color: var(--accent);
+  font-weight: 600;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.badge::before {
+  content: "";
+  width: 0.38rem;
+  height: 0.38rem;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.profile-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.btn {
+  padding: 0.55rem 1rem;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--text-on-accent, #071014);
+}
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--border-card);
+  color: var(--text-secondary);
+}
+
+.profile-divider {
+  border: none;
+  border-top: 1px solid var(--border-subtle);
+  margin: 1.4rem 0;
+  opacity: 1;
+}
+
+.profile-card-title {
+  margin: 0 0 1rem 0;
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
+}
+
+.profile-card-empty {
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.info-row {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.3rem;
+  padding: 0.95rem 1.15rem;
+  border-radius: 14px;
+  background: var(--bg-card-hover);
+  border: 1px solid var(--border-subtle);
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.info-row:hover {
+  border-color: var(--accent-border);
+}
+
+.info-label {
+  color: var(--text-secondary);
+  font-weight: 700;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.info-value {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 0.96rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.profile-activities {
+  margin-top: 0;
+}
 
 .profile-empty-state {
-  padding: 1.5rem 1rem;
+  padding: 2rem 1.25rem;
   justify-content: center;
   text-align: center;
   flex-direction: column;
+  gap: 0.5rem;
   border-radius: 14px;
   background: var(--bg-card-hover);
   border: 1px dashed var(--border-card);
+  font-size: 0.92rem;
 }
-.profile-empty-state i { font-size: 1.2rem; color: var(--accent); opacity: 0.7; }
 
-.sidebar .profile-card + .profile-card{ margin-top:1rem }
+.profile-empty-state i {
+  font-size: 1.35rem;
+  color: var(--accent);
+  opacity: 0.8;
+}
 
-@media (max-width: 980px){
-  .profile-shell{ grid-template-columns:1fr; }
-  .profile-banner{ height:180px }
-  .info-grid{ grid-template-columns:1fr; }
-  .profile-card { padding: 1rem; }
+@media (max-width: 768px) {
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+  .profile-meta {
+    flex-direction: column;
+    text-align: center;
+  }
+  .profile-badges {
+    justify-content: center;
+  }
 }
 
 /* ==================================================
-   LIGHT MODE — same visual language as the Home page
-   (soft off-white backdrop, floating white cards,
-   navy titles, institutional-green accents)
+   MODO CLARO
    ================================================== */
 
-/* 1. Background — flat, solid color on <body> (like the rest of the site's
-      light-mode pages). No gradient, no 100vw/100vh tricks: the page simply
-      flows at its natural height and the body color covers it fully.
-      Uses a body class (set via {% block body_class %}) instead of
-      :has() so it works on every browser, not just the newest ones. */
 [data-theme="light"] body.profile-page-body {
   background: #f4f7fa !important;
 }
 
 [data-theme="light"] .profile-page-user {
-  padding: 2.25rem 0 3rem;
+  padding: 1.75rem 0 3.5rem;
 }
 
-[data-theme="light"] .profile-page-user .profile-banner {
-  display: none;
-}
-
-/* 3. Cards — white, soft radius, gentle shadow, floating */
 [data-theme="light"] .profile-page-user .profile-card {
   background: #ffffff;
-  border: 1px solid rgba(15, 23, 42, 0.07);
-  border-radius: 22px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 20px;
   padding: 1.75rem;
-  box-shadow: 0 18px 44px rgba(16, 35, 60, 0.06);
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.05);
 }
 
-[data-theme="light"] .profile-page-user .profile-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 24px 56px rgba(16, 35, 60, 0.09);
-  border-color: rgba(4, 120, 87, 0.16);
-}
-
-/* 4. Header do card — avatar, nome, matrícula/campus */
 [data-theme="light"] .profile-page-user .profile-avatar {
   border-color: #ffffff;
-  box-shadow: 0 10px 26px rgba(16, 35, 60, 0.12), 0 0 0 1px rgba(15, 23, 42, 0.06);
-}
-
-[data-theme="light"] .profile-page-user .profile-avatar:hover {
-  box-shadow: 0 12px 30px rgba(16, 35, 60, 0.14), 0 0 0 1px rgba(4, 120, 87, 0.18);
+  box-shadow: 0 8px 24px rgba(16, 35, 60, 0.12), 0 0 0 1px rgba(15, 23, 42, 0.08);
 }
 
 [data-theme="light"] .profile-page-user .profile-name {
-  color: #0b1830;
+  color: #0f172a;
 }
 
 [data-theme="light"] .profile-page-user .profile-sub {
   color: #5b6b82;
 }
 
-/* 5. Badges — claras, discretas, verde institucional */
 [data-theme="light"] .profile-page-user .badge {
-  background: rgba(4, 120, 87, 0.07);
-  border: 1px solid rgba(4, 120, 87, 0.18);
+  background: rgba(4, 120, 87, 0.08);
+  border: 1px solid rgba(4, 120, 87, 0.2);
   color: #047857;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
 }
 
 [data-theme="light"] .profile-page-user .badge::before {
-  content: "";
-  width: 0.4rem;
-  height: 0.4rem;
-  border-radius: 999px;
   background: #047857;
 }
 
-/* 6. Divisor sutil */
 [data-theme="light"] .profile-page-user .profile-divider {
-  border-top-color: rgba(15, 23, 42, 0.07);
+  border-top-color: rgba(15, 23, 42, 0.08);
 }
 
-/* 7–8. Painéis de informação */
 [data-theme="light"] .profile-page-user .info-row {
   background: #f8fafc;
-  border-color: rgba(15, 23, 42, 0.06);
+  border-color: rgba(15, 23, 42, 0.07);
 }
 
 [data-theme="light"] .profile-page-user .info-row:hover {
-  border-color: rgba(4, 120, 87, 0.22);
+  border-color: rgba(4, 120, 87, 0.24);
   background: #f4faf7;
 }
 
 [data-theme="light"] .profile-page-user .info-label {
-  color: #5f6e82;
+  color: #64748b;
 }
 
 [data-theme="light"] .profile-page-user .info-value {
-  color: #0b1830;
+  color: #0f172a;
 }
 
-/* 9. Estatísticas */
-[data-theme="light"] .profile-page-user .stat {
-  background: #f8fafc;
-  border-color: rgba(15, 23, 42, 0.06);
-}
-
-[data-theme="light"] .profile-page-user .stat .num {
-  color: #0b1830;
-}
-
-[data-theme="light"] .profile-page-user .stat .lbl {
-  color: #5f6e82;
-}
-
-/* 10. Segurança */
-[data-theme="light"] .profile-page-user .security-dot {
-  background: #047857;
-  box-shadow: 0 0 10px rgba(4, 120, 87, 0.4);
-}
-
-/* 11. Atividades recentes — estado vazio elegante */
 [data-theme="light"] .profile-page-user .profile-empty-state {
   background: #f8fafc;
-  border-color: rgba(15, 23, 42, 0.1);
+  border-color: rgba(15, 23, 42, 0.12);
 }
 
 [data-theme="light"] .profile-page-user .profile-empty-state i {
@@ -222,7 +304,7 @@
 }
 
 [data-theme="light"] .profile-page-user .profile-card-title {
-  color: #0b1830;
+  color: #0f172a;
 }
 
 [data-theme="light"] .profile-page-user .profile-card-empty {
@@ -231,10 +313,10 @@
 
 @media (max-width: 576px) {
   [data-theme="light"] .profile-page-user {
-    padding: 1.5rem 0.9rem 2.25rem;
+    padding: 1.25rem 0.5rem 2.5rem;
   }
   [data-theme="light"] .profile-page-user .profile-card {
     padding: 1.25rem;
-    border-radius: 18px;
+    border-radius: 16px;
   }
 }

@@ -6,7 +6,7 @@
 {% block body_class %}profile-page-body{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/profile.css' %}">
+<link rel="stylesheet" href="{% static 'css/profile.css' %}?v=20261104c">
 {% endblock %}
 
 {% block content %}
@@ -15,58 +15,74 @@
   <section class="profile-page profile-page-user">
 
     <div class="profile-shell">
-      <div>
-        <div class="profile-card">
-          <div class="profile-meta">
-            <div class="profile-avatar">
-              {% if suap_data.foto %}
-                <img src="{{ suap_data.foto }}" alt="Avatar">
-              {% else %}
-                <img src="{% static 'img/avatar-placeholder.png' %}" alt="Avatar">
+      <div class="profile-card">
+        <div class="profile-meta">
+          <div class="profile-avatar">
+            {% if suap_data.foto %}
+              <img src="{{ suap_data.foto }}" alt="Foto de perfil de {{ suap_data.nome|default:user.get_full_name|default:user.username }}">
+            {% else %}
+              <img src="{% static 'img/avatar-placeholder.png' %}" alt="Avatar">
+            {% endif %}
+          </div>
+          <div class="profile-meta-info">
+            <h1 class="profile-name">{{ suap_data.nome|default:user.get_full_name|default:user.username }}</h1>
+            <div class="profile-sub">{{ suap_data.matricula|default:user.username }} &bull; {{ suap_data.campus|default:'—' }}</div>
+            <div class="profile-badges">
+              <span class="badge">{{ user.profile.papel_label }}</span>
+              {% if suap_data.tipo_vinculo and suap_data.tipo_vinculo != user.profile.papel_label %}
+                <span class="badge">{{ suap_data.tipo_vinculo }}</span>
               {% endif %}
             </div>
-            <div style="flex:1">
-              <div class="profile-name">{{ suap_data.nome|default:user.get_full_name|default:user.username }}</div>
-              <div class="profile-sub">{{ suap_data.matricula|default:user.username }} • {{ suap_data.campus|default:'—' }}</div>
-              <div class="profile-badges">
-                <span class="badge">{{ user.profile.papel_label }}</span>
-                {% if suap_data.tipo_vinculo %}<span class="badge">{{ suap_data.tipo_vinculo }}</span>{% endif %}
-              </div>
-            </div>
-
-            <!-- ações removidas: página somente leitura -->
           </div>
+        </div>
 
-          <hr class="profile-divider">
+        <hr class="profile-divider">
 
-          <div class="info-grid">
-            <div class="info-row"><div class="info-label">Nome</div><div class="info-value">{{ suap_data.nome|default:user.get_full_name }}</div></div>
-            <div class="info-row"><div class="info-label">Matrícula</div><div class="info-value">{{ suap_data.matricula|default:user.username }}</div></div>
-            <div class="info-row"><div class="info-label">E-mail acadêmico</div><div class="info-value">{{ suap_data.email_academico|default:user.email|default:'—' }}</div></div>
-            <div class="info-row"><div class="info-label">E-mail escolar</div><div class="info-value">{{ suap_data.email_escolar|default:'—' }}</div></div>
-            <div class="info-row"><div class="info-label">Curso</div><div class="info-value">{{ suap_data.curso|default:'—' }}</div></div>
-            <div class="info-row"><div class="info-label">Campus</div><div class="info-value">{{ suap_data.campus|default:'—' }}</div></div>
-            <div class="info-row"><div class="info-label">Vínculo</div><div class="info-value">{{ suap_data.tipo_vinculo|default:'—' }}{% if suap_data.situacao %} &middot; {{ suap_data.situacao }}{% endif %}</div></div>
-            <div class="info-row"><div class="info-label">IRA</div><div class="info-value">{{ suap_data.ira|default:'—' }}</div></div>
+        <div class="info-grid">
+          <div class="info-row">
+            <div class="info-label">Nome</div>
+            <div class="info-value">{{ suap_data.nome|default:user.get_full_name|default:user.username }}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Matrícula</div>
+            <div class="info-value">{{ suap_data.matricula|default:user.username }}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">E-mail acadêmico</div>
+            <div class="info-value">{{ suap_data.email_academico|default:user.email|default:'—' }}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">E-mail escolar</div>
+            <div class="info-value">{{ suap_data.email_escolar|default:'—' }}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Curso</div>
+            <div class="info-value">{{ suap_data.curso|default:'—' }}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Campus</div>
+            <div class="info-value">{{ suap_data.campus|default:'—' }}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Vínculo</div>
+            <div class="info-value">{{ suap_data.tipo_vinculo|default:'—' }}{% if suap_data.situacao %} &middot; {{ suap_data.situacao }}{% endif %}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">IRA</div>
+            <div class="info-value">{{ suap_data.ira|default:'—' }}</div>
           </div>
         </div>
       </div>
 
-      <aside class="sidebar">
-        <div class="profile-card">
-          <h4 class="profile-card-title">Segurança</h4>
-          <div class="profile-card-empty"><span class="security-dot" aria-hidden="true"></span>Autenticação: SUAP</div>
+      <div class="profile-card profile-activities">
+        <h2 class="profile-card-title">Atividades Recentes</h2>
+        <div class="profile-card-empty profile-empty-state">
+          <i class="fa-regular fa-clock" aria-hidden="true"></i>
+          <span>Nenhuma atividade registrada.</span>
         </div>
-      </aside>
-    </div>
-
-    <div class="profile-card profile-activities">
-      <h4 class="profile-card-title">Atividades Recentes</h4>
-      <div class="profile-card-empty profile-empty-state">
-        <i class="fa-regular fa-clock" aria-hidden="true"></i>
-        Nenhuma atividade registrada.
       </div>
     </div>
+
   </section>
 </div>
 

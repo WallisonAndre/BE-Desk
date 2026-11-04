@@ -4,13 +4,43 @@
 {% block title %}Horários - {{ sala.nome }}{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/grade.css' %}">
+<link rel="stylesheet" href="{% static 'css/grade.css' %}?v=20261104b">
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid mt-4">
+<div class="container-fluid px-3 px-md-4 mt-2">
 
-    <div class="d-flex justify-content-center mb-4 mt-2">
+    <div class="grade-header">
+        <div class="grade-header-info">
+            <a href="{% url 'lista_locais' %}" class="grade-back-link">
+                <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Todos os locais
+            </a>
+            <div class="d-flex align-items-center flex-wrap gap-2 mt-1">
+                <h2 class="mb-0 text-white grade-sala-title">Horários da Sala {{ sala.nome }}</h2>
+                {% if status_semana == 'PASSADA' %}
+                <span class="badge bg-danger">HISTÓRICO</span>
+                {% endif %}
+            </div>
+            <div class="grade-meta-row mt-1">
+                <span class="text-muted">
+                    Semana de {{ faixa_datas_semana.inicio }} a {{ faixa_datas_semana.fim }}
+                </span>
+                <span class="grade-meta-dot" aria-hidden="true">&middot;</span>
+                <span class="sala-nota">
+                    {% if media_avaliacao %}
+                    <i class="fa-solid fa-star" aria-hidden="true"></i>
+                    <strong>{{ media_avaliacao|floatformat:1 }}</strong> de 5
+                    <span class="text-muted">
+                        · {{ total_avaliacoes }} avalia{{ total_avaliacoes|pluralize:"ção,ções" }} de quem já usou
+                    </span>
+                    {% else %}
+                    <i class="fa-regular fa-star" aria-hidden="true"></i>
+                    <span class="text-muted">Nenhuma avaliação ainda</span>
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+
         <div class="saas-controls-wrapper flex-wrap justify-content-center">
             <a href="{% url 'detalhe_sala' nome_sala=sala.nome %}?foco={{ semana_anterior }}"
                 class="saas-nav-btn">
@@ -43,27 +73,6 @@
             </a>
         </div>
     </div>
-    <h2 class="text-center mb-1 text-white">Horários da Sala {{ sala.nome }}</h2>
-
-    <p class="text-center mb-2 sala-nota">
-        {% if media_avaliacao %}
-        <i class="fa-solid fa-star" aria-hidden="true"></i>
-        <strong>{{ media_avaliacao|floatformat:1 }}</strong> de 5
-        <span class="text-muted">
-            · {{ total_avaliacoes }} avalia{{ total_avaliacoes|pluralize:"ção,ções" }} de quem já usou
-        </span>
-        {% else %}
-        <i class="fa-regular fa-star" aria-hidden="true"></i>
-        <span class="text-muted">Nenhuma avaliação ainda</span>
-        {% endif %}
-    </p>
-
-    <h4 class="text-center text-muted mb-4">
-        Semana de {{ faixa_datas_semana.inicio }} a {{ faixa_datas_semana.fim }}
-        {% if status_semana == 'PASSADA' %}
-        <span class="badge bg-danger ms-2">HISTÓRICO</span>
-        {% endif %}
-    </h4>
     <div class="schedule-table-container">
         <div class="table-responsive">
             <table class="schedule-table text-center">

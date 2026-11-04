@@ -2,6 +2,51 @@
    BE-DESK GRADE — Grade Semanal de Horários da Sala
    ============================================= */
 
+/* --- Header Operacional da Sala --- */
+.grade-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    padding: 0.75rem 0 1.25rem;
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.grade-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--accent);
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.grade-back-link:hover {
+    text-decoration: underline;
+}
+
+.grade-sala-title {
+    color: var(--text-primary) !important;
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 880;
+    letter-spacing: -0.02em;
+}
+
+.grade-meta-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.92rem;
+}
+
+.grade-meta-dot {
+    color: var(--text-muted);
+}
+
 /* --- Controles SaaS (Navegação de Semanas) --- */
 .saas-controls-wrapper {
     background: var(--bg-card);
@@ -64,13 +109,16 @@
 .saas-nav-btn.saas-primary-btn {
     background: var(--accent);
     color: var(--text-on-accent);
-    box-shadow: var(--shadow-glow);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.1);
 }
 .saas-nav-btn.saas-primary-btn:hover {
     background: var(--accent-dim);
     color: var(--text-on-accent);
     transform: translateY(-1px);
-    box-shadow: var(--shadow-glow);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.16);
+}
+.saas-nav-btn:active {
+    transform: scale(0.98);
 }
 
 /* Trick to make the entire hidden input clickable in webkit browsers */
@@ -100,13 +148,18 @@
     border-collapse: separate;
     border-spacing: 6px;
 }
+.schedule-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+}
 .schedule-table th {
     background: var(--bg-card);
     color: var(--text-secondary);
     text-transform: uppercase;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     font-weight: 700;
-    padding: 1rem 0.5rem;
+    padding: 0.85rem 0.5rem;
     border-radius: 0.5rem;
     letter-spacing: 0.5px;
     border: 1px solid var(--border-subtle);
@@ -192,14 +245,16 @@
     border-color: var(--border-card);
 }
 .schedule-card.status-pendente {
-    border-left: 4px solid var(--warning);
+    border-color: color-mix(in srgb, var(--warning) 42%, transparent);
+    background: color-mix(in srgb, var(--warning) 8%, var(--bg-card));
 }
 .schedule-card.status-aprovado {
-    border-left: 4px solid #b5e853;
+    border-color: var(--accent-border);
+    background: color-mix(in srgb, var(--accent) 8%, var(--bg-card));
 }
 .schedule-card.status-fixo {
-    border-left: 4px solid #60a5fa;
-    background: color-mix(in srgb, var(--info) 10%, transparent);
+    border-color: color-mix(in srgb, var(--info) 42%, transparent);
+    background: color-mix(in srgb, var(--info) 10%, var(--bg-card));
 }
 .badge-status {
     font-size: 0.65rem;

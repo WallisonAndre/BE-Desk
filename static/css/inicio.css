@@ -21,15 +21,11 @@
 .bd-home {
     position: relative;
     width: 100vw;
-    margin-top: -5.5rem;
+    margin-top: -6.5rem;
     margin-left: calc(50% - 50vw);
     margin-right: calc(50% - 50vw);
     overflow: hidden;
-    background:
-        radial-gradient(circle at 16% 5%, rgba(200, 255, 31, 0.11), transparent 28rem),
-        radial-gradient(circle at 86% 12%, rgba(75, 125, 145, 0.16), transparent 30rem),
-        radial-gradient(circle at 50% 100%, rgba(16, 33, 39, 0.92), transparent 38rem),
-        var(--home-bg);
+    background: var(--home-bg);
     color: var(--home-text);
 }
 
@@ -82,15 +78,22 @@
 }
 
 .bd-app:has(.bd-home) .pill-cta-btn {
-    min-height: 2.55rem;
-    padding: 0 1.15rem;
-    background: linear-gradient(135deg, var(--home-lime), var(--home-lime-soft));
-    box-shadow: 0 10px 28px rgba(181, 232, 83, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.44);
+    min-height: 2.4rem;
+    padding: 0 1.1rem;
+    border-radius: 999px;
+    background: var(--home-lime);
+    color: #0b120a;
+    font-weight: 600;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .bd-app:has(.bd-home) .pill-cta-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 14px 36px rgba(181, 232, 83, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.48);
+    background: #d4ff47;
+    color: #0b120a;
+}
+
+.bd-app:has(.bd-home) .pill-cta-btn:active {
+    transform: scale(0.98);
 }
 
 .bd-home::before {
@@ -128,12 +131,12 @@
 }
 
 .bd-home-hero {
-    min-height: calc(100vh - 88px);
+    min-height: calc(100vh - 76px);
     display: grid;
     grid-template-columns: minmax(0, 0.92fr) minmax(360px, 1.08fr);
     gap: clamp(2rem, 5vw, 4.5rem);
     align-items: center;
-    padding: 7.8rem 0 4.5rem;
+    padding: 8.6rem 0 4.5rem;
 }
 
 .bd-home-copy-wrap {
@@ -212,60 +215,46 @@
 
 .bd-home-btn {
     position: relative;
-    min-height: 3.4rem;
+    min-height: 2.95rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.65rem;
-    padding: 0 1.25rem;
-    border-radius: 14px;
-    font-weight: 820;
+    gap: 0.55rem;
+    padding: 0 1.35rem;
+    border-radius: 10px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
     text-decoration: none;
-    overflow: hidden;
-    transition: transform 0.22s var(--home-ease), border-color 0.22s var(--home-ease), box-shadow 0.22s var(--home-ease), background 0.22s var(--home-ease);
+    transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, box-shadow 160ms ease, transform 140ms cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .bd-home-btn-primary {
-    border: 0;
-    background: linear-gradient(135deg, var(--home-lime), var(--home-lime-soft) 58%, #dbff63);
-    color: #071006;
-    box-shadow: 0 18px 46px rgba(181, 232, 83, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.48);
-}
-
-.bd-home-btn-primary::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.34), transparent);
-    transform: translateX(-120%);
-    transition: transform 0.68s var(--home-ease);
-}
-
-.bd-home-btn-primary:hover::before {
-    transform: translateX(120%);
+    border: 1px solid transparent;
+    background: var(--home-lime);
+    color: #0b120a;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.24);
 }
 
 .bd-home-btn-secondary {
     border: 1px solid rgba(210, 225, 235, 0.16);
-    background: rgba(255, 255, 255, 0.045);
+    background: rgba(255, 255, 255, 0.04);
     color: #fff;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
 }
 
-.bd-home-btn:hover {
-    transform: translateY(-2px);
+.bd-home-btn:active {
+    transform: scale(0.98);
 }
 
 .bd-home-btn-primary:hover {
-    box-shadow: 0 24px 58px rgba(181, 232, 83, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.52);
-    color: #071006;
+    background: #d4ff47;
+    color: #0b120a;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
 }
 
 .bd-home-btn-secondary:hover {
     border-color: rgba(200, 255, 31, 0.32);
-    background: rgba(200, 255, 31, 0.07);
+    background: rgba(255, 255, 255, 0.08);
     color: #fff;
 }
 
@@ -332,9 +321,9 @@
 
 .bd-scroll-panel {
     position: relative;
-    min-height: 17rem;
+    min-height: 12.5rem;
     overflow: hidden;
-    padding: 1.2rem;
+    padding: 1.65rem 1.75rem;
     border: 1px solid rgba(210, 225, 235, 0.12);
     border-radius: 22px;
     background:
@@ -500,12 +489,12 @@
 .bd-steps-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0.9rem;
+    gap: 1.15rem;
 }
 
 .bd-step-card {
-    min-height: 14.5rem;
-    padding: 1.2rem;
+    min-height: 13.5rem;
+    padding: 1.4rem;
     border-radius: 20px;
 }
 
@@ -1016,6 +1005,14 @@
     width: 100vw;
     margin-inline: calc(50% - 50vw);
     padding-inline: calc(50vw - 50%);
+}
+
+/* A primeira faixa (hero) fica no topo da página, atrás do menu flutuante:
+   não deve ter cantos superiores arredondados para não expor faixa escura acima do menu. */
+.bd-home-hero.bd-faixa,
+.bd-faixa:first-of-type {
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
 }
 
 .bd-faixa + .bd-faixa {

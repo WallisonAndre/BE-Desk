@@ -4,8 +4,8 @@
 {% block title %}Admin - BE-Desk{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/reservas.css' %}?v=20260903">
-<link rel="stylesheet" href="{% static 'css/eventos.css' %}?v=20260814">
+<link rel="stylesheet" href="{% static 'css/reservas.css' %}?v=20261104b">
+<link rel="stylesheet" href="{% static 'css/eventos.css' %}?v=20261104b">
 {% endblock %}
 
 {% block content %}
@@ -174,33 +174,35 @@
     {% endif %}
   </section>
 
-  <!-- Horários fixos -->
-  <section class="bd-reservas-section" aria-labelledby="bd-admin-fixos">
-    <div class="bd-reservas-section-head">
-      <h2 id="bd-admin-fixos">Horários fixos</h2>
-    </div>
-    <div class="bd-ev-painel">
-      <p class="bd-ev-aviso">Treinos e atividades que ocupam um espaço toda semana, sem passar por pedido de reserva.</p>
-      <a href="{% url 'lista_horarios_fixos' %}" class="bd-ev-btn bd-ev-btn-primary">
-        <i class="fa-solid fa-repeat" aria-hidden="true"></i> Abrir horários fixos
-      </a>
-    </div>
-  </section>
+  <div class="bd-admin-bottom-grid">
+    <!-- Horários fixos -->
+    <section class="bd-reservas-section" aria-labelledby="bd-admin-fixos">
+      <div class="bd-reservas-section-head">
+        <h2 id="bd-admin-fixos">Horários fixos</h2>
+      </div>
+      <div class="bd-ev-painel">
+        <p class="bd-ev-aviso">Treinos e atividades que ocupam um espaço toda semana, sem passar por pedido de reserva.</p>
+        <a href="{% url 'lista_horarios_fixos' %}" class="bd-ev-btn bd-ev-btn-primary">
+          <i class="fa-solid fa-repeat" aria-hidden="true"></i> Abrir horários fixos
+        </a>
+      </div>
+    </section>
 
-  {% if user.is_superuser %}
-  <!-- Permissões (a view gerenciar_permissoes exige superusuário) -->
-  <section class="bd-reservas-section" aria-labelledby="bd-admin-perm">
-    <div class="bd-reservas-section-head">
-      <h2 id="bd-admin-perm">Gerenciar permissões</h2>
-    </div>
-    <div class="bd-ev-painel">
-      <p class="bd-ev-aviso">Defina quem é professor, aluno bolsista ou aluno. Apenas professores podem alterar papéis.</p>
-      <a href="{% url 'gerenciar_permissoes' %}" class="bd-ev-btn bd-ev-btn-primary">
-        <i class="fa-solid fa-user-shield" aria-hidden="true"></i> Abrir permissões
-      </a>
-    </div>
-  </section>
-  {% endif %}
+    {% if user.is_superuser %}
+    <!-- Permissões (a view gerenciar_permissoes exige superusuário) -->
+    <section class="bd-reservas-section" aria-labelledby="bd-admin-perm">
+      <div class="bd-reservas-section-head">
+        <h2 id="bd-admin-perm">Gerenciar permissões</h2>
+      </div>
+      <div class="bd-ev-painel">
+        <p class="bd-ev-aviso">Defina quem é professor, aluno bolsista ou aluno. Apenas professores podem alterar papéis.</p>
+        <a href="{% url 'gerenciar_permissoes' %}" class="bd-ev-btn bd-ev-btn-primary">
+          <i class="fa-solid fa-user-shield" aria-hidden="true"></i> Abrir permissões
+        </a>
+      </div>
+    </section>
+    {% endif %}
+  </div>
 
 </div>
 {% endblock %}
