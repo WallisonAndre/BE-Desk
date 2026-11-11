@@ -157,6 +157,34 @@
 [data-theme="light"] .bd-blog-feature-content p,
 [data-theme="light"] .bd-blog-card-body p { color: #475569 !important; }
 [data-theme="light"] .bd-blog-meta span { color: #5f6e82 !important; }
+/* Article content (post detail) */
+[data-theme="light"] .bd-blog-article-content {
+  color: #334155 !important;
+}
+[data-theme="light"] .bd-blog-article-content p,
+[data-theme="light"] .bd-blog-article-content li,
+[data-theme="light"] .bd-blog-article-content span {
+  color: #334155 !important;
+}
+[data-theme="light"] .bd-blog-article-content h1,
+[data-theme="light"] .bd-blog-article-content h2,
+[data-theme="light"] .bd-blog-article-content h3,
+[data-theme="light"] .bd-blog-article-content h4,
+[data-theme="light"] .bd-blog-article-content h5,
+[data-theme="light"] .bd-blog-article-content h6,
+[data-theme="light"] .bd-blog-article-content strong,
+[data-theme="light"] .bd-blog-article-content b {
+  color: #0f172a !important;
+}
+[data-theme="light"] .bd-blog-article-content a {
+  color: #047857 !important;
+}
+[data-theme="light"] .bd-blog-article-content hr {
+  border-color: rgba(15, 23, 42, 0.12) !important;
+}
+[data-theme="light"] .bd-blog-article-meta span {
+  color: #64748b !important;
+}
 /* Section heading */
 [data-theme="light"] .bd-blog-section-heading h2 { color: #0f172a !important; }
 [data-theme="light"] .bd-blog-count {
