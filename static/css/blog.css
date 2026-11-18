@@ -526,7 +526,7 @@
 .bd-blog-article-content {
   padding: clamp(1.25rem, 3vw, 2.25rem);
   border-radius: 18px;
-  color: rgba(247, 249, 243, 0.86);
+  color: var(--blog-text);
   font-size: 1.04rem;
   line-height: 1.85;
 }
@@ -1607,3 +1607,34 @@
   background: #047857;
   color: #ffffff;
 }
+
+/* Conteúdo do artigo — modo claro */
+[data-theme="light"] .bd-blog-article-content {
+  background: #ffffff;
+  color: #334155;
+  border-color: rgba(15, 23, 42, 0.08);
+}
+
+[data-theme="light"] .bd-blog-article-content p,
+[data-theme="light"] .bd-blog-article-content li,
+[data-theme="light"] .bd-blog-article-content span {
+  color: #334155;
+}
+
+[data-theme="light"] .bd-blog-article-content h1,
+[data-theme="light"] .bd-blog-article-content h2,
+[data-theme="light"] .bd-blog-article-content h3,
+[data-theme="light"] .bd-blog-article-content h4,
+[data-theme="light"] .bd-blog-article-content strong,
+[data-theme="light"] .bd-blog-article-content b {
+  color: #0f172a;
+}
+
+[data-theme="light"] .bd-blog-article-content a {
+  color: #047857;
+}
+
+[data-theme="light"] .bd-blog-article-content hr {
+  border-color: rgba(15, 23, 42, 0.12);
+}
+
